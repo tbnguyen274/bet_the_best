@@ -8,7 +8,7 @@ pygame.init()
 window_width = 1280
 window_height = 720
 screen = pygame.display.set_mode((window_width,window_height))
-pygame.display.set_caption("Bet for Best")
+pygame.display.set_caption("Bet The Best")
 icon = pygame.image.load('./assets/icons/game-icon.png')
 pygame.display.set_icon(icon)
 
@@ -162,10 +162,11 @@ help_pop = pygame.image.load('./assets/BG-pic/help.png').convert()
 pygame.transform.scale(help_pop,(window_width,window_height))
 help_running = False
 
-
-lobby_running = True
 def lobby():
     for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
         if event.type == MUSIC_END:
             play_next_track()
 
@@ -179,14 +180,10 @@ def lobby():
 
 
 #Chay game
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+
+while True:
     
-    if lobby_running:
-        lobby()
+    lobby()
     
 
 
