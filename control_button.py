@@ -1,15 +1,6 @@
-import pygame
-import sys
 import cv2
+import pygame
 pygame.init()
-
-WIDTH, HEIGHT = 1280, 720
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('CONTROL')
-clock = pygame.time.Clock()
-
-bg1 = cv2.VideoCapture('assets/videos/jungle_background.mp4')
-
 def loop_background(video_capture):
     ret, frame = video_capture.read()
     if not ret:
@@ -20,8 +11,48 @@ def loop_background(video_capture):
     pygame_frame = pygame.image.frombuffer(frame_resized.tobytes(), frame_resized.shape[1::-1], "RGB")
     screen.blit(pygame_frame, (0, 0))
 
+
+class ToggleButton:
+    def __init__(self, x, y, image_path, scale=1.0):
+        self.x = x
+        self.y = y
+        self.image_path = image_path
+        self.original_image = pygame.image.load(self.image_path)
+        self.scale = scale
+        self.image = pygame.transform.scale(self.original_image, (int(self.original_image.get_width() * scale),
+                                                                 int(self.original_image.get_height() * scale)))
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.clicked = False
+        self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+
+    def draw(self, screen):
+        border_size = 3  # Kích thước viền màu vàng
+
+        # Tạo hình chữ nhật viền với kích thước lớn hơn nút
+        border_rect = pygame.Rect(self.rect.x - border_size, self.rect.y - border_size,
+                                  self.rect.width + border_size * 2, self.rect.height + border_size * 2)
+
+        if self.clicked:
+            pygame.draw.rect(screen, (255, 255, 0), border_rect, border_size)  # Vẽ viền màu vàng lớn hơn nút
+
+        screen.blit(self.image, self.rect.topleft)
+
+    @staticmethod
+    def check_click(event, buttons):
+        for button in buttons:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button.rect.collidepoint(event.pos):
+                    button.clicked = not button.clicked  # Toggle button state
+                    button.click_sound.play()  # Play click sound
+
+                    # Disable other buttons when a button is clicked
+                    if button.clicked:
+                        for other_button in buttons:
+                            if other_button != button:
+                                other_button.clicked = False
+
 class Button():
-    def __init__(self,x,y,image,scale):
+    def __init__(self,x,y,image, scale):
         width = image.get_width()
         height = image.get_height()
         self.x = x
@@ -35,8 +66,7 @@ class Button():
         self.image_alpha.set_alpha(160)
 
     def draw(self):
-        click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
-        click_sound.set_volume(0.3)
+        click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
         cursor_pos = pygame.mouse.get_pos()
         if self.image_rect.collidepoint(cursor_pos):
             screen.blit(self.image_alpha,(self.image_rect.x,self.image_rect.y))
@@ -50,157 +80,101 @@ class Button():
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-underwater = pygame.image.load('assets/BG-pic/underwater.jpg')
-jungle = pygame.image.load('assets/BG-pic/jungle.jpg')
-galaxy = pygame.image.load('assets/BG-pic/galaxy.jpg')
+shortRace = ToggleButton (280, 500, 'assets/icons/buttons/button_short.png')
+midRace = ToggleButton (530, 500, 'assets/icons/buttons/button_medium.png')
+longRace = ToggleButton (780, 500, 'assets/icons/buttons/button_long.png')
 
-# Tạo một list để lưu trữ các hình ảnh
-set12_images = []
-set6_images = []
-set10_images = []
-# Load các hình ảnh từ 'Set 12' từ 1 đến 6
-for i in range(1, 7):
-    image_path = f"assets/sets/Set 12/{i}.png"
-    loaded_image = pygame.image.load(image_path)
-    set12_images.append(loaded_image)
-    image_path = f"assets/sets/Set 6/{i}.png"
-    loaded_image = pygame.image.load(image_path)
-    set6_images.append(loaded_image)
-    image_path = f"assets/sets/Set 10/{i}.png"
-    loaded_image = pygame.image.load(image_path)
-    set10_images.append(loaded_image)
+set12_uw = ToggleButton(400, 300, 'assets/sets/Set 12/1.png', 0.3)
 
-underwaterButton = Button(80, 70, underwater, 0.25)
-jungleButton = Button(480, 70, jungle, 0.25)
-galaxyButton = Button (880, 70, galaxy, 0.25)
+set13_j = ToggleButton(400, 300, 'assets/sets/Set 13/1.png', 0.3)
+set6_j = ToggleButton(600, 300, 'assets/sets/Set 6/1.png', 0.3)
 
-##Nhan vat set12##
-set12_1Button = Button (80, 300, set12_images[0], 0.2)
-set12_2Button = Button (250, 300, set12_images[1], 0.2)
-set12_3Button = Button (450, 300, set12_images[2], 0.2)
-set12_4Button = Button (600, 300, set12_images[3], 0.2)
-set12_5Button = Button (770, 300, set12_images[4], 0.2)
-set12_6Button = Button (980, 300, set12_images[5], 0.2)
-##Nhan vat set6###
-set6_1Button = Button (80, 300, set6_images[0], 0.2)
-set6_2Button = Button (250, 300, set6_images[1], 0.17)
-set6_3Button = Button (450, 300, set6_images[2], 0.17)
-set6_4Button = Button (600, 300, set6_images[3], 0.2)
-set6_5Button = Button (770, 300, set6_images[4], 0.2)
-set6_6Button = Button (980, 300, set6_images[5], 0.2)
-##Nhan vat set10###
-set10_1Button = Button (80, 300, set10_images[0], 0.2)
-set10_2Button = Button (250, 300, set10_images[1], 0.2)
-set10_3Button = Button (450, 300, set10_images[2], 0.2)
-set10_4Button = Button (600, 300, set10_images[3], 0.2)
-set10_5Button = Button (770, 300, set10_images[4], 0.2)
-set10_6Button = Button (980, 300, set10_images[5], 0.2)
+set11_g = ToggleButton(400, 300, 'assets/sets/Set 11/1.png', 0.3)
+set10_g = ToggleButton(600, 300, 'assets/sets/Set 10/1.png', 0.3)
 
-# Main game loop
-# Trong vòng lặp game loop, kiểm tra khi nào người dùng nhấn vào underwaterButton
-# Khởi tạo các biến để kiểm soát trạng thái hiển thị của các set Button
-show_set12_buttons = False
-previous_show_set12_buttons = False
-show_set6_buttons = False
-previous_show_set6_buttons = False
-show_set10_buttons = False
-previous_show_set10_buttons = False
+underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
+jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
+galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
 
-def race_select():
-    show_set12_buttons = False
-    show_set6_buttons = False
-    show_set10_buttons = False
-    show_set12_1_button_only = False
-    show_set6_1_button_only = False
-    show_set10_1_button_only = False
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if underwaterButton.image_rect.collidepoint(event.pos):
-                    show_set12_buttons = False
-                    show_set6_buttons = False
-                    show_set6_1_button_only = False
-                    show_set12_1_button_only = True
-                    show_set10_1_button_only = False
+next_img = pygame.image.load('assets/icons/return.png')
+next_img = pygame.transform.flip(next_img, True, False)
+next = Button(1120, 600, next_img , 0.2)
+WIDTH, HEIGHT = 1280, 720
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
 
-                elif jungleButton.image_rect.collidepoint(event.pos):
-                    show_set12_buttons = False
-                    show_set12_1_button_only = False
-                    show_set6_1_button_only = True
-                    show_set10_1_button_only = False
-                    show_set10_buttons = False
-                    show_set6_buttons = False
 
-                elif galaxyButton.image_rect.collidepoint(event.pos):
-                    show_set12_buttons = False
-                    show_set6_buttons = False
-                    show_set10_1_button_only = True
-                    show_set12_1_button_only = False
-                    show_set6_1_button_only = False
+check_j = False
+check_uw = False
+check_g = False
+activated_buttons = []
+running = True
+while running:
+    screen.fill((255, 255, 255))
+    bg = loop_background(cv2.VideoCapture('assets/videos/jungle_background.mp4'))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        ToggleButton.check_click(event, [underwater, jungle, galaxy])
+        if jungle.clicked:
+            check_j = True
+            ToggleButton.check_click(event, [set6_j, set13_j])
+        else:
+            check_j = False
 
-                if set12_1Button.image_rect.collidepoint(event.pos):
-                    if show_set12_1_button_only:
-                        if not show_set12_buttons:
-                            show_set12_buttons = True
-                        else:
-                            show_set12_buttons = False
-                            #show_set12_1_button_only = False
+        if galaxy.clicked:
+            check_g = True
+            ToggleButton.check_click(event, [set10_g, set11_g])
+        else:
+            check_g = False
 
-                if set6_1Button.image_rect.collidepoint(event.pos):
-                    if show_set6_1_button_only:
-                        if not show_set6_buttons:
-                            show_set6_buttons = True
-                        else:
-                            show_set6_buttons = False
-                            #show_set6_1_button_only = False
+        ToggleButton.check_click(event, [midRace, longRace, shortRace])
 
-                if set10_1Button.image_rect.collidepoint(event.pos):
-                    if show_set10_1_button_only:
-                        if not show_set10_buttons:
-                            show_set10_buttons = True
-                        else:
-                            show_set10_buttons = False
+        if next.clicked:
+            activated_buttons = []
+            if jungle.clicked:
+                activated_buttons.append('jungle')
+            elif underwater.clicked:
+                activated_buttons.append('underwater')
+            elif galaxy.clicked:
+                activated_buttons.append('galaxy')
 
-        loop_background(bg1)
-        underwaterButton.draw()
-        jungleButton.draw()
-        galaxyButton.draw()
+            if set6_j.clicked:
+                activated_buttons.append('set6_j')
+            elif set13_j.clicked:
+                activated_buttons.append('set13_j')
+            elif set10_g.clicked:
+                activated_buttons.append('set10_g')
+            elif set11_g.clicked:
+                activated_buttons.append('set11_g')
 
-        if show_set12_buttons:
-            set12_1Button.draw()
-            set12_2Button.draw()
-            set12_3Button.draw()
-            set12_4Button.draw()
-            set12_5Button.draw()
-            set12_6Button.draw()
-        elif show_set12_1_button_only:
-            set12_1Button.draw()
+            if midRace.clicked:
+                activated_buttons.append('mid')
+            elif longRace.clicked:
+                activated_buttons.append('long')
+            elif shortRace.clicked:
+                activated_buttons.append('short')
 
-        if show_set6_buttons:
-            set6_1Button.draw()
-            set6_2Button.draw()
-            set6_3Button.draw()
-            set6_4Button.draw()
-            set6_5Button.draw()
-            set6_6Button.draw()
-        elif show_set6_1_button_only:
-            set6_1Button.draw()
+    if check_j:
+        set6_j.draw(screen)
+        set13_j.draw(screen)
+    if check_g:
+        set10_g.draw(screen)
+        set11_g.draw(screen)
 
-        if show_set10_buttons:
-            set10_1Button.draw()
-            set10_2Button.draw()
-            set10_3Button.draw()
-            set10_4Button.draw()
-            set10_5Button.draw()
-            set10_6Button.draw()
-        elif show_set10_1_button_only:
-            set10_1Button.draw()
+    underwater.draw(screen)
+    galaxy.draw(screen)
+    jungle.draw(screen)
+    longRace.draw(screen)
+    midRace.draw(screen)
+    shortRace.draw(screen)
+    next.draw()
 
-        pygame.display.update()
-        clock.tick(30)
+    pygame.display.flip()
+    clock.tick(30)
 
-while True:
-    race_select()
+
+pygame.quit()
+for btn in activated_buttons:
+    print(btn)
+
