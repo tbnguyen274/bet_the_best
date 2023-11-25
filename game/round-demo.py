@@ -48,7 +48,7 @@ num_players = 6
 
 # Adjust starting positions and y-coordinates
 players = [{"x": 0, "y": 110 +85*i,
-            "speed": random.uniform(2, 5), "speed_multiplier": 1.0, "power_up_timer": 0, "power_up": None, "image": image,
+            "speed": random.uniform(1, 3), "speed_multiplier": 1.0, "power_up_timer": 0, "power_up": None, "image": image,
             "normal_image": pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (player_size, player_size)),
             "turnaround_image": pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (player_size, player_size)),
             "current_image": pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (player_size, player_size)),  # Dùng để lưu ảnh hiện tại của người chơi
@@ -67,8 +67,8 @@ def apply_power_up(player):
     elif player["power_up"] == "SlowDown":
         player["speed_multiplier"] = 0.5
     elif player["power_up"] == "TurnAround":
-        player["speed_multiplier"] *= -1.0  # Đảo chiều tốc độ
         player["current_image"] = player["turnaround_image"]
+        player["speed_multiplier"] *= -1.0  # Đảo chiều tốc độ
     elif player["power_up"] == "GoBack":
         player["x"] -= width - player_size
     elif player["power_up"] == "StraightToFinish":
@@ -94,7 +94,7 @@ while running:
                 player["x"] += player["speed"] * player["speed_multiplier"]
             else:
                 player["current_image"] = player["normal_image"]
-                player["x"] += random.uniform(2, 5)  # Tốc độ ngẫu nhiên       
+                player["x"] += random.uniform(1, 3)  # Tốc độ ngẫu nhiên       
 
             # Check for boundaries
             if player["x"] < 0:
@@ -141,7 +141,7 @@ while running:
     pygame.display.flip()
 
     # Set frames per second
-    clock.tick(30)  # 30 fps
+    clock.tick(60)  # 30 fps
 
 # Quit Pygame
 pygame.quit()
