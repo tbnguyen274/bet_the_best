@@ -88,7 +88,7 @@ pygame.init()
 # Tao cua so trinh dang nhap
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 login_icon = pygame.image.load('./assets/icons/lock.png')
-pygame.display.set_caption('Login')
+pygame.display.set_caption('Bet the Best - Login')
 pygame.display.set_icon(login_icon)
 
 # loop bacground
@@ -225,15 +225,15 @@ return_button = pygame.image.load('./assets/icons/return2.png').convert_alpha()
 return_button = pygame.transform.scale(return_button,(70,70))
 return_button_rect = return_button.get_rect(topleft = (form_x + form_indent, form_y+form_indent))
 
-
+# Thiết lập độ dài, tọa độ các nút
 facerecognition_register_button_w = (form_width - form_indent*2) // 3
 facerecognition_button_width = form_width - form_indent*2
 facerecognition_button_height = 40
 facerecognition_login_button_h = 50
-
 fr_register_button_rect = pygame.Rect(form_x + form_indent, form_y + form_height - 160, facerecognition_register_button_w, facerecognition_button_height)
 fr_login_button_rect = pygame.Rect(form_x + form_indent, form_y + form_height - 100, facerecognition_button_width, facerecognition_login_button_h)
 
+# Khung hiển thị Camera
 cam_width = (form_width - form_indent*6)
 cam_height = (cam_width*9)//16
 cam_x = form_x+ form_indent*3
@@ -241,11 +241,11 @@ cam_y = form_y+form_indent
 cam_border = pygame.Rect(cam_x-2, cam_y-2 , cam_width+4, cam_height+4)  # Register button
 
 # Hien thi chu trong face recognition
-fr_pop_empty = login_pop_up("Enter username!", ORANGE, form_x + form_width - 300, fr_register_button_rect.y - 30)
-fr_pop_regsuccess = login_pop_up("Account created!", GREEN, form_x + form_width - 300, fr_register_button_rect.y - 30)
-fr_pop_noface = login_pop_up("No face detected!", RED, form_x + form_width - 300, fr_register_button_rect.y - 30)
-fr_pop_regexist = login_pop_up("User already exist!", PURPLE, form_x + form_width - 300, fr_register_button_rect.y - 30)
-fr_pop_loginfail = login_pop_up("User doesn't exist!", NEONGREEN, form_x + form_width - 300, fr_register_button_rect.y - 30)
+fr_pop_empty = login_pop_up("Enter username!", ORANGE, form_x + form_width - 330, fr_register_button_rect.y - 40)
+fr_pop_regsuccess = login_pop_up("Account created!", GREEN, form_x + form_width - 330, fr_register_button_rect.y - 40)
+fr_pop_noface = login_pop_up("No face detected!", RED, form_x + form_width - 330, fr_register_button_rect.y - 40)
+fr_pop_regexist = login_pop_up("User already exist!", PURPLE, form_x + form_width - 330, fr_register_button_rect.y - 40)
+fr_pop_loginfail = login_pop_up("User doesn't exist!", NEONGREEN, form_x + form_width - 330, fr_register_button_rect.y - 40)
 
 # nút và hiển thị chữ của nhận diện km
 def facerecognition_login_GUI():
@@ -279,54 +279,48 @@ def facerecognition_login_GUI():
     else:
         display_text(form_x + form_indent + fr_button_gap + facerecognition_register_button_w + 10, fr_register_button_rect.y + 10, fr_username, BLACK, 32)
 
-process_facerecognition = False
-fr_register_button_clicked = False
-fr_login_button_clicked = False
-
-##############################################################################################
-state_login_password = True
-state_login_facerec = False
+###############################################   HIỂN THỊ ĐĂNG NHẬP BẰNG MẬT KHẨU###########################################################
 start_time = 0
 def display_password_state():
-    # Khai báo các biến Global
     global start_time, pop_loginfail_display, pop_regexist_display, pop_regsuccess_display, pop_empty_display, username, password, input_active, state_login_password, state_login_facerec
     
+    # Vẽ giao diện password
     fr_login_button_rect, fr_register_button_rect = password_login_GUI()
-            
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            if facerecognition_rect.collidepoint(mouse_pos) and not state_login_facerec:
+            mouse_pos = pygame.mouse.get_pos() # Lấy vị trí chuột
+            if facerecognition_rect.collidepoint(mouse_pos) and not state_login_facerec: # Nếu nhấn nút này, chuyển sang giao diện đăng nhập khuôn mặt
                 state_login_password = False
                 state_login_facerec = True
                 username = ''
                 password = ''
             elif fr_login_button_rect.collidepoint(mouse_pos):
-                if isempty(username) or isempty(password):
+                if isempty(username) or isempty(password): # Chừa trống, cảnh báo
                     pop_empty_display = True
                     start_time = pygame.time.get_ticks()
-                elif validate_login(username, password):
+                elif validate_login(username, password): # Nếu đúng mật khẩu, vào game
                     login_success()
                 else:
-                    pop_loginfail_display = True
+                    pop_loginfail_display = True # Nếu sai thì thông báo
                     start_time = pygame.time.get_ticks()
             elif fr_register_button_rect.collidepoint(mouse_pos):
-                if isempty(username) or isempty(password):
+                if isempty(username) or isempty(password): # Chừa trống, cảnh báo
                     pop_empty_display = True
                     start_time = pygame.time.get_ticks()
-                elif username in user_data:
+                elif username in user_data: # Nếu tên ng chơi đã tồn tại, thông báo
                     pop_regexist_display = True
                     start_time = pygame.time.get_ticks()
-                else:
+                else: # Nếu không bị gì, đky
                     register_user(username,password)
                     username = ''
                     password = ''
                     pop_regsuccess_display = True
                     start_time = pygame.time.get_ticks()
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN: # Cập nhật chuỗi nhận kí tự để in ra màn hình
             if event.key == pygame.K_TAB:
                 input_active['username'] = not input_active['username']
                 input_active['password'] = not input_active['password']
@@ -339,14 +333,15 @@ def display_password_state():
                 else:
                     username += event.unicode
             elif input_active['password']:
-                if event.key == pygame.K_RETURN:
-                    login_success()
+                if event.key == pygame.K_RETURN: # Sau khi đã nhập mật khẩu vào ô thứ 2, nhấn enter để vào game cũng dc
+                    if validate_login(username, password):
+                        login_success()
                 elif event.key == pygame.K_BACKSPACE:
                     password = password[:-1]
                 else:
                     password += event.unicode
     
-    # Chữ hiển thị trạng thái đăng nhập
+    # Chữ hiển thị trạng thái đăng nhập trong 1,5s
     current_time = pygame.time.get_ticks()
     elapsed_time = current_time - start_time
     
@@ -362,16 +357,22 @@ def display_password_state():
     else:
         pop_loginfail_display = pop_empty_display = pop_regexist_display = pop_regsuccess_display = False
 
+###############################################   HIỂN THỊ ĐĂNG NHẬP BẰNG KHUÔN MẶT  ###########################################################
+
+# Các biến để thực hiện chức năng trong giao diện khuôn mặt
+process_facerecognition = False
+fr_register_button_clicked = False
+fr_login_button_clicked = False
+
 def display_state_facerecognition():
-    # khai bao bien global
     global start_time, process_facerecognition, fr_register_button_clicked, fr_login_button_clicked, input_active, fr_username, state_login_facerec, state_login_password, fr_pop_empty_display, fr_pop_noface_display, fr_pop_regsuccess_display, fr_pop_regexist_display, fr_pop_loginfail_display
     ret, frame = cam_capture.read()
 
+    # Tạo khung để chiếu lên màn hình trực quan (Camera feed)
     frame = cv2.resize(frame, (cam_width,cam_height))
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame_surface = pygame.image.frombuffer(frame.flatten(), (cam_width,cam_height), 'RGB')
     
-    #Ve camera feed
     pygame.draw.rect(window, BLACK, cam_border) #Ve vien
     window.blit(frame_surface, (cam_x, cam_y))  # Display camera feed in the square
     facerecognition_login_GUI() #Chay ham ve nut
@@ -383,17 +384,17 @@ def display_state_facerecognition():
             pygame.quit()
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if return_button_rect.collidepoint(mouse_pos) and not state_login_password:  # Check if return_button is clicked in the face recognition interface
+            if return_button_rect.collidepoint(mouse_pos) and not state_login_password:  # Chuyển giao diện nếu ấn nút này
                 state_login_password = True
                 state_login_facerec = False
                 fr_username = ''
             elif fr_register_button_rect.collidepoint(mouse_pos):
                 fr_register_button_clicked = True
-                process_facerecognition = True
+                process_facerecognition = True # Chỉ thực hiện gương mặt khi nhấn nút -> tối ưu cho hiệu suất, tránh gây nặng cpu, tương tự với nút đăng nhập
             elif fr_login_button_rect.collidepoint(mouse_pos):
                 fr_login_button_clicked = True
                 process_facerecognition = True
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN: # Cập nhật chuỗi username
             if event.key == pygame.K_TAB:
                 input_active['fr_username'] = not input_active['fr_username']
             elif input_active['fr_username']:
@@ -408,30 +409,59 @@ def display_state_facerecognition():
         big_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         face_locations = face_recognition.face_locations(big_frame)
 
-        if len(face_locations) > 0:
+        if len(face_locations) > 0: # Kiểm tra có detect dc khuôn mặt không
             face_encodings = face_recognition.face_encodings(big_frame, face_locations)
             for face_encoding in face_encodings:
                 if fr_register_button_clicked:
-                    if isempty(fr_username):
-                        fr_pop_empty_display = True
-                    elif fr_username in json.load(open(DATABASE, 'r+')):
-                        fr_pop_regexist_display = True
-                    else: 
-                        register_user_facerecognition(fr_username, face_encoding)
-                        fr_pop_regsuccess_display = True
-                    start_time = pygame.time.get_ticks()
-                    fr_register_button_clicked = False
-                elif fr_login_button_clicked:
+                    face_encodings_from_db = []
                     with open(DATABASE) as file:
                         data = json.load(file)
-                        for username, user_data in data.items():
-                            known_face_encoding = np.array(user_data['face_encoding'])
-                            match = face_recognition.compare_faces([known_face_encoding], face_encoding)
-                            if match[0]:
-                                login_success()
-                            else:
-                                fr_pop_loginfail_display = True
-                                start_time = pygame.time.get_ticks()
+                        for user_data in data.values():
+                            face_encodings_from_db.append(np.array(user_data['face_encoding']))
+
+                        # Check if the new face encoding matches any face encoding in the database
+                    face_encoding_exists = False
+                    for known_face_encoding in face_encodings_from_db:
+                        if known_face_encoding.shape == (0,):  # Skip empty face encodings
+                            continue
+                        match = face_recognition.compare_faces([known_face_encoding], face_encoding)
+                        if match[0]:
+                            face_encoding_exists = True
+                            break
+
+                    if face_encoding_exists: # Nếu tồn tại rồi thì ko cho đăng kí
+                        fr_pop_regexist_display = True
+                        start_time = pygame.time.get_ticks()
+                    elif isempty(fr_username): # Chừa trống, không cho đki
+                        fr_pop_empty_display = True
+                        start_time = pygame.time.get_ticks()
+                    else: # Không có vấn đề gì thì đky
+                        register_user_facerecognition(fr_username, face_encoding)
+                        fr_pop_regsuccess_display = True
+                        start_time = pygame.time.get_ticks()
+                    fr_register_button_clicked = False
+                elif fr_login_button_clicked:
+                    face_encodings_from_db = []
+                    with open(DATABASE) as file:
+                        data = json.load(file)
+                        for user_data in data.values():
+                            face_encodings_from_db.append(np.array(user_data['face_encoding']))
+
+                    # Check if the new face encoding matches any face encoding in the database
+                    face_encoding_exists = False
+                    for known_face_encoding in face_encodings_from_db:
+                        if known_face_encoding.shape == (0,):  # Skip empty face encodings
+                            continue
+                        match = face_recognition.compare_faces([known_face_encoding], face_encoding)
+                        if match[0]:
+                            face_encoding_exists = True
+                            break
+
+                    if face_encoding_exists:
+                        login_success()
+                    else:
+                        fr_pop_loginfail_display = True
+                        start_time = pygame.time.get_ticks()
                     fr_login_button_clicked = False
         elif fr_register_button_clicked or fr_login_button_clicked:
             fr_pop_noface_display = True
@@ -439,8 +469,9 @@ def display_state_facerecognition():
             fr_register_button_clicked = False
             fr_login_button_clicked = False
 
-    process_facerecognition = False
+    process_facerecognition = False # Dừng nhận diện sau khi chạy xong
 
+    # Hiển thị chữ thông báo 1,5s
     current_time = pygame.time.get_ticks()
     elapsed_time = current_time - start_time
     if elapsed_time < 1500:
@@ -452,15 +483,16 @@ def display_state_facerecognition():
             fr_pop_regsuccess.pop()
         elif fr_pop_regexist_display:
             fr_pop_regexist.pop()
-        if fr_pop_loginfail_display:
+        elif fr_pop_loginfail_display:
             fr_pop_loginfail.pop()
     else:
         fr_pop_empty_display = fr_pop_noface_display = fr_pop_regsuccess_display = fr_pop_regexist_display = fr_pop_loginfail_display = False
 
 # khối lệnh sẽ dc thực hiện khi đăng nhập thành công
 def login_success():
-    print("Welcome " + username + "!, entering the game...")
+    print("entering the game...")
     pygame.mixer.music.stop()
+    
 
 ##################################################  CHAY GAME  #########################################################
 
@@ -469,6 +501,10 @@ login_music = ('./assets/musics/login_music.mp3')
 pygame.mixer.music.load(login_music)
 pygame.mixer.music.set_volume(0.3)
 pygame.mixer.music.play(loops=-1)
+
+# Trạng thái hiển thị
+state_login_password = True
+state_login_facerec = False
 
 # Chạy game
 while True:
