@@ -1,10 +1,8 @@
 import cv2
+import sys
 import pygame
 pygame.init()
-
-
 class VideoPlayer:
-
     def __init__(self, video_path):
         self.video_capture = cv2.VideoCapture(video_path)
         pygame.init()
@@ -80,7 +78,7 @@ class ToggleButton2:
         self.clicked_image = self.darken_image(self.original_image)  # Tạo hình ảnh sậm đi khi nút được nhấn
         self.rect_clicked = self.clicked_image.get_rect(topleft=(x, y))
         self.clicked = False
-        self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+        self.click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
 
     def darken_image(self, image):
         # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
@@ -178,105 +176,152 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 
-check_j = False
-check_uw = False
-check_g = False
-check_next = False
-bgdf = True
-activated_buttons = []
-running = True
-while running:
-    screen.fill((255, 255, 255))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if next.clicked:
-            # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
-            activated_buttons = []
-            if jungle.clicked:
-                activated_buttons.append('jungle')
-            elif underwater.clicked:
-                activated_buttons.append('underwater')
-            elif galaxy.clicked:
-                activated_buttons.append('galaxy')
 
-            if set6_j.clicked:
-                activated_buttons.append('set6_j')
-            elif set13_j.clicked:
-                activated_buttons.append('set13_j')
-            elif set10_g.clicked:
-                activated_buttons.append('set10_g')
-            elif set11_g.clicked:
-                activated_buttons.append('set11_g')
-            elif set12_uw.clicked:
-                activated_buttons.append('set12_uw')
 
-            if midRace.clicked:
-                activated_buttons.append('mid')
-            elif longRace.clicked:
-                activated_buttons.append('long')
-            elif shortRace.clicked:
-                activated_buttons.append('short')
+class selector:
+    def __init__(self):
+        pygame.init()
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((1280, 720))
 
-            if len(activated_buttons) == 3:
-                 check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM CLICK
+        self.shortRace = ToggleButton2(280, 600, 'assets/icons/buttons/button_short.png')
+        self.midRace = ToggleButton2(530, 600, 'assets/icons/buttons/button_medium.png')
+        self.longRace = ToggleButton2(780, 600, 'assets/icons/buttons/button_long.png')
 
-        if not check_next:
-            ToggleButton.check_click(event, [underwater, jungle, galaxy])
-            if jungle.clicked:
-                check_j = True
-                ToggleButton.check_click(event, [set6_j, set13_j])
+        self.set12_uw = ToggleButton(470, 330, 'assets/sets/Set 12/1.png', 0.3)
+        self.set13_j = ToggleButton(470, 330, 'assets/sets/Set 13/1.png', 0.3)
+        self.set6_j = ToggleButton(660, 330, 'assets/sets/Set 6/1.png', 0.3)
+        self.set11_g = ToggleButton(470, 330, 'assets/sets/Set 11/1.png', 0.3)
+        self.set10_g = ToggleButton(660, 330, 'assets/sets/Set 10/1.png', 0.3)
+
+        self.set12_char = []
+        self.set11_char = []
+        self.set10_char = []
+        self.set6_char = []
+
+        self.underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
+        self.jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
+        self.galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
+
+        self.next_img = pygame.image.load('assets/icons/return.png')
+        self.next_img = pygame.transform.flip(self.next_img, True, False)
+        self.next = Button(1120, 600, self.next_img, 0.2)
+
+        self.bg_default = 'assets/videos/tunnel.mp4'
+        self.bg_default_loop = VideoPlayer(self.bg_default)
+        self.bg_uw = 'assets/videos/underwater_background.mp4'
+        self.bg_uw_loop = VideoPlayer(self.bg_uw)
+        self.bg_j = 'assets/videos/jungle_background.mp4'
+        self.bg_j_loop = VideoPlayer(self.bg_j)
+        self.bg_g = 'assets/videos/galaxy_background.mp4'
+        self.bg_g_loop = VideoPlayer(self.bg_g)
+
+    def select(self):
+        check_j = False
+        check_uw = False
+        check_g = False
+        check_next = False
+        activated_buttons = []
+        running = True
+        self.screen.fill((255, 255, 255))
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
+                if self.next.clicked:
+                    # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
+                    activated_buttons = []
+                    if self.jungle.clicked:
+                        activated_buttons.append('jungle')
+                    elif self.underwater.clicked:
+                        activated_buttons.append('underwater')
+                    elif self.galaxy.clicked:
+                        activated_buttons.append('galaxy')
+
+                    if self.set6_j.clicked:
+                        activated_buttons.append('set6_j')
+                    elif self.set13_j.clicked:
+                        activated_buttons.append('set13_j')
+                    elif self.set10_g.clicked:
+                        activated_buttons.append('set10_g')
+                    elif self.set11_g.clicked:
+                        activated_buttons.append('set11_g')
+                    elif self.set12_uw.clicked:
+                        activated_buttons.append('set12_uw')
+
+                    if self.midRace.clicked:
+                        activated_buttons.append('mid')
+                    elif self.longRace.clicked:
+                        activated_buttons.append('long')
+                    elif self.shortRace.clicked:
+                        activated_buttons.append('short')
+
+                    if len(activated_buttons) == 3:
+                         check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
+
+                if not check_next:
+                    ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
+                    if self.jungle.clicked:
+                        check_j = True
+                        ToggleButton.check_click(event, [self.set6_j, self.set13_j])
+                    else:
+                        check_j = False
+
+                    if self.galaxy.clicked:
+                        check_g = True
+                        ToggleButton.check_click(event, [self.set10_g, self.set11_g])
+                    else:
+                        check_g = False
+
+                    if self.underwater.clicked:
+                        check_uw = True
+                        ToggleButton.check_click(event, [self.set12_uw])
+                    else:
+                        check_uw = False
+
+                    ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
+                else:
+                    pass
+
+            if not check_next:
+                self.bg_default_loop.loop_background()
+                if check_j:
+                    self.bg_j_loop.loop_background()
+                    self.set6_j.draw(self.screen)
+                    self.set13_j.draw(self.screen)
+                if check_g:
+                    self.bg_g_loop.loop_background()
+                    self.set10_g.draw(self.screen)
+                    self.set11_g.draw(self.screen)
+                if check_uw:
+                    self.bg_uw_loop.loop_background()
+                    self.set12_uw.draw(self.screen)
+                self.underwater.draw(self.screen)
+                self.galaxy.draw(self.screen)
+                self.jungle.draw(self.screen)
+                self.longRace.draw(self.screen)
+                self.midRace.draw(self.screen)
+                self.shortRace.draw(self.screen)
+                self.next.draw()
+
             else:
-                check_j = False
+                if activated_buttons[0] == 'underwater':
+                    self.bg_uw_loop.loop_background()
 
-            if galaxy.clicked:
-                check_g = True
-                ToggleButton.check_click(event, [set10_g, set11_g])
-            else:
-                check_g = False
+                if activated_buttons[0] == 'jungle':
+                    self.bg_j_loop.loop_background()
 
-            if underwater.clicked:
-                check_uw = True
-                ToggleButton.check_click(event, [set12_uw])
-            else:
-                check_uw = False
+                if activated_buttons[0] == 'galaxy':
+                    self.bg_g_loop.loop_background()
 
-            ToggleButton2.check_click(event, [midRace, longRace, shortRace])
-        else:
-            pass
+            pygame.display.update()
+            pygame.display.flip()
+            self.clock.tick(60)
 
-    if not check_next:
-        bg_default_loop.loop_background()
-        if check_j:
-            bg_j_loop.loop_background()
-            set6_j.draw(screen)
-            set13_j.draw(screen)
-        if check_g:
-            bg_g_loop.loop_background()
-            set10_g.draw(screen)
-            set11_g.draw(screen)
-        if check_uw:
-            bg_uw_loop.loop_background()
-            set12_uw.draw(screen)
-        underwater.draw(screen)
-        galaxy.draw(screen)
-        jungle.draw(screen)
-        longRace.draw(screen)
-        midRace.draw(screen)
-        shortRace.draw(screen)
-        next.draw()
-    else:
-        if activated_buttons[0] == 'underwater':
-            bg_uw_loop.loop_background()
+        pygame.quit()
 
-        if activated_buttons[0] == 'jungle':
-            bg_j_loop.loop_background()
-
-        if activated_buttons[0] == 'galaxy':
-            bg_g_loop.loop_background()
-
-    pygame.display.update()
-    pygame.display.flip()
-    clock.tick(60)
-
-pygame.quit()
+if __name__ == '__main__':
+    selector = selector()
+    selector.select()
