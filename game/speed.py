@@ -83,8 +83,8 @@ class Game:
         window.blit(background, (0, 0))
         for i in range(num_repetitions):
             window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
-        window.blit(race_start, (0, 100))
-        window.blit(race_end, (self.width - end_width, 100))
+            window.blit(race_start, (0, 100))
+            window.blit(race_end, (self.width - end_width, 100))
 
     def draw_powerup_icons(self):
         for power_up_icon in self.power_up_icons:
@@ -97,11 +97,11 @@ class Game:
 
     def create_players(self):
         self.players = [Player(0, 110 +85*i, random.uniform(1, 3), image,
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                               0, False)
-                          for i in range(self.num_players)]
+                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
+                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
+                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
+                        0, False)
+                    for i in range(self.num_players)]
 
     def create_power_up_icons(self):
         self.power_up_icons = []
@@ -242,7 +242,7 @@ class Game:
         sys.exit()
 
 # Initialize the game
-game = Game(1280, 720, 50, 6, 10)
+game = Game(1280, 720, 50, 6, 20)
 
 # Create players and power-up icons
 game.create_players()
