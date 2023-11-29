@@ -250,7 +250,7 @@ pop_regexist = login_pop_up("Account already existed", ORANGE, form_x + 300, for
 pop_validemail = login_pop_up("Please enter a valid email", ORANGE, form_x + 300, form_y + 46)
 
 # Chỉ hiện chữ khi biến của nó là True
-pop_validemail_display = pop_regnotmatch_display = pop_loginfail_display = pop_loginsuccess_display = pop_regexist_display = pop_regsuccess_display = pop_empty_display = fr_pop_empty_display = fr_pop_regsuccess_display = fr_pop_noface_display = fr_pop_regexist_display = fr_pop_loginfail_display = False
+pop_validemail_display = pop_regnotmatch_display = pop_loginfail_display = pop_loginsuccess_display = pop_regexist_display = pop_regsuccess_display = pop_empty2_display = pop_empty_display = fr_pop_empty_display = fr_pop_regsuccess_display = fr_pop_noface_display = fr_pop_regexist_display = fr_pop_loginfail_display = False
 
 ###################################################  facerecognition SYSTEM  ###############################################################
 
@@ -448,7 +448,7 @@ def display_password_state():
         pop_loginfail_display = pop_empty_display = pop_regexist_display = pop_regsuccess_display = False
 ############################################### HIỂN THỊ ĐĂNG Ý #############################################################
 def display_register_state():
-    global start_time, pop_validemail_display, pop_regexist_display, pop_regnotmatch_display, pop_regsuccess_display, pop_empty_display, r_username, r_password, r_reenterpassword, r_email, input_active,state_login_facerec, state_login_password, state_register_password
+    global start_time, pop_empty2_display, pop_validemail_display, pop_regexist_display, pop_regnotmatch_display, pop_regsuccess_display, pop_empty_display, r_username, r_password, r_reenterpassword, r_email, input_active,state_login_facerec, state_login_password, state_register_password
     
     # Vẽ giao diện password
     register_button_rect, return_login_button_rect = register_password_GUI()
@@ -469,7 +469,7 @@ def display_register_state():
                 r_email = ''
             elif register_button_rect.collidepoint(mouse_pos):
                 if isempty(r_username) or isempty(r_password) or isempty(r_reenterpassword) or isempty(r_email): # Chừa trống, cảnh báo
-                    pop_empty_display = True
+                    pop_empty2_display = True
                 elif r_password != r_reenterpassword:
                     pop_regnotmatch_display = True
                 elif r_username in user_data: # Nếu tên ng chơi đã tồn tại, thông báo
@@ -542,7 +542,7 @@ def display_register_state():
             elif input_active['r_email']:
                 if event.key == pygame.K_RETURN: # Sau khi đã nhập mật khẩu vào ô thứ 2, nhấn enter để vào game cũng dc
                     if isempty(r_username) or isempty(r_password) or isempty(r_reenterpassword) or isempty(r_email): # Chừa trống, cảnh báo
-                        pop_empty_display = True
+                        pop_empty2_display = True
                     elif r_username in user_data: # Nếu tên ng chơi đã tồn tại, thông báo
                         pop_regexist_display = True
                     elif r_password != r_reenterpassword:
@@ -572,14 +572,14 @@ def display_register_state():
             pop_regsuccess.pop()
         elif pop_regexist_display:
             pop_regexist.pop()
-        elif pop_empty_display:
+        elif pop_empty2_display:
             pop_empty2.pop()
         elif pop_regnotmatch_display:
             pop_regnotmatch.pop()
         elif pop_validemail_display:
             pop_validemail.pop()
     else:
-        pop_validemail_display = pop_regnotmatch_display = pop_empty_display = pop_regexist_display = pop_regsuccess_display = False
+        pop_validemail_display = pop_empty2_display = pop_regnotmatch_display = pop_empty_display = pop_regexist_display = pop_regsuccess_display = False
 
 ###############################################   HIỂN THỊ ĐĂNG NHẬP BẰNG KHUÔN MẶT  ###########################################################
 
@@ -715,6 +715,7 @@ def login_success(username):
 ##################################################  CHAY GAME  #########################################################
 
 # Chạy nhạc nền
+pygame.mixer.music.stop
 login_music = ('./assets/musics/login_music.mp3')
 pygame.mixer.music.load(login_music)
 pygame.mixer.music.set_volume(0.3)
