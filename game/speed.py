@@ -1,14 +1,14 @@
+
 import pygame
 import random
 import sys
-import os
 
 # Initialize Pygame
 pygame.init()
 
 # Set up display
 width, height = 1280, 720
-window = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Racing Game")
 
 Length = 2
@@ -42,211 +42,279 @@ end_width = race_end.get_width()
 # Calculate the number of repetitions needed to fill the window horizontally
 num_repetitions = width // image_width + 1  # Add 1 to ensure the whole window is filled
 
-class Player:
-    def __init__(self, x, y, speed, image, normal_image, turnaround_image, current_image, order, finished):
-        self.x = x
-        self.y = y
-        self.speed = speed
-        self.speed_multiplier = 1.0
-        self.power_up_timer = 0
-        self.power_up = None
-        self.image = image
-        self.normal_image = normal_image
-        self.turnaround_image = turnaround_image
-        self.current_image = current_image
-        self.order = order
-        self.finished = finished
+# class RacingBackground:
+#     def __init__(self, width, height, length):
+#         self.width, self.height = width, height
+#         self.window = pygame.display.set_mode((width, height))
 
-class PowerUpIcon:
-    def __init__(self, x, y, type, image):
-        self.rect = pygame.Rect(x, y, image.get_width(), image.get_height())
-        self.type = type
-        self.image = image
-        self.active = True  # Thêm thuộc tính active để kiểm tra xem biểu tượng có còn hoạt động không
+#         self.race_scale = self.calculate_race_scale(length)
 
-class Game:
-    def __init__(self, width, height, player_size, num_players, num_power_up_icons):
-        self.width = width
-        self.height = height
-        self.player_size = player_size
-        self.num_players = num_players
-        self.num_power_up_icons = num_power_up_icons
-        self.players = []
-        self.power_up_icons = []
-        self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "GoBack", "StraightToFinish", "MoveToPosition"]
-        self.power_up_probabilities = [0.05, 0.05, 0.03, 0.01, 0.01, 0.03]
-        self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (player_size, player_size)) for i, power_up in enumerate(self.power_ups)}
-        self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
-        # self.running = True
+#         # Load images
+#         self.background = self.load_scaled_image('./assets/BG-pic/galaxy.jpg')
+#         self.image = self.load_scaled_image('./assets/race/race-mid.png')
+#         self.race_start = self.load_scaled_image('./assets/race/race-start.png')
+#         self.race_end = self.load_scaled_image('./assets/race/race-end.png')
+#         self.end_width = self.race_end.get_width()
 
-    def draw_background(self):
-        window.blit(background, (0, 0))
-        for i in range(num_repetitions):
-            window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
-        window.blit(race_start, (0, 100))
-        window.blit(race_end, (self.width - end_width, 100))
+#         self.num_repetitions = width // self.image.get_width() + 1
 
-    def draw_powerup_icons(self):
-        for power_up_icon in self.power_up_icons:
-            if power_up_icon.active:
-                window.blit(power_up_icon.image, power_up_icon.rect.topleft)
+#     def calculate_race_scale(self, length):
+#         if length == 1:
+#             return 1
+#         elif length == 2:
+#             return 0.7
+#         else:
+#             return 0.5
 
-    def draw_players(self):
-        for player in self.players:
-            window.blit(player.current_image, (player.x, player.y))
+#     def load_scaled_image(self, path):
+#         image = pygame.image.load(path)
+#         image.set_alpha(120)
+#         scaled_width = int(self.race_scale * image.get_width())
+#         scaled_height = int(self.race_scale * image.get_height())
+#         return pygame.transform.scale(image, (scaled_width, scaled_height))
 
-    def create_players(self):
-        self.players = [Player(0, 110 +85*i, random.uniform(1, 3), image,
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
-                               pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                               0, False)
-                          for i in range(self.num_players)]
+#     def draw_background(self):
+#         total_width = self.num_repetitions * self.image.get_width()
+#         for x in range(0, total_width, self.image.get_width()):
+#             self.window.blit(self.image, (x, 0))
 
-    def create_power_up_icons(self):
-        self.power_up_icons = []
+#         # Draw the start and end signs
+#         self.window.blit(self.race_start, (0, 0))
+#         self.window.blit(self.race_end, (self.width - self.end_width, 0))
 
-    def add_random_power_up_icon(self):
-        if len(self.power_up_icons) >= self.num_power_up_icons:
-            return
 
-        player = random.choice(self.players)
-        x = random.randint(200, self.width - 100)
-        y = player.y
+# # Tạo đối tượng RacingBackground
+# race_background = RacingBackground(width, height, 2)
 
-        # Bua chi xuat hien tren doan duong phia truoc nguoi choi
-        if x > player.x:
-            icon = PowerUpIcon(x, y, None, self.mystery_icon)
-            self.power_up_icons.append(icon)
-        
+# Người chơi
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, image_path):
+        super().__init__()
+        self.image_original = pygame.transform.scale(pygame.image.load(image_path), (50, 50))
+        self.image = self.image_original
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.speed = random.randint(1, 2)  # Tốc độ ban đầu ngẫu nhiên
+        self.effect = None
+        self.start_delay = 180  # Đếm ngược trước khi bắt đầu chạy
+        self.is_running = False
 
-    def apply_power_up(self, player):
-        player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)  # Định nghĩa player_rect ở đây
-        if player.power_up == "SpeedUp":
-            player.speed_multiplier = 1.5
-        elif player.power_up == "SlowDown":
-            player.speed_multiplier = 0.5
-        elif player.power_up == "TurnAround":
-            player.speed_multiplier *= -1.0
-            player.current_image = player.turnaround_image
-        elif player.power_up == "GoBack":
-            player.x -= self.width - self.player_size
-        elif player.power_up == "StraightToFinish":
-            player.x = self.width - self.player_size
-        elif player.power_up == "MoveToPosition":
-            player.x = random.randint(player.y, self.width // 2 - self.player_size)
+    def update(self):
+        # Đếm ngược trước khi bắt đầu chạy
+        if self.start_delay > 0:
+            self.start_delay -= 1
+        else:
+            self.is_running = True
 
-        # Tìm biểu tượng bùa liên quan và đặt active về False khi hiệu ứng kết thúc
-        for power_up_icon in self.power_up_icons:
-            if power_up_icon.rect.colliderect(player_rect) and power_up_icon.type == player.power_up and power_up_icon.active:
-                power_up_icon.active = False
-                break
-        player.power_up = None
+        # Di chuyển người chơi khi đã bắt đầu chạy
+        if self.is_running:
+            self.rect.x += self.speed
 
-    def move_players(self):
-        for player in self.players:
-            if not player.finished:
-                if player.power_up_timer > 0:
-                    player.power_up_timer -= 1
-                    self.apply_power_up(player)
-                    player.x += player.speed * player.speed_multiplier
-                else:
-                    player.current_image = player.normal_image
-                    player.x += random.uniform(1, 3)  # Tốc độ ngẫu nhiên
+            # Giữ người chơi trong khung cửa sổ
+            if self.rect.left < 0:
+                self.rect.left = 0
+                self.speed = 0  # Dừng khi đến biên trái
+            elif self.rect.right > width:
+                self.rect.right = width
+                self.speed = 0  # Dừng khi đến biên phải
 
-    def check_boundaries(self):
-        for player in self.players:
-            if player.x < 0:
-                player.x = 0
-            elif player.x > self.width - self.player_size:
-                player.x = self.width - self.player_size
+        # Lật ngược hình ảnh khi tốc độ là âm
+        if self.speed < 0:
+            self.image = pygame.transform.flip(self.image_original, True, False)
+        else:
+            self.image = self.image_original
 
-    def check_power_up_collided(self):
-        for player in self.players:
-            player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)
-            for power_up_icon in self.power_up_icons:
-                if player_rect.colliderect(power_up_icon.rect):
-                    if power_up_icon.type is None:
-                        power_up_type = random.choices(self.power_ups, weights=self.power_up_probabilities)[0]
-                        power_up_icon.type = power_up_type
-                        print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
-                        player.power_up = power_up_type
-                        player.power_up_timer = random.randint(60, 80)  # Power-up duration
-                        power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
-                        #break  # Exit the loop as the player can only pick up one power-up at a time
+# Chướng ngại vật
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y, image_path):
+        super().__init__()
+        self.image_path = image_path  # Thêm thuộc tính image_path để lưu đường dẫn của hình ảnh
+        self.image = pygame.transform.scale(pygame.image.load(image_path), (50, 50))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+        self.visible = False  # Khởi tạo chướng ngại vật ẩn đi
+        self.effect_duration = 0  # Thêm thuộc tính để lưu thời gian của hiệu ứng
 
-    # def check_winners(self):
-    #     finished_players = [player for player in self.players if player.finished]
-    #     if len(finished_players) == self.num_players:
-    #         print("All players reached the finish line!")
-    #         self.running = False
+    def update(self):
+        if self.effect_duration > 0:
+            self.effect_duration -= 1
+        else:
+            self.visible = False
+            self.kill()
 
-    def check_finish(self):
-        for player in self.players:
-            if not player.finished and player.x >= self.width - self.player_size:
-                player.current_image = player.normal_image
-                player.finished = True
-                player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
-                print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-                player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
+# Hiệu ứng khi đụng chướng ngại vật
+class Effect:
+    def __init__(self, duration):
+        self.duration = duration
+        self.start_time = pygame.time.get_ticks()  # Thời điểm bắt đầu hiệu ứng
 
-    def run(self):
-        
-        # Main game loop
-        clock = pygame.time.Clock()
-        running = True
+    def speedup(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= 1.25
 
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+    def slow(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= 0.99
 
-            # Move players
-            self.move_players()
+    def stun(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed = 0.8
 
-            # Check for boundaries
-            self.check_boundaries()
+    def rotate(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= -1
 
-            # Check if it's time to add a random power-up icon
-            if random.random() < 0.02:  # Thay đổi giá trị này để điều chỉnh tần suất xuất hiện
-                self.add_random_power_up_icon()
+    def teleport(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= 1.5
 
-            # Check if any player has collided with a power-up icon
-            self.check_power_up_collided()
+    def restart(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= 1.5
 
-            # Check for winners
-            finished_players = [player for player in self.players if player.finished]
-            if len(finished_players) == self.num_players:
-                print("All players reached the finish line!")
-                running = False
+    def goal(self, player):
+        elapsed_time = pygame.time.get_ticks() - self.start_time
+        if elapsed_time < self.duration * 1000:  # Kiểm tra xem hiệu ứng đã kết thúc chưa
+            player.speed *= 1.5
 
-            # Check for players reaching the finish line
-            self.check_finish()
+# Tạo người chơi
+players = [
+    Player(0, 110, "assets/sets/Set 3/player1.png"),
+    Player(0, 200, "assets/sets/Set 3/player2.png"),
+    Player(0, 280, "assets/sets/Set 3/player3.png"),
+    Player(0, 370, "assets/sets/Set 3/player4.png"),
+    Player(0, 450, "assets/sets/Set 3/player5.png"),
+    Player(0, 530, "assets/sets/Set 3/player6.png")
+]
 
-            # Draw the tiled image horizontally
-            self.draw_background()
+# Tạo chướng ngại vật
+obstacle_types = [
+    "assets/icons/buff/speedup.png",
+    "assets/icons/buff/slow.png",
+    "assets/icons/buff/stun.png",
+    "assets/icons/buff/rotate.png",
+    "assets/icons/buff/teleport.png",
+    "assets/icons/buff/restart.png",
+    "assets/icons/buff/goal.png"
+]
 
-            # Draw power-up icons
-            self.draw_powerup_icons()
-            # Draw players
-            self.draw_players()
+# Xác suất xuất hiện cnv
+power_up_probabilities = [0.05, 0.05, 0.05, 0.03, 0.02, 0.01, 0.01]
 
-            # Update display
-            pygame.display.flip()
+obstacles = []
 
-            # Set frames per second
-            clock.tick(60)  # 60 fps
+# Thời điểm xuất hiện chướng ngại vật cuối cùng
+time_since_last_obstacle = 0
 
-        # Quit Pygame
-        pygame.quit()
-        sys.exit()
+# Khoảng thời gian giữa các chướng ngại vật (tính bằng frame)
+time_to_next_obstacle = random.randint(30, 60)
 
-# Initialize the game
-game = Game(1280, 720, 50, 6, 10)
+# Vị trí hàng ngang của chướng ngại vật
+obstacle_rows = [110, 200, 280, 370, 450, 530]
 
-# Create players and power-up icons
-game.create_players()
-game.create_power_up_icons()
+clock = pygame.time.Clock()
 
-# Run the game
-game.run()
+# Vòng lặp chính
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Kiểm tra va chạm với chướng ngại vật
+    for player in players:
+        for obstacle in obstacles:
+            if player.rect.colliderect(obstacle.rect):
+                obstacle.visible = True  # Hiển thị chướng ngại vật khi va chạm
+                if obstacle.image_path == "assets/icons/buff/speedup.png":
+                # Áp dụng hiệu ứng tăng tốc nếu là chướng ngại vật tăng tốc
+                    player.effect = Effect(30)  # Hiệu ứng tăng tốc trong 3 giây
+                    player.effect.speedup(player)
+                    obstacle.effect_duration = 120  # Đặt thời gian hiệu ứng (3 giây * 60 frame/giây)
+                    obstacle.visible = True
+
+                elif obstacle.image_path == "assets/icons/buff/slow.png":
+                    player.effect = Effect(120)
+                    player.effect.slow(player)
+                    obstacle.effect_duration = 120  # Đặt thời gian hiệu ứng (3 giây * 60 frame/giây)
+                    obstacle.visible = True
+
+                elif obstacle.image_path == "assets/icons/buff/stun.png":
+                    player.effect = Effect(120)
+                    player.effect.stun(player)
+                    obstacle.effect_duration = 120  # Đặt thời gian hiệu ứng (3 giây * 60 frame/giây)
+                    obstacle.visible = True
+
+                elif obstacle.image_path == "assets/icons/buff/rotate.png":
+                    player.effect = Effect(120)
+                    player.effect.rotate(player)
+                    obstacle.effect_duration = 120  # Đặt thời gian hiệu ứng (3 giây * 60 frame/giây)
+                    obstacle.visible = True
+
+                elif obstacle.image_path == "assets/icons/buff/teleport.png":
+                    pass
+                elif obstacle.image_path == "assets/icons/buff/restart.png":
+                    pass
+                elif obstacle.image_path == "assets/icons/buff/goal.png":
+                    pass
+
+
+        # Áp dụng hiệu ứng nếu có
+        if player.effect:
+            player.effect.duration -= 1
+            if player.effect.duration == 0:
+                player.effect = None
+                player.speed = random.randint(1, 2)  # Khôi phục tốc độ ban đầu
+
+
+
+        # Cập nhật người chơi
+        player.update()
+
+
+
+    # Tăng thời gian từ lần xuất hiện chướng ngại vật cuối cùng
+    time_since_last_obstacle += 1
+
+    # Kiểm tra nếu đã đến thời điểm xuất hiện chướng ngại vật mới
+    if time_since_last_obstacle >= time_to_next_obstacle:
+        # Chọn ngẫu nhiên một loại chướng ngại vật
+        random_obstacle_type = random.choices(obstacle_types, weights = power_up_probabilities)[0]
+
+        # Chọn ngẫu nhiên một hàng ngang để xuất hiện chướng ngại vật
+        random_obstacle_row = random.choice(obstacle_rows)
+
+        # Tạo chướng ngại vật
+        obstacles.append(Obstacle(random.randint(200, width - 100), random_obstacle_row, random_obstacle_type))
+
+        # Đặt lại thời điểm và khoảng thời gian cho lần xuất hiện chướng ngại vật tiếp theo
+        time_since_last_obstacle = 0
+        time_to_next_obstacle = random.randint(30, 60)  # Khoảng thời gian giữa các chướng ngại vật (tính bằng frame)
+
+    # Vẽ màn hình
+    screen.blit(background, (0, 0))
+    for i in range(num_repetitions):
+        screen.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
+    screen.blit(race_start, (0, 100))
+    screen.blit(race_end, (width - end_width, 100))
+
+    # Vẽ người chơi và chướng ngại vật
+    for player in players:
+        screen.blit(player.image, player.rect)
+
+    # Trong vòng lặp chính
+    for obstacle in obstacles:
+        if obstacle.visible:
+            screen.blit(obstacle.image, obstacle.rect)
+            obstacle.update()  # Cập nhật thời gian hiệu ứng
+
+
+    pygame.display.flip()
+
+    clock.tick(60)
