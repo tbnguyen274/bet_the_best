@@ -74,10 +74,26 @@ class Game:
         self.players = []
         self.power_up_icons = []
         self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "GoBack", "StraightToFinish", "MoveToPosition"]
-        self.power_up_probabilities = [0.05, 0.05, 0.05, 0.01, 0.01, 0.03]
+        self.power_up_probabilities = [0.05, 0.05, 0.03, 0.01, 0.01, 0.03]
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (player_size, player_size)) for i, power_up in enumerate(self.power_ups)}
-
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
+        # self.running = True
+
+    def draw_background(self):
+        window.blit(background, (0, 0))
+        for i in range(num_repetitions):
+            window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
+        window.blit(race_start, (0, 100))
+        window.blit(race_end, (self.width - end_width, 100))
+
+    def draw_powerup_icons(self):
+        for power_up_icon in self.power_up_icons:
+            if power_up_icon.active:
+                window.blit(power_up_icon.image, power_up_icon.rect.topleft)
+
+    def draw_players(self):
+        for player in self.players:
+            window.blit(player.current_image, (player.x, player.y))
 
     def create_players(self):
         self.players = [Player(0, 110 +85*i, random.uniform(1, 3), image,
@@ -91,12 +107,18 @@ class Game:
         self.power_up_icons = []
 
     def add_random_power_up_icon(self):
+        if len(self.power_up_icons) >= self.num_power_up_icons:
+            return
+
         player = random.choice(self.players)
         x = random.randint(200, self.width - 100)
         y = player.y
-        icon = PowerUpIcon(x, y, None, self.mystery_icon)
-        self.power_up_icons.append(icon)
 
+        # Bua chi xuat hien tren doan duong phia truoc nguoi choi
+        if x > player.x:
+            icon = PowerUpIcon(x, y, None, self.mystery_icon)
+            self.power_up_icons.append(icon)
+        
 
     def apply_power_up(self, player):
         player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)  # Định nghĩa player_rect ở đây
@@ -121,81 +143,76 @@ class Game:
                 break
         player.power_up = None
 
+    def move_players(self):
+        for player in self.players:
+            if not player.finished:
+                if player.power_up_timer > 0:
+                    player.power_up_timer -= 1
+                    self.apply_power_up(player)
+                    player.x += player.speed * player.speed_multiplier
+                else:
+                    player.current_image = player.normal_image
+                    player.x += random.uniform(1, 3)  # Tốc độ ngẫu nhiên
 
+    def check_boundaries(self):
+        for player in self.players:
+            if player.x < 0:
+                player.x = 0
+            elif player.x > self.width - self.player_size:
+                player.x = self.width - self.player_size
+
+    def check_power_up_collided(self):
+        for player in self.players:
+            player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)
+            for power_up_icon in self.power_up_icons:
+                if player_rect.colliderect(power_up_icon.rect):
+                    if power_up_icon.type is None:
+                        power_up_type = random.choices(self.power_ups, weights=self.power_up_probabilities)[0]
+                        power_up_icon.type = power_up_type
+                        print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
+                        player.power_up = power_up_type
+                        player.power_up_timer = random.randint(60, 80)  # Power-up duration
+                        power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
+                        #break  # Exit the loop as the player can only pick up one power-up at a time
+
+    # def check_winners(self):
+    #     finished_players = [player for player in self.players if player.finished]
+    #     if len(finished_players) == self.num_players:
+    #         print("All players reached the finish line!")
+    #         self.running = False
+
+    def check_finish(self):
+        for player in self.players:
+            if not player.finished and player.x >= self.width - self.player_size:
+                player.current_image = player.normal_image
+                player.finished = True
+                player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
+                print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
+                player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
 
     def run(self):
-        # Initialize Pygame
-        pygame.init()
-
-        # Set up display
-        window = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Racing Game")
-
-        # Load the image to be looped
-        background = pygame.image.load('./assets/BG-pic/galaxy.jpg')
-        image = pygame.image.load('./assets/race/race-mid.png')
-        image.set_alpha(120)
-        image_width = image.get_width()
-        image_height = image.get_height()
-        pygame.transform.scale(image,(int(race_scale*image_width),int(race_scale*image_height)))
-        race_start = pygame.image.load('./assets/race/race-start.png')
-        race_start.set_alpha(120)
-        race_s_w = race_start.get_width()
-        race_s_h = race_start.get_height()
-        pygame.transform.scale(race_start,(int(race_scale*race_s_w),int(race_scale*race_s_h)))
-        race_end = pygame.image.load('./assets/race/race-end.png')
-        race_end.set_alpha(120)
-        race_e_w = race_end.get_width()
-        race_e_h = race_end.get_height()
-        pygame.transform.scale(race_end,(int(race_scale*race_e_w),int(race_scale*race_e_h)))
-        end_width = race_end.get_width()
-
-        # Calculate the number of repetitions needed to fill the window horizontally
-        num_repetitions = self.width // image_width + 1  # Add 1 to ensure the whole window is filled
-
+        
         # Main game loop
         clock = pygame.time.Clock()
         running = True
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
 
             # Move players
-            for player in self.players:
-                if not player.finished:
-                    if player.power_up_timer > 0:
-                        player.power_up_timer -= 1
-                        self.apply_power_up(player)
-                        player.x += player.speed * player.speed_multiplier
-                    else:
-                        player.current_image = player.normal_image
-                        player.x += random.uniform(1, 3)  # Tốc độ ngẫu nhiên
+            self.move_players()
 
             # Check for boundaries
-            for player in self.players:
-                if player.x < 0:
-                    player.x = 0
-                elif player.x > self.width - self.player_size:
-                    player.x = self.width - self.player_size
+            self.check_boundaries()
 
             # Check if it's time to add a random power-up icon
             if random.random() < 0.02:  # Thay đổi giá trị này để điều chỉnh tần suất xuất hiện
                 self.add_random_power_up_icon()
 
             # Check if any player has collided with a power-up icon
-            for player in self.players:
-                player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)
-                for power_up_icon in self.power_up_icons:
-                    if player_rect.colliderect(power_up_icon.rect):
-                        if power_up_icon.type is None:
-                            power_up_type = random.choices(self.power_ups, weights=self.power_up_probabilities)[0]
-                            power_up_icon.type = power_up_type
-                            print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
-                            player.power_up = power_up_type
-                            player.power_up_timer = random.randint(60, 120)  # Power-up duration
-                            power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
-                        #break  # Exit the loop as the player can only pick up one power-up at a time
+            self.check_power_up_collided()
 
             # Check for winners
             finished_players = [player for player in self.players if player.finished]
@@ -204,31 +221,15 @@ class Game:
                 running = False
 
             # Check for players reaching the finish line
-            for player in self.players:
-                if not player.finished and player.x >= self.width - self.player_size:
-                    player.current_image = player.normal_image
-                    player.finished = True
-                    player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
-                    print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-                    player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
-
+            self.check_finish()
 
             # Draw the tiled image horizontally
-            window.blit(background, (0, 0))
-            for i in range(num_repetitions):
-                window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
-            window.blit(race_start, (0, 100))
-            window.blit(race_end, (self.width - end_width, 100))
+            self.draw_background()
 
             # Draw power-up icons
-            for power_up_icon in self.power_up_icons:
-                if power_up_icon.active:
-                    window.blit(power_up_icon.image, power_up_icon.rect.topleft)
-
+            self.draw_powerup_icons()
             # Draw players
-            for player in self.players:
-                window.blit(player.current_image, (player.x, player.y))
-
+            self.draw_players()
 
             # Update display
             pygame.display.flip()
@@ -239,18 +240,6 @@ class Game:
         # Quit Pygame
         pygame.quit()
         sys.exit()
-
-# Initialize the game
-game = Game(1280, 720, 50, 6, 20)
-
-# Create players and power-up icons
-game.create_players()
-game.create_power_up_icons()
-
-# Run the game
-game.run()
-
-
 
 # Initialize the game
 game = Game(1280, 720, 50, 6, 10)
