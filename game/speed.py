@@ -80,7 +80,29 @@ class Game:
 
         # self.running = True
 
-    
+    def countdown(self):
+        countdown_font = pygame.font.Font(None, 100)
+        countdown_text = [" ","3", "2", "1", "Go!"]
+        countdown_duration = 60  # Đếm ngược mỗi giây
+
+        music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+        music.play()
+        
+        for i in range(len(countdown_text)):
+            
+            for j in range(countdown_duration):
+                self.draw_background()
+                self.draw_powerup_icons()
+                self.draw_players()
+                
+                countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
+                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, self.height // 2 - countdown_render.get_height() // 2))
+
+                pygame.display.flip()
+
+
+        self.run()
+        
     def draw_background(self):
         window.blit(background, (0, 0))
         for i in range(num_repetitions):
@@ -268,4 +290,4 @@ game.create_players()
 game.create_power_up_icons()
 
 # Run the game
-game.run()
+game.countdown()
