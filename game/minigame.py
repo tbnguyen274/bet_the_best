@@ -6,13 +6,13 @@ from random import randint, choice
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        walk1 = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
-        walk2 = pygame.image.load('graphics/Player/player_walk_2.png').convert_alpha()
+        walk1 = pygame.image.load('../assets/graphics/Player/player_walk_1.png').convert_alpha()
+        walk2 = pygame.image.load('../assets/graphics/Player/player_walk_2.png').convert_alpha()
         player_walk_1 = pygame.transform.rotozoom(walk1,0,1.6)
         player_walk_2 = pygame.transform.rotozoom(walk2, 0 ,1.6)
         self.player_walk = [player_walk_1, player_walk_2]
         self.player_index = 0
-        player_jump = pygame.image.load('graphics/Player/jump.png').convert_alpha()
+        player_jump = pygame.image.load('../assets/graphics/Player/jump.png').convert_alpha()
         self.player_jump = pygame.transform.rotozoom(player_jump,0,1.6)
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom=(120, 500))
@@ -55,15 +55,15 @@ class Obstacle(pygame.sprite.Sprite):
         super().__init__()
 
         if type == 'fly':
-            fly_1 = pygame.image.load('graphics/Fly/Fly1.png').convert_alpha()
-            fly_2 = pygame.image.load('graphics/Fly/Fly2.png').convert_alpha()
+            fly_1 = pygame.image.load('../assets/graphics/Fly/Fly1.png').convert_alpha()
+            fly_2 = pygame.image.load('../assets/graphics/Fly/Fly2.png').convert_alpha()
             fly_1 = pygame.transform.rotozoom(fly_1,0,1.6)
             fly_2 = pygame.transform.rotozoom(fly_2, 0, 1.6)
             self.frames = [fly_1, fly_2]
             y_pos = 250
         else:
-            snail_1 = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
-            snail_2 = pygame.image.load('graphics/snail/snail2.png').convert_alpha()
+            snail_1 = pygame.image.load('../assets/graphics/snail/snail1.png').convert_alpha()
+            snail_2 = pygame.image.load('../assets/graphics/snail/snail2.png').convert_alpha()
             snail_1 = pygame.transform.rotozoom(snail_1,0,1.6)
             snail_2 = pygame.transform.rotozoom(snail_2, 0, 1.6)
             self.frames = [snail_1, snail_2]
@@ -108,7 +108,7 @@ pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption('BetTheBest-Minigame')
 clock = pygame.time.Clock()
-test_font = pygame.font.Font('font/Pixeltype.ttf', 100)
+test_font = pygame.font.Font('../assets/font/Pixeltype.ttf', 100)
 game_active = False
 start_time = 0
 score = 0
@@ -121,11 +121,11 @@ player.add(Player())
 
 obstacle_group = pygame.sprite.Group()
 
-sky_surface = pygame.image.load('graphics/background3.jpg').convert()
-ground_surface = pygame.image.load('graphics/ground1.png').convert()
+sky_surface = pygame.image.load('../assets/graphics/background3.jpg').convert()
+ground_surface = pygame.image.load('../assets/graphics/ground1.png').convert()
 
 # Intro screen
-player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+player_stand = pygame.image.load('../assets/graphics/Player/player_stand.png').convert_alpha()
 player_stand = pygame.transform.rotozoom(player_stand, 0, 4)
 player_stand_rect = player_stand.get_rect(midbottom=(640,500 ))
 
