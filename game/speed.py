@@ -43,12 +43,12 @@ end_width = race_end.get_width()
 num_repetitions = width // image_width + 1  # Add 1 to ensure the whole window is filled
 
 class Player:
-    def __init__(self, x, y, speed, image, normal_image, turnaround_image, current_image, order, finished):
+    def __init__(self, x, y, speed, normal_image, turnaround_image, current_image, order, finished):
         self.x = x
         self.y = y
         self.speed = speed
         self.speed_multiplier = 1.0
-        self.power_up_timer = 0
+        self.power_up_timer = 1
         self.power_up = None
         self.image = image
         self.normal_image = normal_image
@@ -62,7 +62,7 @@ class PowerUpIcon:
         self.rect = pygame.Rect(x, y, image.get_width(), image.get_height())
         self.type = type
         self.image = image
-        self.active = True  # Thêm thuộc tính active để kiểm tra xem biểu tượng có còn hoạt động không
+        self.active = True  # active attribute checks if a power-up is still active
 
 class Game:
     def __init__(self, width, height, player_size, num_players, num_power_up_icons):
@@ -73,12 +73,14 @@ class Game:
         self.num_power_up_icons = num_power_up_icons
         self.players = []
         self.power_up_icons = []
-        self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "GoBack", "StraightToFinish", "MoveToPosition"]
-        self.power_up_probabilities = [0.05, 0.05, 0.03, 0.01, 0.01, 0.03]
+        self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport"]
+        self.power_up_probabilities = [0.02, 0.05, 0.05, 0.01, 0.01, 0.03]
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (player_size, player_size)) for i, power_up in enumerate(self.power_ups)}
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
+
         # self.running = True
 
+    
     def draw_background(self):
         window.blit(background, (0, 0))
         for i in range(num_repetitions):
@@ -96,32 +98,45 @@ class Game:
             window.blit(player.current_image, (player.x, player.y))
 
     def create_players(self):
-        self.players = [Player(0, 110 +85*i, random.uniform(1, 3), image,
+        self.players = [Player(0, 110 +85*i, random.uniform(1, 3),
                         pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
                         pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
                         pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
                         0, False)
                     for i in range(self.num_players)]
+        
+        # Save y-coordinate of all players for later use
+        self.all_y_coordinates = [player.y for player in self.players]
+        # create a copy
+        self.available_y_coordinates = [player.y for player in self.players]
 
     def create_power_up_icons(self):
         self.power_up_icons = []
 
     def add_random_power_up_icon(self):
+        # stop adding creating power-up when exceeding the limit number
         if len(self.power_up_icons) >= self.num_power_up_icons:
             return
 
-        player = random.choice(self.players)
-        x = random.randint(200, self.width - 100)
-        y = player.y
+        # Check if the list of available y-coordinates is empty
+        if not self.available_y_coordinates:
+            # If empty, reset it to the initial state
+            self.available_y_coordinates = self.all_y_coordinates.copy()
 
-        # Bua chi xuat hien tren doan duong phia truoc nguoi choi
-        if x > player.x:
+        # choose a random y-coordinate
+        y = random.choice(self.available_y_coordinates)
+        self.available_y_coordinates.remove(y)
+
+        x = random.randint(200, self.width - 100)
+
+        # power-ups will not appear behind the last player
+        if x > min(player.x for player in self.players if player.y == y):
             icon = PowerUpIcon(x, y, None, self.mystery_icon)
             self.power_up_icons.append(icon)
         
 
     def apply_power_up(self, player):
-        player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)  # Định nghĩa player_rect ở đây
+        player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)
         if player.power_up == "SpeedUp":
             player.speed_multiplier = 1.5
         elif player.power_up == "SlowDown":
@@ -129,14 +144,14 @@ class Game:
         elif player.power_up == "TurnAround":
             player.speed_multiplier *= -1.0
             player.current_image = player.turnaround_image
-        elif player.power_up == "GoBack":
+        elif player.power_up == "Restart":
             player.x -= self.width - self.player_size
         elif player.power_up == "StraightToFinish":
             player.x = self.width - self.player_size
-        elif player.power_up == "MoveToPosition":
-            player.x = random.randint(player.y, self.width // 2 - self.player_size)
-
-        # Tìm biểu tượng bùa liên quan và đặt active về False khi hiệu ứng kết thúc
+        elif player.power_up == "Teleport":
+            player.x = random.randint(0, self.width // 2 - self.player_size)
+            
+        # set active to False when the power-up's effect has ended
         for power_up_icon in self.power_up_icons:
             if power_up_icon.rect.colliderect(player_rect) and power_up_icon.type == player.power_up and power_up_icon.active:
                 power_up_icon.active = False
@@ -152,7 +167,7 @@ class Game:
                     player.x += player.speed * player.speed_multiplier
                 else:
                     player.current_image = player.normal_image
-                    player.x += random.uniform(1, 3)  # Tốc độ ngẫu nhiên
+                    player.x += random.uniform(2, 4)  # Tốc độ ngẫu nhiên
 
     def check_boundaries(self):
         for player in self.players:
@@ -189,12 +204,16 @@ class Game:
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
                 print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
                 player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
+                
 
     def run(self):
         
         # Main game loop
         clock = pygame.time.Clock()
         running = True
+        
+        music = pygame.mixer.Sound('assets\musics\cars-and-bikes-mokkkamusic.mp3')
+        music.play()
 
         while running:
             for event in pygame.event.get():
@@ -208,7 +227,7 @@ class Game:
             self.check_boundaries()
 
             # Check if it's time to add a random power-up icon
-            if random.random() < 0.02:  # Thay đổi giá trị này để điều chỉnh tần suất xuất hiện
+            if random.random() < 0.03 and len(finished_players) == 0:  # Thay đổi giá trị này để điều chỉnh tần suất xuất hiện
                 self.add_random_power_up_icon()
 
             # Check if any player has collided with a power-up icon
