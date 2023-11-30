@@ -1,7 +1,10 @@
 import cv2
 import sys
 import pygame
+import random
 pygame.init()
+
+
 class VideoPlayer:
     def __init__(self, video_path):
         self.video_capture = cv2.VideoCapture(video_path)
@@ -20,14 +23,14 @@ class VideoPlayer:
 
 
 class ToggleButton:
-    def __init__(self, x, y, image_path, scale=1.0):
+    def __init__(self, x, y, image_path, scale=1.0 ):
         self.x = x
         self.y = y
         self.image_path = image_path
         self.original_image = pygame.image.load(self.image_path)
         self.scale = scale
         self.image = pygame.transform.scale(self.original_image, (int(self.original_image.get_width() * scale),
-                                                                 int(self.original_image.get_height() * scale)))
+                                                                  int(self.original_image.get_height() * scale)))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
         self.click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
@@ -73,7 +76,7 @@ class ToggleButton2:
         self.original_image = pygame.image.load(self.image_path)
         self.scale = scale
         self.image = pygame.transform.scale(self.original_image, (int(self.original_image.get_width() * scale),
-                                                                 int(self.original_image.get_height() * scale)))
+                                                                  int(self.original_image.get_height() * scale)))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked_image = self.darken_image(self.original_image)  # Tạo hình ảnh sậm đi khi nút được nhấn
         self.rect_clicked = self.clicked_image.get_rect(topleft=(x, y))
@@ -113,8 +116,8 @@ class Button:
         height = image.get_height()
         self.x = x
         self.y = y
-        self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
-        self.image_rect = self.image.get_rect(topleft = (x, y))
+        self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+        self.image_rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
         self.action = False
         self.image_alpha = self.image.copy()
@@ -124,13 +127,13 @@ class Button:
         click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
         cursor_pos = pygame.mouse.get_pos()
         if self.image_rect.collidepoint(cursor_pos):
-            screen.blit(self.image_alpha, (self.image_rect.x,self.image_rect.y))
+            screen.blit(self.image_alpha, (self.image_rect.x, self.image_rect.y))
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 click_sound.play()
                 self.action = True
         else:
-            screen.blit(self.image,(self.image_rect.x, self.image_rect.y))
+            screen.blit(self.image, (self.image_rect.x, self.image_rect.y))
 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
@@ -139,14 +142,20 @@ class Button:
 class TextInput:
     def __init__(self, x, y, width, height, font_size):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_inactive = pygame.Color('lightskyblue3')
-        self.color_active = pygame.Color('dodgerblue2')
+        self.color_inactive = pygame.Color('#C2D9FF')
+        self.color_active = pygame.Color('#9BBEC8')
         self.color = self.color_inactive
         self.font_color = pygame.Color('black')  # Add this line to set the font color
         self.font = pygame.font.Font(None, font_size)
-        self.text = ''
+        self.text = ""
         self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
         self.active = False
+        self.random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
+                       "Alison", "Joel", "Joe", "Harrvey", "Luis", "Darwin", "Diogo", "Mac",
+                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben"]
+        self.random_namecopy = self.random_name
+        # self.text = random.choice(self.random_namecopy)
+        # self.random_namecopy = list(set(self.random_namecopy) - set([self.text]))
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -162,6 +171,9 @@ class TextInput:
                     self.text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
+                elif event.key == pygame.K_SPACE: #random name khi nhan SPACE
+                    self.text = random.choice(self.random_namecopy)
+                    self.random_namecopy = list(set(self.random_namecopy) - set([self.text]))
                 else:
                     temp_text = self.text + event.unicode
                     temp_surface = self.font.render(temp_text, True, self.font_color)
@@ -174,10 +186,9 @@ class TextInput:
         pygame.draw.rect(screen, self.color, self.rect)
 
         # Draw the text on the filled input box
-        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
-
-       
-
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 8))
+    def naming_character(self):
+        return self.text
 
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -194,14 +205,14 @@ class selector:
         self.midRace = ToggleButton2(530, 600, '../assets/icons/buttons/button_medium.png')
         self.longRace = ToggleButton2(780, 600, '../assets/icons/buttons/button_long.png')
 
-        #Ô ĐẶT TÊN
-        self.betbox = [
-            TextInput(50, 300, 140, 50, 40),
-            TextInput(250, 300, 140, 50, 40),
-            TextInput(450, 300, 140, 50, 40),
-            TextInput(650, 300, 140, 50, 40),
-            TextInput(850, 300, 140, 50, 40),
-            TextInput(1050, 300, 140, 50, 40),
+        # Ô ĐẶT TÊN
+        self.namebox = [
+            TextInput(50, 300, 140, 40, 35),
+            TextInput(250, 300, 140, 40, 35),
+            TextInput(450, 300, 140, 40, 35),
+            TextInput(650, 300, 140, 40, 35),
+            TextInput(850, 300, 140, 40, 35),
+            TextInput(1050, 300, 140, 40, 35),
         ]
         self.set4_uw = ToggleButton(670, 330, '../assets/sets/Set 4/1.png', 0.3)
         self.set12_uw = ToggleButton(470, 330, '../assets/sets/Set 12/1.png', 0.3)
@@ -212,12 +223,12 @@ class selector:
 
         self.set4_char = [
             ToggleButton(20, 130, '../assets/sets/Set 4/1.png', 0.22),
-            ToggleButton( 210, 130, '../assets/sets/Set 4/2.png', 0.22),
+            ToggleButton(210, 130, '../assets/sets/Set 4/2.png', 0.22),
             ToggleButton(460, 130, '../assets/sets/Set 4/3.png', 0.2),
             ToggleButton(670, 130, '../assets/sets/Set 4/4.png', 0.22),
             ToggleButton(850, 130, '../assets/sets/Set 4/5.png', 0.22),
             ToggleButton(1050, 130, '../assets/sets/Set 4/6.png', 0.22),
-            ]
+        ]
         self.set12_char = [
             ToggleButton(20, 130, '../assets/sets/Set 12/1.png', 0.25),
             ToggleButton(210, 130, '../assets/sets/Set 12/2.png', 0.25),
@@ -225,7 +236,7 @@ class selector:
             ToggleButton(600, 130, '../assets/sets/Set 12/4.png', 0.25),
             ToggleButton(800, 130, '../assets/sets/Set 12/5.png', 0.25),
             ToggleButton(1030, 130, '../assets/sets/Set 12/6.png', 0.25),
-            ]
+        ]
 
         self.set11_char = [
             ToggleButton(50, 130, '../assets/sets/Set 11/1.png', 0.3),
@@ -262,8 +273,6 @@ class selector:
             ToggleButton(1050, 130, '../assets/sets/Set 13/6.png', 0.3),
         ]
 
-
-
         self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
         self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
         self.galaxy = ToggleButton(880, 70, '../assets/BG-pic/galaxy.jpg', 0.25)
@@ -284,7 +293,6 @@ class selector:
         self.bg_g = '../assets/videos/galaxy_background.mp4'
         self.bg_g_loop = VideoPlayer(self.bg_g)
         self.activated_buttons = []
-
 
     def select(self):
         check_j = False
@@ -356,7 +364,7 @@ class selector:
                     ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
 
                 else:
-                    #HIEN THI CAC SET NHAN VAT
+                    # HIEN THI CAC SET NHAN VAT
                     if self.activated_buttons[1] == 'set4_uw':
                         ToggleButton.check_click(event, self.set4_char)
                     if self.activated_buttons[1] == 'set12_uw':
@@ -370,7 +378,7 @@ class selector:
                     if self.activated_buttons[1] == 'set13_j':
                         ToggleButton.check_click(event, self.set13_char)
 
-                    for box in self.betbox:
+                    for box in self.namebox:
                         box.handle_event(event)
             if not check_next:
                 self.bg_default_loop.loop_background()
@@ -424,7 +432,7 @@ class selector:
                         for b in self.set11_char:
                             b.draw(self.screen)
 
-                for box in self.betbox:
+                for box in self.namebox:
                     box.draw(self.screen)
 
                 self.back.draw(self.screen)
@@ -433,11 +441,9 @@ class selector:
             pygame.display.flip()
             self.clock.tick(60)
 
-
-
-
-
         sys.exit()
+
+
 if __name__ == '__main__':
-  selector = selector()
-  selector.select()
+    selector = selector()
+    selector.select()
