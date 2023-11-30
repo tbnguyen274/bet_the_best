@@ -3,7 +3,6 @@ import random
 import sys
 import os
 
-
 # Initialize Pygame
 pygame.init()
 pygame.mixer.init()
@@ -13,14 +12,14 @@ width, height = 1280, 720
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Racing Game")
 
-Length = 2
+Length = 3
 race_scale = 1
 if Length == 1:
-    race_scale = 1
+    race_scale = 1.2
 elif Length == 2:
-    race_scale = 0.7
+    race_scale = 1
 else:
-    race_scale = 0.5
+    race_scale = 0.8
 
 # Load the image to be looped
 background = pygame.image.load('./assets/BG-pic/galaxy.jpg')
@@ -28,17 +27,23 @@ image = pygame.image.load('./assets/race/race-mid.png')
 image.set_alpha(120)
 image_width = image.get_width()
 image_height = image.get_height()
-pygame.transform.scale(image,(int(race_scale*image_width),int(race_scale*image_height)))
+image = pygame.transform.scale(image,(int(race_scale*image_width),int(race_scale*image_height)))
+image_width = image.get_width()
+image_height = image.get_height()
 race_start = pygame.image.load('./assets/race/race-start.png')
 race_start.set_alpha(120)
 race_s_w = race_start.get_width()
 race_s_h = race_start.get_height()
-pygame.transform.scale(race_start,(int(race_scale*race_s_w),int(race_scale*race_s_h)))
+race_start = pygame.transform.scale(race_start,(int(race_scale*race_s_w),int(race_scale*race_s_h)))
+race_s_w = race_start.get_width()
+race_s_h = race_start.get_height()
 race_end = pygame.image.load('./assets/race/race-end.png')
 race_end.set_alpha(120)
 race_e_w = race_end.get_width()
 race_e_h = race_end.get_height()
-pygame.transform.scale(race_end,(int(race_scale*race_e_w),int(race_scale*race_e_h)))
+race_end = pygame.transform.scale(race_end,(int(race_scale*race_e_w),int(race_scale*race_e_h)))
+race_e_w = race_end.get_width()
+race_e_h = race_end.get_height()
 end_width = race_end.get_width()
 
 # Calculate the number of repetitions needed to fill the window horizontally
@@ -46,11 +51,11 @@ num_repetitions = width // image_width + 1  # Add 1 to ensure the whole window i
 
 class Player:
     def __init__(self, x, y, speed, normal_image, turnaround_image, current_image, order, finished):
-        self.x = x
-        self.y = y
-        self.speed = speed
-        self.speed_multiplier = 1.0
-        self.power_up_timer = 1
+        self.x = x  # player's x-coordinate
+        self.y = y  # player's y-coordinate
+        self.speed = speed  
+        self.speed_multiplier = 1.0 # Use to change player's speed when experiencing powerup's effect
+        self.power_up_timer = 0 # time that powerup takes effect, initialize at 1
         self.power_up = None
         self.image = image
         self.normal_image = normal_image
@@ -81,30 +86,6 @@ class Game:
         self.power_up_probabilities = [0.02, 0.05, 0.05, 0.01, 0.01, 0.03]
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (player_size, player_size)) for i, power_up in enumerate(self.power_ups)}
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
-        self.announcement = []
-        # self.running = True
-
-    def countdown(self):
-        countdown_font = pygame.font.Font(None, 100)
-        countdown_text = [" ","3", "2", "1", "Go!"]
-        countdown_duration = 60  # Đếm ngược mỗi giây
-
-        music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
-        music.play()
-        
-        for i in range(len(countdown_text)):
-            
-            for j in range(countdown_duration):
-                self.draw_background()
-                self.draw_powerup_icons()
-                self.draw_players()
-                
-                countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
-                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, self.height // 2 - countdown_render.get_height() // 2))
-
-                pygame.display.update()
-
-        self.run()
     
     def announce(self, text, duration=1000):
         announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
@@ -121,10 +102,10 @@ class Game:
     def draw_background(self):
         window.blit(background, (0, 0))
         for i in range(num_repetitions):
-            window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
-            window.blit(race_start, (0, 100))
-            window.blit(race_end, (self.width - end_width, 100))
-    # draw power-ups
+            window.blit(image, (i * image_width, self.height - image_height - 10))  # Render the image at each multiple of image width
+            window.blit(race_start, (0, self.height - image_height - 10))
+            window.blit(race_end, (self.width - end_width, self.height - image_height - 10))
+
     def draw_powerup_icons(self):
         for power_up_icon in self.power_up_icons:
             if power_up_icon.active:
@@ -232,7 +213,7 @@ class Game:
                         
                         print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
                         self.announce(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
-                        self.announcement.append(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
+
 
 
     def check_finish(self):
@@ -243,9 +224,29 @@ class Game:
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
                 print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
                 self.announce(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-                self.announcement.append(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
 
+
+    def countdown(self):
+        countdown_font = pygame.font.Font(None, 100)
+        countdown_text = [" ","3", "2", "1", "Go!"]
+        countdown_duration = 60  # Đếm ngược mỗi giây
+
+        music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+        music.play()
+        
+        for i in range(len(countdown_text)):
+            
+            for j in range(countdown_duration):
+                self.draw_background()
+                self.draw_powerup_icons()
+                self.draw_players()
                 
+                countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
+                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, self.height // 2 - countdown_render.get_height() // 2))
+
+                pygame.display.update()
+
+        self.run()            
 
     def run(self):
         
@@ -255,6 +256,7 @@ class Game:
         
         music = pygame.mixer.Sound('assets\musics\cars-and-bikes-mokkkamusic.mp3')
         music.play()
+        
 
         while running:
             for event in pygame.event.get():
