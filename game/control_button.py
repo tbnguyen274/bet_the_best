@@ -30,7 +30,7 @@ class ToggleButton:
                                                                  int(self.original_image.get_height() * scale)))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
-        self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+        self.click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
 
     def draw(self, screen):
         border_size = 3  # Kích thước viền
@@ -78,7 +78,7 @@ class ToggleButton2:
         self.clicked_image = self.darken_image(self.original_image)  # Tạo hình ảnh sậm đi khi nút được nhấn
         self.rect_clicked = self.clicked_image.get_rect(topleft=(x, y))
         self.clicked = False
-        self.click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
+        self.click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
 
     def darken_image(self, image):
         # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
@@ -120,8 +120,8 @@ class Button:
         self.image_alpha = self.image.copy()
         self.image_alpha.set_alpha(160)
 
-    def draw(self):
-        click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+    def draw(self, screen):
+        click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
         cursor_pos = pygame.mouse.get_pos()
         if self.image_rect.collidepoint(cursor_pos):
             screen.blit(self.image_alpha, (self.image_rect.x,self.image_rect.y))
@@ -136,46 +136,9 @@ class Button:
             self.clicked = False
 
 
-shortRace = ToggleButton2(280, 600, 'assets/icons/buttons/button_short.png')
-midRace = ToggleButton2(530, 600, 'assets/icons/buttons/button_medium.png')
-longRace = ToggleButton2(780, 600, 'assets/icons/buttons/button_long.png')
-
-set12_uw = ToggleButton(470, 330, 'assets/sets/Set 12/1.png', 0.3)
-
-set13_j = ToggleButton(470, 330, 'assets/sets/Set 13/1.png', 0.3)
-set6_j = ToggleButton(660, 330, 'assets/sets/Set 6/1.png', 0.3)
-
-set11_g = ToggleButton(470, 330, 'assets/sets/Set 11/1.png', 0.3)
-set10_g = ToggleButton(660, 330, 'assets/sets/Set 10/1.png', 0.3)
-
-set12_char = []
-set11_char = []
-set10_char = []
-set6_char = []
-
-underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
-jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
-galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
-
-next_img = pygame.image.load('assets/icons/return.png')
-next_img = pygame.transform.flip(next_img, True, False)
-next = Button(1120, 600, next_img, 0.2)
-
-bg_default = 'assets/videos/tunnel.mp4'
-bg_default_loop = VideoPlayer(bg_default)
-bg_uw = 'assets/videos/underwater_background.mp4'
-bg_uw_loop = VideoPlayer(bg_uw)
-bg_j = 'assets/videos/jungle_background.mp4'
-bg_j_loop = VideoPlayer(bg_j)
-bg_g = 'assets/videos/galaxy_background.mp4'
-bg_g_loop = VideoPlayer(bg_g)
-
-
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
-
-
 
 
 class selector:
@@ -184,45 +147,97 @@ class selector:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((1280, 720))
 
-        self.shortRace = ToggleButton2(280, 600, 'assets/icons/buttons/button_short.png')
-        self.midRace = ToggleButton2(530, 600, 'assets/icons/buttons/button_medium.png')
-        self.longRace = ToggleButton2(780, 600, 'assets/icons/buttons/button_long.png')
+        self.shortRace = ToggleButton2(280, 600, '../assets/icons/buttons/button_short.png')
+        self.midRace = ToggleButton2(530, 600, '../assets/icons/buttons/button_medium.png')
+        self.longRace = ToggleButton2(780, 600, '../assets/icons/buttons/button_long.png')
 
-        self.set12_uw = ToggleButton(470, 330, 'assets/sets/Set 12/1.png', 0.3)
-        self.set13_j = ToggleButton(470, 330, 'assets/sets/Set 13/1.png', 0.3)
-        self.set6_j = ToggleButton(660, 330, 'assets/sets/Set 6/1.png', 0.3)
-        self.set11_g = ToggleButton(470, 330, 'assets/sets/Set 11/1.png', 0.3)
-        self.set10_g = ToggleButton(660, 330, 'assets/sets/Set 10/1.png', 0.3)
+        self.set4_uw = ToggleButton(670, 330, '../assets/sets/Set 4/1.png', 0.3)
+        self.set12_uw = ToggleButton(470, 330, '../assets/sets/Set 12/1.png', 0.3)
+        self.set13_j = ToggleButton(470, 330, '../assets/sets/Set 13/1.png', 0.3)
+        self.set6_j = ToggleButton(660, 330, '../assets/sets/Set 6/1.png', 0.3)
+        self.set11_g = ToggleButton(470, 330, '../assets/sets/Set 11/1.png', 0.3)
+        self.set10_g = ToggleButton(660, 330, '../assets/sets/Set 10/1.png', 0.3)
 
-        self.set12_char = []
-        self.set11_char = []
-        self.set10_char = []
-        self.set6_char = []
+        self.set4_char = [
+            ToggleButton(20, 70, '../assets/sets/Set 4/1.png', 0.23),
+            ToggleButton( 230, 70, '../assets/sets/Set 4/2.png', 0.23),
+            ToggleButton(490, 70, '../assets/sets/Set 4/3.png', 0.23),
+            ToggleButton(700, 70, '../assets/sets/Set 4/4.png', 0.23),
+            ToggleButton(850, 70, '../assets/sets/Set 4/5.png', 0.23),
+            ToggleButton(1050, 70, '../assets/sets/Set 4/6.png', 0.23),
+            ]
+        self.set12_char = [
+            ToggleButton(20, 70, '../assets/sets/Set 12/1.png', 0.3),
+            ToggleButton(210, 70, '../assets/sets/Set 12/2.png', 0.3),
+            ToggleButton(440, 70, '../assets/sets/Set 12/3.png', 0.3),
+            ToggleButton(600, 70, '../assets/sets/Set 12/4.png', 0.3),
+            ToggleButton(800, 70, '../assets/sets/Set 12/5.png', 0.3),
+            ToggleButton(1030, 70, '../assets/sets/Set 12/6.png', 0.3),
+            ]
 
-        self.underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
-        self.jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
-        self.galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
+        self.set11_char = [
+            ToggleButton(50, 70, '../assets/sets/Set 11/1.png', 0.3),
+            ToggleButton(250, 70, '../assets/sets/Set 11/2.png', 0.3),
+            ToggleButton(450, 70, '../assets/sets/Set 11/3.png', 0.3),
+            ToggleButton(650, 70, '../assets/sets/Set 11/4.png', 0.3),
+            ToggleButton(850, 70, '../assets/sets/Set 11/5.png', 0.3),
+            ToggleButton(1050, 70, '../assets/sets/Set 11/6.png', 0.3),
+        ]
+        self.set10_char = [
+            ToggleButton(50, 70, '../assets/sets/Set 10/1.png', 0.3),
+            ToggleButton(250, 70, '../assets/sets/Set 10/2.png', 0.3),
+            ToggleButton(450, 70, '../assets/sets/Set 10/3.png', 0.3),
+            ToggleButton(650, 70, '../assets/sets/Set 10/4.png', 0.3),
+            ToggleButton(850, 70, '../assets/sets/Set 10/5.png', 0.3),
+            ToggleButton(1050, 70, '../assets/sets/Set 10/6.png', 0.3),
 
-        self.next_img = pygame.image.load('assets/icons/return.png')
+        ]
+        self.set6_char = [
+            ToggleButton(50, 70, '../assets/sets/Set 6/1.png', 0.25),
+            ToggleButton(250, 50, '../assets/sets/Set 6/2.png', 0.25),
+            ToggleButton(450, 50, '../assets/sets/Set 6/3.png', 0.25),
+            ToggleButton(650, 70, '../assets/sets/Set 6/4.png', 0.25),
+            ToggleButton(850, 70, '../assets/sets/Set 6/5.png', 0.25),
+            ToggleButton(1050, 70, '../assets/sets/Set 6/6.png', 0.25),
+        ]
+
+        self.set13_char = [
+            ToggleButton(50, 70, '../assets/sets/Set 13/1.png', 0.3),
+            ToggleButton(250, 70, '../assets/sets/Set 13/2.png', 0.3),
+            ToggleButton(450, 70, '../assets/sets/Set 13/3.png', 0.3),
+            ToggleButton(650, 70, '../assets/sets/Set 13/4.png', 0.3),
+            ToggleButton(850, 70, '../assets/sets/Set 13/5.png', 0.3),
+            ToggleButton(1050, 70, '../assets/sets/Set 13/6.png', 0.3),
+        ]
+
+
+
+        self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
+        self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
+        self.galaxy = ToggleButton(880, 70, '../assets/BG-pic/galaxy.jpg', 0.25)
+
+        self.next_img = pygame.image.load('../assets/icons/return.png')
         self.next_img = pygame.transform.flip(self.next_img, True, False)
         self.next = Button(1120, 600, self.next_img, 0.2)
 
-        self.bg_default = 'assets/videos/tunnel.mp4'
+        self.bg_default = '../assets/videos/diffselectbg.mp4'
         self.bg_default_loop = VideoPlayer(self.bg_default)
-        self.bg_uw = 'assets/videos/underwater_background.mp4'
+        self.bg_uw = '../assets/videos/underwater_background.mp4'
         self.bg_uw_loop = VideoPlayer(self.bg_uw)
-        self.bg_j = 'assets/videos/jungle_background.mp4'
+        self.bg_j = '../assets/videos/jungle_background.mp4'
         self.bg_j_loop = VideoPlayer(self.bg_j)
-        self.bg_g = 'assets/videos/galaxy_background.mp4'
+        self.bg_g = '../assets/videos/galaxy_background.mp4'
         self.bg_g_loop = VideoPlayer(self.bg_g)
+        self.activated_buttons = []
+
 
     def select(self):
         check_j = False
         check_uw = False
         check_g = False
         check_next = False
-        activated_buttons = []
         running = True
+        self.activated_buttons = []
         self.screen.fill((255, 255, 255))
         while running:
             for event in pygame.event.get():
@@ -232,34 +247,36 @@ class selector:
                     sys.exit()
                 if self.next.clicked:
                     # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
-                    activated_buttons = []
+                    self.activated_buttons = []
                     if self.jungle.clicked:
-                        activated_buttons.append('jungle')
+                        self.activated_buttons.append('jungle')
                     elif self.underwater.clicked:
-                        activated_buttons.append('underwater')
+                        self.activated_buttons.append('underwater')
                     elif self.galaxy.clicked:
-                        activated_buttons.append('galaxy')
-
+                        self.activated_buttons.append('galaxy')
                     if self.set6_j.clicked:
-                        activated_buttons.append('set6_j')
+                        self.activated_buttons.append('set6_j')
                     elif self.set13_j.clicked:
-                        activated_buttons.append('set13_j')
+                        self.activated_buttons.append('set13_j')
                     elif self.set10_g.clicked:
-                        activated_buttons.append('set10_g')
+                        self.activated_buttons.append('set10_g')
                     elif self.set11_g.clicked:
-                        activated_buttons.append('set11_g')
+                        self.activated_buttons.append('set11_g')
                     elif self.set12_uw.clicked:
-                        activated_buttons.append('set12_uw')
-
+                        self.activated_buttons.append('set12_uw')
+                    elif self.set4_uw.clicked:
+                        self.activated_buttons.append('set4_uw')
                     if self.midRace.clicked:
-                        activated_buttons.append('mid')
+                        self.activated_buttons.append('mid')
                     elif self.longRace.clicked:
-                        activated_buttons.append('long')
+                        self.activated_buttons.append('long')
                     elif self.shortRace.clicked:
-                        activated_buttons.append('short')
+                        self.activated_buttons.append('short')
 
-                    if len(activated_buttons) == 3:
-                         check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
+                    if len(self.activated_buttons) == 3:
+                        check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
+                        for b in self.activated_buttons:
+                            print(b)
 
                 if not check_next:
                     ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
@@ -277,13 +294,26 @@ class selector:
 
                     if self.underwater.clicked:
                         check_uw = True
-                        ToggleButton.check_click(event, [self.set12_uw])
+                        ToggleButton.check_click(event, [self.set12_uw, self.set4_uw])
                     else:
                         check_uw = False
 
                     ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
+
                 else:
-                    pass
+                    #HIEN THI CAC SET NHAN VAT
+                    if self.activated_buttons[1] == 'set4_uw':
+                        ToggleButton.check_click(event, self.set4_char)
+                    if self.activated_buttons[1] == 'set12_uw':
+                        ToggleButton.check_click(event, self.set12_char)
+                    if self.activated_buttons[1] == 'set11_g':
+                        ToggleButton.check_click(event, self.set11_char)
+                    if self.activated_buttons[1] == 'set10_g':
+                        ToggleButton.check_click(event, self.set10_char)
+                    if self.activated_buttons[1] == 'set6_j':
+                        ToggleButton.check_click(event, self.set6_char)
+                    if self.activated_buttons[1] == 'set13_j':
+                        ToggleButton.check_click(event, self.set13_char)
 
             if not check_next:
                 self.bg_default_loop.loop_background()
@@ -298,30 +328,56 @@ class selector:
                 if check_uw:
                     self.bg_uw_loop.loop_background()
                     self.set12_uw.draw(self.screen)
+                    self.set4_uw.draw(self.screen)
+
                 self.underwater.draw(self.screen)
                 self.galaxy.draw(self.screen)
                 self.jungle.draw(self.screen)
                 self.longRace.draw(self.screen)
                 self.midRace.draw(self.screen)
                 self.shortRace.draw(self.screen)
-                self.next.draw()
+                self.next.draw(self.screen)
 
             else:
-                if activated_buttons[0] == 'underwater':
-                    self.bg_uw_loop.loop_background()
-
-                if activated_buttons[0] == 'jungle':
+                if self.activated_buttons[0] == 'jungle':
                     self.bg_j_loop.loop_background()
+                    if self.activated_buttons[1] == 'set6_j':
+                        for b in self.set6_char:
+                            b.draw(self.screen)
+                    elif self.activated_buttons[1] == 'set13_j':
+                        for b in self.set13_char:
+                            b.draw(self.screen)
 
-                if activated_buttons[0] == 'galaxy':
+                elif self.activated_buttons[0] == 'underwater':
+                    self.bg_uw_loop.loop_background()
+                    if self.activated_buttons[1] == 'set4_uw':
+                        for b in self.set4_char:
+                            b.draw(self.screen)
+                    elif self.activated_buttons[1] == 'set12_uw':
+                        for b in self.set12_char:
+                            b.draw(self.screen)
+                elif self.activated_buttons[0] == 'galaxy':
                     self.bg_g_loop.loop_background()
+                    if self.activated_buttons[1] == 'set10_g':
+                        for b in self.set10_char:
+                            b.draw(self.screen)
+                    if self.activated_buttons[1] == 'set11_g':
+                        for b in self.set11_char:
+                            b.draw(self.screen)
+
+
+
+
 
             pygame.display.update()
             pygame.display.flip()
             self.clock.tick(60)
 
-        pygame.quit()
 
+
+
+
+        sys.exit()
 if __name__ == '__main__':
-    selector = selector()
-    selector.select()
+  selector = selector()
+  selector.select()
