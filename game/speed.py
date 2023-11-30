@@ -12,42 +12,37 @@ width, height = 1280, 720
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Racing Game")
 
-Length = 3
-race_scale = 1
-if Length == 1:
-    race_scale = 1.2
-elif Length == 2:
-    race_scale = 1
-else:
-    race_scale = 0.8
+class Background:
+    def __init__(self, length, width, height):
+        self.length = length
+        self.width = width
+        self.height = height
+        self.race_scale = 0.8 if length > 2 else 1 if length == 2 else 1.2
+        self.load_images()
+        
+    def load_images(self):
+        self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg')
+        self.image = self.load_and_scale_image('./assets/race/race-mid.png')
+        self.race_start = self.load_and_scale_image('./assets/race/race-start.png')
+        self.race_end = self.load_and_scale_image('./assets/race/race-end.png')
+        self.end_width = self.race_end.get_width()
 
-# Load the image to be looped
-background = pygame.image.load('./assets/BG-pic/galaxy.jpg')
-image = pygame.image.load('./assets/race/race-mid.png')
-image.set_alpha(120)
-image_width = image.get_width()
-image_height = image.get_height()
-image = pygame.transform.scale(image,(int(race_scale*image_width),int(race_scale*image_height)))
-image_width = image.get_width()
-image_height = image.get_height()
-race_start = pygame.image.load('./assets/race/race-start.png')
-race_start.set_alpha(120)
-race_s_w = race_start.get_width()
-race_s_h = race_start.get_height()
-race_start = pygame.transform.scale(race_start,(int(race_scale*race_s_w),int(race_scale*race_s_h)))
-race_s_w = race_start.get_width()
-race_s_h = race_start.get_height()
-race_end = pygame.image.load('./assets/race/race-end.png')
-race_end.set_alpha(120)
-race_e_w = race_end.get_width()
-race_e_h = race_end.get_height()
-race_end = pygame.transform.scale(race_end,(int(race_scale*race_e_w),int(race_scale*race_e_h)))
-race_e_w = race_end.get_width()
-race_e_h = race_end.get_height()
-end_width = race_end.get_width()
+    def load_and_scale_image(self, path):
+        image = pygame.image.load(path)
+        image.set_alpha(120)
+        image_width = image.get_width()
+        image_height = image.get_height()
+        image = pygame.transform.scale(image,(int(self.race_scale*image_width),int(self.race_scale*image_height)))
+        return image
 
-# Calculate the number of repetitions needed to fill the window horizontally
-num_repetitions = width // image_width + 1  # Add 1 to ensure the whole window is filled
+    def draw_background(self, window):
+        window.blit(self.background, (0, 0))
+        num_repetitions = self.width // self.image.get_width() + 1
+        for i in range(num_repetitions):
+            window.blit(self.image, (i * self.image.get_width(), self.height - self.image.get_height() - 10))  # Render the image at each multiple of image width
+            window.blit(self.race_start, (0, self.height - self.image.get_height() - 10))
+            window.blit(self.race_end, (self.width - self.end_width, self.height - self.image.get_height() - 10))
+
 
 class Player:
     def __init__(self, x, y, speed, normal_image, turnaround_image, current_image, order, finished):
@@ -57,7 +52,6 @@ class Player:
         self.speed_multiplier = 1.0 # Use to change player's speed when experiencing powerup's effect
         self.power_up_timer = 0 # time that powerup takes effect, initialize at 1
         self.power_up = None
-        self.image = image
         self.normal_image = normal_image
         self.turnaround_image = turnaround_image
         self.current_image = current_image
@@ -98,13 +92,6 @@ class Game:
         while pygame.time.get_ticks() - start_time < duration:
             pygame.display.update()
 
-        
-    def draw_background(self):
-        window.blit(background, (0, 0))
-        for i in range(num_repetitions):
-            window.blit(image, (i * image_width, self.height - image_height - 10))  # Render the image at each multiple of image width
-            window.blit(race_start, (0, self.height - image_height - 10))
-            window.blit(race_end, (self.width - end_width, self.height - image_height - 10))
 
     def draw_powerup_icons(self):
         for power_up_icon in self.power_up_icons:
@@ -229,7 +216,7 @@ class Game:
     def countdown(self):
         countdown_font = pygame.font.Font(None, 100)
         countdown_text = [" ","3", "2", "1", "Go!"]
-        countdown_duration = 60  # Đếm ngược mỗi giây
+        countdown_duration = 75  # Đếm ngược mỗi giây
 
         music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
         music.play()
@@ -237,8 +224,7 @@ class Game:
         for i in range(len(countdown_text)):
             
             for j in range(countdown_duration):
-                self.draw_background()
-                self.draw_powerup_icons()
+                bg.draw_background(window)
                 self.draw_players()
                 
                 countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
@@ -291,10 +277,7 @@ class Game:
             # Check for players reaching the finish line
             self.check_finish()
             
-            
-
-            # Draw the tiled image horizontally
-            self.draw_background()
+            bg.draw_background(window)
 
             # Draw power-up icons
             self.draw_powerup_icons()
@@ -310,6 +293,9 @@ class Game:
         # Quit Pygame
         pygame.quit()
         sys.exit()
+
+bg = Background(length = int(input("Type length number: ")), width=1280, height=720)
+bg.draw_background(window)
 
 # Initialize the game
 game = Game(1280, 720, 50, 6, 20)
