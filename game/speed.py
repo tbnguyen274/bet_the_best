@@ -124,7 +124,7 @@ class Game:
             window.blit(image, (i * image_width, 100))  # Render the image at each multiple of image width
             window.blit(race_start, (0, 100))
             window.blit(race_end, (self.width - end_width, 100))
-
+    # draw power-ups
     def draw_powerup_icons(self):
         for power_up_icon in self.power_up_icons:
             if power_up_icon.active:
