@@ -171,6 +171,8 @@ class TextInput:
                     self.text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
+                elif event.key == pygame.K_DELETE:
+                    self.text = ''
                 elif event.key == pygame.K_SPACE: #random name khi nhan SPACE
                     self.text = random.choice(self.random_namecopy)
                     self.random_namecopy = list(set(self.random_namecopy) - set([self.text]))
