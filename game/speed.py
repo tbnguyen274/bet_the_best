@@ -111,11 +111,11 @@ class Game:
         announce_text = text
         announce_render = announce_font.render(announce_text, True, (255, 255, 255))
         announce_position = (self.width // 2 - announce_render.get_width() // 2, 15 + announce_render.get_height() // 2)
-
-
-
         window.blit(announce_render, announce_position)
-        pygame.display.update()
+        
+        start_time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_time < duration:
+            pygame.display.update()
 
         
     def draw_background(self):
