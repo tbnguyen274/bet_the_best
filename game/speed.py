@@ -3,8 +3,10 @@ import random
 import sys
 import os
 
+
 # Initialize Pygame
 pygame.init()
+pygame.mixer.init()
 
 # Set up display
 width, height = 1280, 720
@@ -62,7 +64,9 @@ class PowerUpIcon:
         self.rect = pygame.Rect(x, y, image.get_width(), image.get_height())
         self.type = type
         self.image = image
+        self.timer = 0
         self.active = True  # active attribute checks if a power-up is still active
+        self.collided = False
 
 class Game:
     def __init__(self, width, height, player_size, num_players, num_power_up_icons):
@@ -98,7 +102,7 @@ class Game:
                 countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
                 window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, self.height // 2 - countdown_render.get_height() // 2))
 
-                pygame.display.flip()
+                pygame.display.update()
 
         self.run()
     
@@ -106,11 +110,13 @@ class Game:
         announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
         announce_text = text
         announce_render = announce_font.render(announce_text, True, (255, 255, 255))
-        window.blit(announce_render, (self.width // 2 - announce_render.get_width() // 2, 15 + announce_render.get_height() // 2))
+        announce_position = (self.width // 2 - announce_render.get_width() // 2, 15 + announce_render.get_height() // 2)
 
-        start_time = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_time < duration:
-            pygame.display.flip()
+
+
+        window.blit(announce_render, announce_position)
+        pygame.display.update()
+
         
     def draw_background(self):
         window.blit(background, (0, 0))
@@ -123,6 +129,12 @@ class Game:
         for power_up_icon in self.power_up_icons:
             if power_up_icon.active:
                 window.blit(power_up_icon.image, power_up_icon.rect.topleft)
+            if power_up_icon.collided:
+                power_up_icon.active = False
+                if power_up_icon.timer > 0:
+                    power_up_icon.timer -= 1
+                    window.blit(power_up_icon.image, power_up_icon.rect.topleft)
+
 
     def draw_players(self):
         for player in self.players:
@@ -173,7 +185,7 @@ class Game:
         elif player.power_up == "SlowDown":
             player.speed_multiplier = 0.5
         elif player.power_up == "TurnAround":
-            player.speed_multiplier *= -1.0
+            player.speed_multiplier = -1.0
             player.current_image = player.turnaround_image
         elif player.power_up == "Restart":
             player.x -= self.width - self.player_size
@@ -182,14 +194,10 @@ class Game:
         elif player.power_up == "Teleport":
             player.x = random.randint(0, self.width // 2 - self.player_size)
             
-        # set active to False when the power-up's effect has ended
-        for power_up_icon in self.power_up_icons:
-            if power_up_icon.rect.colliderect(player_rect) and power_up_icon.type == player.power_up and power_up_icon.active:
-                power_up_icon.active = False
-                break
         player.power_up = None
 
     def move_players(self):
+        
         for player in self.players:
             if not player.finished:
                 if player.power_up_timer > 0:
@@ -213,21 +221,19 @@ class Game:
             for power_up_icon in self.power_up_icons:
                 if player_rect.colliderect(power_up_icon.rect):
                     if power_up_icon.type is None:
-                        power_up_type = random.choices(self.power_ups, weights=self.power_up_probabilities)[0]
+                        power_up_type = random.choices(self.power_ups, weights = self.power_up_probabilities)[0]
                         power_up_icon.type = power_up_type
+                        power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
+                        power_up_icon.collided = True
+                        power_up_icon.timer = 30
+                        
+                        player.power_up = power_up_type
+                        player.power_up_timer = random.randint(60, 80)  # Power-up duration
+                        
                         print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
                         self.announce(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
                         self.announcement.append(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
-                        player.power_up = power_up_type
-                        player.power_up_timer = random.randint(60, 80)  # Power-up duration
-                        power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
-                        #break  # Exit the loop as the player can only pick up one power-up at a time
 
-    # def check_winners(self):
-    #     finished_players = [player for player in self.players if player.finished]
-    #     if len(finished_players) == self.num_players:
-    #         print("All players reached the finish line!")
-    #         self.running = False
 
     def check_finish(self):
         for player in self.players:
@@ -238,7 +244,7 @@ class Game:
                 print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
                 self.announce(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
                 self.announcement.append(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-                player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
+
                 
 
     def run(self):
@@ -255,29 +261,35 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
+            finished_players = [player for player in self.players if player.finished]
+            
             # Move players
             self.move_players()
+            
+            # Check if any player has collided with a power-up icon
+            self.check_power_up_collided()
 
             # Check for boundaries
             self.check_boundaries()
 
-            # Check if it's time to add a random power-up icon
-            if random.random() < 0.03 and len(finished_players) == 0:  # Thay đổi giá trị này để điều chỉnh tần suất xuất hiện
+            # Add a randon power-up if a random number created < 0.03 and nobody's finished the line yet
+            if random.random() < 0.03 and len(finished_players) == 0:  
                 self.add_random_power_up_icon()
 
-            # Check if any player has collided with a power-up icon
-            self.check_power_up_collided()
+            
 
             # Check for winners
-            finished_players = [player for player in self.players if player.finished]
+            
             if len(finished_players) == self.num_players:
                 print("All players reached the finish line!")
                 self.announce("All players reached the finish line!")
                 pygame.time.delay(1000)
-                running = False
+                running = False # xit main loop
 
             # Check for players reaching the finish line
             self.check_finish()
+            
+            
 
             # Draw the tiled image horizontally
             self.draw_background()
