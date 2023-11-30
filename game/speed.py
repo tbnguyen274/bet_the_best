@@ -77,7 +77,7 @@ class Game:
         self.power_up_probabilities = [0.02, 0.05, 0.05, 0.01, 0.01, 0.03]
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (player_size, player_size)) for i, power_up in enumerate(self.power_ups)}
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
-
+        self.announcement = []
         # self.running = True
 
     def countdown(self):
@@ -100,8 +100,17 @@ class Game:
 
                 pygame.display.flip()
 
-
         self.run()
+    
+    def announce(self, text, duration=1000):
+        announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        announce_text = text
+        announce_render = announce_font.render(announce_text, True, (255, 255, 255))
+        window.blit(announce_render, (self.width // 2 - announce_render.get_width() // 2, 15 + announce_render.get_height() // 2))
+
+        start_time = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_time < duration:
+            pygame.display.flip()
         
     def draw_background(self):
         window.blit(background, (0, 0))
@@ -207,6 +216,8 @@ class Game:
                         power_up_type = random.choices(self.power_ups, weights=self.power_up_probabilities)[0]
                         power_up_icon.type = power_up_type
                         print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
+                        self.announce(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
+                        self.announcement.append(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
                         player.power_up = power_up_type
                         player.power_up_timer = random.randint(60, 80)  # Power-up duration
                         power_up_icon.image = self.power_up_images[power_up_type]  # Change the icon to the actual power-up icon
@@ -225,6 +236,8 @@ class Game:
                 player.finished = True
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
                 print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
+                self.announce(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
+                self.announcement.append(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
                 player.y = player.y  # Giữ nguyên hàng ngang cuối cùng mà họ đạt được
                 
 
@@ -259,6 +272,8 @@ class Game:
             finished_players = [player for player in self.players if player.finished]
             if len(finished_players) == self.num_players:
                 print("All players reached the finish line!")
+                self.announce("All players reached the finish line!")
+                pygame.time.delay(1000)
                 running = False
 
             # Check for players reaching the finish line
