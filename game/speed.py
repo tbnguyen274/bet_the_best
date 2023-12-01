@@ -84,11 +84,21 @@ class Announcement:
         self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 10 + self.announce_render.get_height() // 2)
         
     def update_finish(self, text):
-        
         self.announce_render = self.announce_font.render(text, True, (244, 169, 80), (22, 27, 33))
-        self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 50 + self.announce_render.get_height() // 2)
+        self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 60 + self.announce_render.get_height() // 2)
     
-    def draw(self):
+    def draw_power_up(self):
+        border_rect_1 = pygame.Rect(310, 15, 660, 50)     
+        pygame.Surface.fill(window, (248,248,255), border_rect_1)
+        pygame.draw.rect(window, (255,0,0),border_rect_1 , 3)
+
+        if self.announce_render is not None and self.announce_position is not None:
+            window.blit(self.announce_render, self.announce_position)
+            
+    def draw_finish(self):
+        border_rect_2 = pygame.Rect(310, 65, 660, 50)
+        pygame.Surface.fill(window, (22, 27, 33), border_rect_2)
+        pygame.draw.rect(window, (255,0,0),border_rect_2 , 3)
         if self.announce_render is not None and self.announce_position is not None:
             window.blit(self.announce_render, self.announce_position)
 
@@ -335,8 +345,8 @@ class Game:
             announce2.update_finish(self.text_finish)
             
             # Draw announcements
-            announce1.draw()
-            announce2.draw()
+            announce1.draw_power_up()
+            announce2.draw_finish()
 
             # Update display
             pygame.display.flip()
