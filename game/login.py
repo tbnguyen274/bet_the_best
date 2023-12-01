@@ -262,6 +262,7 @@ class password():
                         self.start_time = pygame.time.get_ticks()
                     elif self.validate_login(self.input_username.text, self.input_password.text): # Nếu đúng mật khẩu, vào game
                         login_success(self.input_username.text)
+                        self.input_username.text = self.input_password.text = ''
                     else:
                         self.pop_fail.display = True # Nếu sai thì thông báo
                         self.start_time = pygame.time.get_ticks()
@@ -285,6 +286,7 @@ class password():
                     if event.key == pygame.K_RETURN: # Sau khi đã nhập mật khẩu vào ô thứ 2, nhấn enter để vào game cũng dc
                         if self.validate_login(self.input_username.text, self.input_password.text):
                             login_success(self.input_username.text)
+                            self.input_username.text = self.input_password.text = ''
                         else:
                             self.pop_fail.display = True # Nếu sai thì thông báo
                             self.start_time = pygame.time.get_ticks()
@@ -388,12 +390,16 @@ class faceid():
                         self.input_username.text += event.unicode
         
         if self.register_clicked:
-            big_frame = cv2.resize(frame, (1080,1080))
-            big_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            face_locations = face_recognition.face_locations(big_frame)
+            enhanced_frame = frame.copy()
+            enhanced_frame = cv2.resize(enhanced_frame, (700,700))
+            enhanced_frame = cv2.convertScaleAbs(enhanced_frame, alpha=1.5, beta=50)
+            enhanced_frame = cv2.cvtColor(enhanced_frame, cv2.COLOR_BGR2RGB)
+            gray_frame = cv2.cvtColor(enhanced_frame, cv2.COLOR_BGR2GRAY)
+
+            face_locations = face_recognition.face_locations(gray_frame)
 
             if len(face_locations) > 0: # Kiểm tra có detect dc khuôn mặt không
-                face_encodings = face_recognition.face_encodings(big_frame, face_locations)
+                face_encodings = face_recognition.face_encodings(enhanced_frame, face_locations)
                 face_encodings_from_db = []
                 with open(DATABASE) as file:
                     data = json.load(file)
@@ -423,12 +429,16 @@ class faceid():
             self.start_time = pygame.time.get_ticks()
             self.register_clicked = False
         elif self.login_clicked:
-            big_frame = cv2.resize(frame, (1080,1080))
-            big_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            face_locations = face_recognition.face_locations(big_frame)
+            enhanced_frame = frame.copy()
+            enhanced_frame = cv2.resize(enhanced_frame, (700,700))
+            enhanced_frame = cv2.convertScaleAbs(enhanced_frame, alpha=1.5, beta=50)
+            enhanced_frame = cv2.cvtColor(enhanced_frame, cv2.COLOR_BGR2RGB)
+            gray_frame = cv2.cvtColor(enhanced_frame, cv2.COLOR_BGR2GRAY)
+
+            face_locations = face_recognition.face_locations(gray_frame)
 
             if len(face_locations) > 0:
-                face_encodings = face_recognition.face_encodings(big_frame, face_locations)
+                face_encodings = face_recognition.face_encodings(enhanced_frame, face_locations)
                 with open(DATABASE, "r") as database:
                     user_data = json.load(database)
                     found_match = False
@@ -440,7 +450,7 @@ class faceid():
                             match = face_recognition.compare_faces([stored_face_encoding], face_encoding)
                             if match[0]:  # If a match is found in the database
                                 found_match = True
-                                login_success(face_username)  # Execute login_success with the username
+                                login_success(face_username)
                                 break
                         if found_match:
                             break
@@ -679,6 +689,7 @@ faceid = faceid()
 register = register()
 
 # Chạy nhạc nền
+
 pygame.mixer.music.stop
 login_music = ('assets/musics/login_music.mp3')
 pygame.mixer.music.load(login_music)
@@ -691,17 +702,12 @@ while True:
     background.display()
     form.display()
 
-    # Hien thi cac state dang nhap 
+        # Hien thi cac state dang nhap 
     if password.display:
         password.run()
     elif faceid.display:
         faceid.run()
     elif register.display:
         register.run()    
-    
+        
     pygame.display.update()
-
-# Thoát game hoàn toàn
-cam_capture.release()
-pygame.quit()
-sys.exit()
