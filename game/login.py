@@ -288,7 +288,7 @@ def start_login():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     mouse_pos = pygame.mouse.get_pos() # Lấy vị trí chuột
                     if button_faceid.collidepoint(mouse_pos): # Nếu nhấn nút này, chuyển sang giao diện đăng nhập khuôn mặt
                         self.display = False
@@ -410,7 +410,7 @@ def start_login():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.return_button_rect.collidepoint(mouse_pos):  # Chuyển giao diện nếu ấn nút này
                         password.display = True
                         self.display = register.display = False
@@ -607,7 +607,7 @@ def start_login():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     mouse_pos = pygame.mouse.get_pos() # Lấy vị trí chuột
                     if return_login_button.collidepoint(mouse_pos): # Nếu nhấn nút này, chuyển sang giao diện đăng nhập khuôn mặt
                         password.display = True

@@ -181,7 +181,7 @@ def mainmenu(loggedinuser):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
                 if button_logout.image_rect.collidepoint(mousepos):
                     login.restart_login()
