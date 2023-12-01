@@ -13,15 +13,19 @@ window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Racing Game")
 
 class Background:
-    def __init__(self, length, width, height):
+    def __init__(self, length, width, height, bg_type):
         self.length = length
         self.width = width
         self.height = height
         self.race_scale = 0.8 if length > 2 else 1 if length == 2 else 1.2
+        self.bg_type = bg_type
         self.load_images()
         
     def load_images(self):
-        self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg')
+        self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 3 else
+                                            './assets/BG-pic/jungle.jpg' if self.bg_type == 2 else
+                                            './assets/BG-pic/underwater.jpg')  
+        
         self.image = self.load_and_scale_image('./assets/race/race-mid.png')
         self.race_start = self.load_and_scale_image('./assets/race/race-start.png')
         self.race_end = self.load_and_scale_image('./assets/race/race-end.png')
@@ -57,7 +61,6 @@ class Player:
         self.current_image = normal_image
         self.order = 0
         self.finished = False
-        self.name
 
 class PowerUpIcon:
     def __init__(self, x, y, type, image):
@@ -122,14 +125,14 @@ class Game:
         elif bg.length > 2:
             self.players = [Player(0, bg.height - bg.image.get_height() +  65*i,
                         pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
                         )
                     for i in range(self.num_players)]
         
         else:   
             self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
                         pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
                         )
                     for i in range(self.num_players)]
         
@@ -285,7 +288,7 @@ class Game:
                 print("All players reached the finish line!")
                 self.announce("All players finished the race!")
                 pygame.time.delay(1000)
-                running = False # xit main loop
+                running = False # exit main loop
 
             # Check for players reaching the finish line
             self.check_finish()
@@ -307,7 +310,7 @@ class Game:
         pygame.quit()
         sys.exit()
 
-bg = Background(length = 2, width = 1280, height = 720)
+bg = Background(length = 2, width = 1280, height = 720, bg_type = 1)
 bg.draw_background(window)
 
 # Initialize the game
