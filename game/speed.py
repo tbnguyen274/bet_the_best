@@ -250,37 +250,42 @@ class Game:
                 print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
                 
     def show_rankings(self):
+        # ...
         bg.draw_background(window)
+        # Load RankingImg
         RankingImg = pygame.image.load("assets/BG-pic/leaderboard.png")
 
-        # Calculate the scaling factors to fit the image on the screen
-        width_ratio = bg.width / RankingImg.get_width()
-        height_ratio = bg.height / RankingImg.get_height()
-        min_ratio = min(width_ratio, height_ratio)
+        # Calculate the dimensions of the frame
+        frame_width = RankingImg.get_width() /4 + 10
+        frame_height = RankingImg.get_height() /4 + 10
+        frame = pygame.Surface((frame_width, frame_height))
 
-        # Resize the image while maintaining the aspect ratio
-        rankingImg = pygame.transform.scale(RankingImg, (int(RankingImg.get_width() * min_ratio), int(RankingImg.get_height() * min_ratio)))
+        # Calculate the dimensions of the image display area
+        image_width = RankingImg.get_width() /4
+        image_height = RankingImg.get_height() /4
 
-        # Calculate the position to center the image on the screen
-        img_x = (bg.width - rankingImg.get_width()) // 2
-        img_y = (bg.height - rankingImg.get_height()) // 2
 
-        # Draw the ranking image
-        window.blit(rankingImg, (img_x, img_y))
+        # Resize and center the image
+        scaled_image = pygame.transform.scale(RankingImg, (image_width, image_height))
+        image_rect = scaled_image.get_rect(center=(frame_width // 2, frame_height // 2))
 
-        # Initialize font
-        pygame.font.init()
+        # Blit the image onto the frame
+        frame.blit(scaled_image, image_rect.topleft)
+
+        # Render and display ranking information
         myfont = pygame.font.SysFont('Comic Sans MS', 30)
-        
-        # Sort players based on their order
-        self.players.sort(key=lambda player: player.order)
-
-        # Display player rankings
         for i, player in enumerate(self.players):
-            rankText = myfont.render('Rank {0}:'.format(player.order), False, (255, 0, 0))
-            window.blit(rankText, (300 + 150, 100 + 180 + i * 50))
-            carsImg = pygame.transform.scale(player.normal_image, (50, 50))
-            window.blit(carsImg, (300 + 500, 100 + 170 + i * 50))
+            rank_text = myfont.render('Rank {0}:'.format(player.order), False, (255, 0, 0))
+            frame.blit(rank_text, (frame_width // 2 - 40, image_rect.bottom + 20 + i * 30))
+
+        # Calculate the position of the frame on the main window
+        frame_rect = frame.get_rect(center=(self.width // 2, self.height // 2))
+
+        # Draw the frame onto the main window
+        window.blit(frame, frame_rect.topleft)
+
+        pygame.display.flip()
+
 
             
 
@@ -365,8 +370,8 @@ class Game:
                 self.show_rankings()
                 pygame.display.update()
                 pygame.time.delay(10000)
-                
-                 # exit main loop
+                break
+                # exit main loop
 
             # Check for players reaching the finish line
             self.check_finish()
