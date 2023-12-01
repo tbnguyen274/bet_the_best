@@ -137,7 +137,10 @@ class Button:
 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
-
+#random ten
+random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
+                       "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
+                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben"]
 
 class TextInput:
     def __init__(self, x, y, width, height, font_size):
@@ -150,12 +153,6 @@ class TextInput:
         self.text = ""
         self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
         self.active = False
-        self.random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
-                       "Alison", "Joel", "Joe", "Harrvey", "Luis", "Darwin", "Diogo", "Mac",
-                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben"]
-        self.random_namecopy = self.random_name
-        # self.text = random.choice(self.random_namecopy)
-        # self.random_namecopy = list(set(self.random_namecopy) - set([self.text]))
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -174,8 +171,10 @@ class TextInput:
                 elif event.key == pygame.K_DELETE:
                     self.text = ''
                 elif event.key == pygame.K_SPACE: #random name khi nhan SPACE
-                    self.text = random.choice(self.random_namecopy)
-                    self.random_namecopy = list(set(self.random_namecopy) - set([self.text]))
+                    while self.text == "":
+                        self.text = random.choice(random_name)
+                        random_name.remove(self.text)
+
                 else:
                     temp_text = self.text + event.unicode
                     temp_surface = self.font.render(temp_text, True, self.font_color)
