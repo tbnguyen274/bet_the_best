@@ -2,6 +2,7 @@ import pygame
 import random
 import sys
 import os
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -239,25 +240,42 @@ class Game:
                 print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
 
     def countdown(self):
-        countdown_font = pygame.font.Font(None, 100)
-        countdown_text = [" ","3", "2", "1", "Start!"]
-        countdown_duration = 60  # Đếm ngược mỗi giây
-
+        running = True
         music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
         music.play()
+        time_sec = 3
+        bg.draw_background(window)
+        self.draw_players()
+        pygame.display.update()
         
-        for i in range(len(countdown_text)):
-            
-            for j in range(countdown_duration):
-                bg.draw_background(window)
-                self.draw_players()
-                
-                countdown_render = countdown_font.render(countdown_text[i], True, (255, 0, 0))
-                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, 50 + countdown_render.get_height() // 2))
+        # Tạo đối tượng Font
+        font = pygame.font.Font(None, 50)
 
-                pygame.display.update()
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-        self.run()            
+            bg.draw_background(window)
+            self.draw_players()
+
+            if time_sec > -1:
+                mins, secs = divmod(time_sec, 60)
+                timeformat = '{:02d}:{:02d}'.format(mins, secs)
+
+                # Tạo Surface chứa văn bản
+                text = font.render(timeformat, True, (255, 255, 255))
+
+                # Vẽ văn bản lên màn hình
+                window.blit(text, (10, 10))
+
+                time.sleep(1)
+                time_sec -= 1
+            else:
+                pygame.time.delay(500) # delay 0.5s
+                self.run()
+
+            pygame.display.update()
 
     def run(self):
 
@@ -271,7 +289,6 @@ class Game:
         announce1 = Announcement() 
         announce2 = Announcement()
     
-
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
