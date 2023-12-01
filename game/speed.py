@@ -45,18 +45,19 @@ class Background:
 
 
 class Player:
-    def __init__(self, x, y, speed, normal_image, turnaround_image, current_image, order, finished):
+    def __init__(self, x, y, normal_image, turnaround_image):
         self.x = x  # player's x-coordinate
         self.y = y  # player's y-coordinate
-        self.speed = speed  
+        self.speed = random.uniform(1, 3)  
         self.speed_multiplier = 1.0 # Use to change player's speed when experiencing powerup's effect
         self.power_up_timer = 0 # time that powerup takes effect
         self.power_up = None
         self.normal_image = normal_image
         self.turnaround_image = turnaround_image
-        self.current_image = current_image
-        self.order = order
-        self.finished = finished
+        self.current_image = normal_image
+        self.order = 0
+        self.finished = False
+        self.name
 
 class PowerUpIcon:
     def __init__(self, x, y, type, image):
@@ -68,21 +69,22 @@ class PowerUpIcon:
         self.collided = False
 
 class Game:
-    def __init__(self, width, height, player_size, num_players, num_power_up_icons):
-        self.width = width
-        self.height = height
+    def __init__(self, num_player_set, num_power_up_icons):
+        self.width = 1280
+        self.height = 720
         self.player_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
-        self.num_players = num_players
+        self.num_players = 6
+        self.num_player_set = num_player_set
         self.num_power_up_icons = num_power_up_icons
         self.players = []
         self.power_up_icons = []
         self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport"]
-        self.power_up_probabilities = [0.02, 0.04, 0.03, 0.03, 0.01, 0.03]
+        self.power_up_probabilities = [0.02, 0.04, 0.03, 0.03, 0.005, 0.03]
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (self.player_size, self.player_size))
                                for i, power_up in enumerate(self.power_ups)}
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
     
-    def announce(self, text, duration=1000):
+    def announce(self, text, duration = 1000):
         announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
         announce_text = text
         announce_render = announce_font.render(announce_text, True, (255, 255, 255))
@@ -111,27 +113,24 @@ class Game:
 
     def create_players(self):
         if bg.length == 2:
-            self.players = [Player(0, bg.height - bg.image.get_height() +  85*i, random.uniform(1, 3),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        0, False)
+            self.players = [Player(0, bg.height - bg.image.get_height() +  85*i,
+                        pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
+                        )
                     for i in range(self.num_players)]
         
         elif bg.length > 2:
-            self.players = [Player(0, bg.height - bg.image.get_height() +  65*i, random.uniform(1, 3),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        0, False)
+            self.players = [Player(0, bg.height - bg.image.get_height() +  65*i,
+                        pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        )
                     for i in range(self.num_players)]
         
         else:   
-            self.players = [Player(0, bg.height - bg.image.get_height() +  102*i, random.uniform(1, 3),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"rplayer{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.scale(pygame.image.load(os.path.join("assets/sets/Set 3", f"player{i+1}.png")), (self.player_size, self.player_size)),
-                        0, False)
+            self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
+                        pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        )
                     for i in range(self.num_players)]
         
         # Save y-coordinate of all players for later use
@@ -179,11 +178,9 @@ class Game:
             player.x = self.width - self.player_size
         elif player.power_up == "Teleport":
             player.x = random.randint(0, self.width // 2 - self.player_size)
-            
         player.power_up = None
 
     def move_players(self):
-        
         for player in self.players:
             if not player.finished:
                 if player.power_up_timer > 0:
@@ -219,17 +216,14 @@ class Game:
                         print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
                         self.announce(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
 
-
-
     def check_finish(self):
         for player in self.players:
             if not player.finished and player.x >= self.width - self.player_size:
                 player.current_image = player.normal_image
                 player.finished = True
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
-                print(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-                self.announce(f"Player {self.players.index(player) + 1} finished in {player.order}th place!")
-
+                print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
+                self.announce(f"Player {self.players.index(player) + 1} finished at rank: {player.order}")
 
     def countdown(self):
         countdown_font = pygame.font.Font(None, 100)
@@ -289,7 +283,7 @@ class Game:
             
             if len(finished_players) == self.num_players:
                 print("All players reached the finish line!")
-                self.announce("All players reached the finish line!")
+                self.announce("All players finished the race!")
                 pygame.time.delay(1000)
                 running = False # xit main loop
 
@@ -313,15 +307,11 @@ class Game:
         pygame.quit()
         sys.exit()
 
-bg = Background(length = 3, width = 1280, height = 720)
+bg = Background(length = 2, width = 1280, height = 720)
 bg.draw_background(window)
 
 # Initialize the game
-game = Game(width = 1280,
-            height = 720,
-            player_size = 50,
-            num_players = 6,
-            num_power_up_icons = 20)
+game = Game(num_player_set = 3, num_power_up_icons = 20)
 
 # Create players and power-up icons
 game.create_players()
