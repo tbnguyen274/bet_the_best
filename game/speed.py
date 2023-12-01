@@ -25,8 +25,8 @@ class Background:
     def load_images(self):
         self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 3 else
                                             './assets/BG-pic/jungle.jpg' if self.bg_type == 2 else
-                                            './assets/BG-pic/underwater.jpg')  
-        
+                                            './assets/BG-pic/underwater.jpg')
+                
         self.image = self.load_and_scale_image('./assets/race/race-mid.png')
         self.race_start = self.load_and_scale_image('./assets/race/race-start.png')
         self.race_end = self.load_and_scale_image('./assets/race/race-end.png')
@@ -248,6 +248,41 @@ class Game:
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
                 self.text_finish = f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}"
                 print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
+                
+    def show_rankings(self):
+        bg.draw_background(window)
+        RankingImg = pygame.image.load("assets/BG-pic/leaderboard.png")
+
+        # Calculate the scaling factors to fit the image on the screen
+        width_ratio = bg.width / RankingImg.get_width()
+        height_ratio = bg.height / RankingImg.get_height()
+        min_ratio = min(width_ratio, height_ratio)
+
+        # Resize the image while maintaining the aspect ratio
+        rankingImg = pygame.transform.scale(RankingImg, (int(RankingImg.get_width() * min_ratio), int(RankingImg.get_height() * min_ratio)))
+
+        # Calculate the position to center the image on the screen
+        img_x = (bg.width - rankingImg.get_width()) // 2
+        img_y = (bg.height - rankingImg.get_height()) // 2
+
+        # Draw the ranking image
+        window.blit(rankingImg, (img_x, img_y))
+
+        # Initialize font
+        pygame.font.init()
+        myfont = pygame.font.SysFont('Comic Sans MS', 30)
+        
+        # Sort players based on their order
+        self.players.sort(key=lambda player: player.order)
+
+        # Display player rankings
+        for i, player in enumerate(self.players):
+            rankText = myfont.render('Rank {0}:'.format(player.order), False, (255, 0, 0))
+            window.blit(rankText, (300 + 150, 100 + 180 + i * 50))
+            carsImg = pygame.transform.scale(player.normal_image, (50, 50))
+            window.blit(carsImg, (300 + 500, 100 + 170 + i * 50))
+
+            
 
     def countdown(self):
         running = True
@@ -327,7 +362,11 @@ class Game:
             if len(finished_players) == self.num_players:
                 print("All players reached the finish line!")
                 pygame.time.delay(1000)
-                running = False # exit main loop
+                self.show_rankings()
+                pygame.display.update()
+                pygame.time.delay(10000)
+                
+                 # exit main loop
 
             # Check for players reaching the finish line
             self.check_finish()
