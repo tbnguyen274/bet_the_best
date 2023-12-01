@@ -70,6 +70,26 @@ class PowerUpIcon:
         self.timer = 0
         self.active = True  # active attribute checks if a power-up is still active
         self.collided = False
+        
+class Announcement:
+    def __init__(self):
+        self.announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        self.announce_render = None
+        self.announce_position = None
+        
+    def update_power_up(self, text):
+        
+        self.announce_render = self.announce_font.render(text, True, (22, 27, 33), (248,248,255))
+        self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 10 + self.announce_render.get_height() // 2)
+        
+    def update_finish(self, text):
+        
+        self.announce_render = self.announce_font.render(text, True, (244, 169, 80), (22, 27, 33))
+        self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 50 + self.announce_render.get_height() // 2)
+    
+    def draw(self):
+        if self.announce_render is not None and self.announce_position is not None:
+            window.blit(self.announce_render, self.announce_position)
 
 class Game:
     def __init__(self, num_player_set, num_power_up_icons):
@@ -86,18 +106,8 @@ class Game:
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (self.player_size, self.player_size))
                                for i, power_up in enumerate(self.power_ups)}
         self.mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (self.player_size, self.player_size))
-    
-    def announce(self, text, duration = 1000):
-        announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
-        announce_text = text
-        announce_render = announce_font.render(announce_text, True, (255, 255, 255))
-        announce_position = (self.width // 2 - announce_render.get_width() // 2, 15 + announce_render.get_height() // 2)
-        window.blit(announce_render, announce_position)
-        
-        start_time = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_time < duration:
-            pygame.display.update()
-
+        self.text_power_up = None
+        self.text_finish = None
 
     def draw_powerup_icons(self):
         for power_up_icon in self.power_up_icons:
@@ -216,8 +226,8 @@ class Game:
                         player.power_up = power_up_type
                         player.power_up_timer = random.randint(60, 80)  # Power-up duration
                         
+                        self.text_power_up = f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}"
                         print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
-                        self.announce(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
 
     def check_finish(self):
         for player in self.players:
@@ -225,12 +235,12 @@ class Game:
                 player.current_image = player.normal_image
                 player.finished = True
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
+                self.text_finish = f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}"
                 print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
-                self.announce(f"Player {self.players.index(player) + 1} finished at rank: {player.order}")
 
     def countdown(self):
         countdown_font = pygame.font.Font(None, 100)
-        countdown_text = [" ","3", "2", "1", "Go!"]
+        countdown_text = [" ","3", "2", "1", "Start!"]
         countdown_duration = 60  # Đếm ngược mỗi giây
 
         music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
@@ -242,16 +252,15 @@ class Game:
                 bg.draw_background(window)
                 self.draw_players()
                 
-                countdown_render = countdown_font.render(countdown_text[i], True, (255, 255, 255))
-                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, self.height // 2 - countdown_render.get_height() // 2))
+                countdown_render = countdown_font.render(countdown_text[i], True, (255, 0, 0))
+                window.blit(countdown_render, (self.width // 2 - countdown_render.get_width() // 2, 50 + countdown_render.get_height() // 2))
 
                 pygame.display.update()
 
         self.run()            
 
     def run(self):
-        print(bg.image.get_width())
-        print(bg.image.get_height())
+
         # Main game loop
         clock = pygame.time.Clock()
         running = True
@@ -259,6 +268,9 @@ class Game:
         music = pygame.mixer.Sound('assets\musics\cars-and-bikes-mokkkamusic.mp3')
         music.play()
         
+        announce1 = Announcement() 
+        announce2 = Announcement()
+    
 
         while running:
             for event in pygame.event.get():
@@ -272,6 +284,7 @@ class Game:
             
             # Check if any player has collided with a power-up icon
             self.check_power_up_collided()
+            
 
             # Check for boundaries
             self.check_boundaries()
@@ -286,19 +299,27 @@ class Game:
             
             if len(finished_players) == self.num_players:
                 print("All players reached the finish line!")
-                self.announce("All players finished the race!")
                 pygame.time.delay(1000)
                 running = False # exit main loop
 
             # Check for players reaching the finish line
             self.check_finish()
             
+            # Draw background
             bg.draw_background(window)
 
             # Draw power-up icons
             self.draw_powerup_icons()
             # Draw players
             self.draw_players()
+            
+            # Update announcements
+            announce1.update_power_up(self.text_power_up)
+            announce2.update_finish(self.text_finish)
+            
+            # Draw announcements
+            announce1.draw()
+            announce2.draw()
 
             # Update display
             pygame.display.flip()
@@ -310,7 +331,7 @@ class Game:
         pygame.quit()
         sys.exit()
 
-bg = Background(length = 2, width = 1280, height = 720, bg_type = 1)
+bg = Background(length = 2, width = 1280, height = 720, bg_type = 2)
 bg.draw_background(window)
 
 # Initialize the game
