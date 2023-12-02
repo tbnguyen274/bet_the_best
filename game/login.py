@@ -745,10 +745,6 @@ def start_login():
             
         pygame.display.update()
 
-def restart_login():
-    pygame.quit()
-    start_login()
-
 if __name__ == "__main__":
     pygame.init()
     display_intro(pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)))
