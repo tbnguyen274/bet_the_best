@@ -9,6 +9,8 @@ WINDOW_HEIGHT = 720
 def mainmenu(loggedinuser):
     pygame.init()
     username = loggedinuser
+    coin = json.load(open(DATABASE,"r"))[username].get('coin')
+    isRunning = True
 
     window = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
     pygame.display.set_caption("Bet The Best")
@@ -64,6 +66,8 @@ def mainmenu(loggedinuser):
             window.blit(current_track_text, (self.bar_x, self.bar_y))
 
             self.angle += 1
+            
+        
 
     #Tao nut bam
     class button():
@@ -102,7 +106,7 @@ def mainmenu(loggedinuser):
 
     #Tao thanh tai khoan
     class user_status():
-        global username
+        global username, coin
         def __init__(self):
             # Set up bar
             self.height = 120
@@ -114,7 +118,7 @@ def mainmenu(loggedinuser):
 
             # User info
             self.username = username
-            self.coin = json.load(open(DATABASE,"r"))[username].get('coin')
+            self.coin = coin
 
             self.avatar_list = ['./assets/icons/user.png']
             self.current_avatar = self.avatar_list[0]
@@ -174,7 +178,7 @@ def mainmenu(loggedinuser):
 
         music.bar()
 
-    while True:
+    while isRunning:
         pygame.time.Clock().tick(60)
 
         for event in pygame.event.get():
@@ -184,8 +188,9 @@ def mainmenu(loggedinuser):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
                 if button_logout.image_rect.collidepoint(mousepos):
-                    login.restart_login()
-        music.play()
+                    pygame.mixer.music.stop()
+                    isRunning = False
+        music.play() if isRunning else None
         GUI()
         
         pygame.display.update() #cap nhat man hinh game
