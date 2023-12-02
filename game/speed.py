@@ -97,7 +97,7 @@ class PowerUpIcon:
             return
 
         # Check if the list of available y-coordinates is empty
-        if not game.available_y_coordinates:
+        if len(game.available_y_coordinates) == 0:
             # If empty, reset it to the initial state
             game.available_y_coordinates = game.all_y_coordinates.copy()
 
