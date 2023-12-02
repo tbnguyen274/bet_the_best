@@ -63,9 +63,9 @@ def save_transaction(previous_money, new_money):
 screen = pygame.display.set_mode((760, 406))
 pygame.display.set_caption("Notification")
 clock = pygame.time.Clock()
-test_surface = pygame.image.load('../assets/BG-pic/nền.png').convert()
+test_surface = pygame.image.load('assets/BG-pic/nền.png').convert()
 
-font = pygame.font.Font('../assets/font/game.ttf', 28)  # Chọn font và kích thước
+font = pygame.font.Font('assets/font/game.ttf', 28)  # Chọn font và kích thước
 
 current_money = 100  # Số tiền hiện có
 target_money = 0  # Số tiền mục tiêu ban đầu
@@ -79,7 +79,7 @@ input_rect = pygame.Rect(550, 200, 100, 40)  # Khu vực nhập dữ liệu
 
 # Tạo hộp thông báo với ảnh nền
 notification_rect = pygame.Rect(200, 10, 400, 200)  # Hộp thông báo
-notification_image = pygame.image.load('../assets/BG-pic/space.jpg').convert()
+notification_image = pygame.image.load('assets/BG-pic/space.jpg').convert()
 
 while True:
     handle_input()
