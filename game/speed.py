@@ -354,7 +354,8 @@ class Game:
 
     def countdown(self):
         running = True
-        
+        music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+        music.play()
         
         bg.draw_background(window)
         Player.draw_players()
@@ -370,11 +371,7 @@ class Game:
                     running = False
 
             bg.draw_background(window)
-            self.draw_players()
-
-            if time_sec == 2:
-                music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
-                music.play()
+            self.draw_players()                
                 
             if time_sec > -1:
                 mins, secs = divmod(time_sec, 60)
