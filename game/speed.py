@@ -222,28 +222,28 @@ class Game:
         
         if player.power_up == "SpeedUp":
             player.speed_multiplier = 2.0
-            pygame.mixer.Sound('assets\sfx\speed-up.mp3').play()
+            pygame.mixer.Sound('assets\sfx\speedup.mp3').play()
             
         elif player.power_up == "SlowDown":
             player.speed_multiplier = 0.5
-            pygame.mixer.Sound('assets\sfx\slow-down.mp3').play()
+            pygame.mixer.Sound('assets\sfx\slow.mp3').play()
             
         elif player.power_up == "TurnAround":
             player.speed_multiplier = -1.0
             player.current_image = player.turnaround_image
-            pygame.mixer.Sound('assets\sfx\quayxe.mp3').play()
+            pygame.mixer.Sound('assets\sfx/reverse.mp3').play()
             
         elif player.power_up == "Restart":
             player.x -= self.width - self.player_size
-            pygame.mixer.Sound('assets\sfx/restart.mp3').play()            
+            pygame.mixer.Sound('assets\sfx/reset.mp3').play()            
             
         elif player.power_up == "StraightToFinish":
             player.x = self.width - self.player_size
-            pygame.mixer.Sound('assets\sfx\speed-up.mp3').play()
+            pygame.mixer.Sound('assets\sfx\stun.mp3').play()
             
         elif player.power_up == "Teleport":
             player.x = random.randint(0, self.width - self.player_size - 100)
-            pygame.mixer.Sound('assets\sfx/tele.mp3').play() 
+            pygame.mixer.Sound('assets\sfx/teleport.mp3').play() 
             
         player.power_up = None
 
@@ -354,8 +354,8 @@ class Game:
 
     def countdown(self):
         running = True
-        music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
-        music.play()
+        
+        
         bg.draw_background(window)
         Player.draw_players()
         pygame.display.update()
@@ -372,6 +372,10 @@ class Game:
             bg.draw_background(window)
             self.draw_players()
 
+            if time_sec == 2:
+                music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+                music.play()
+                
             if time_sec > -1:
                 mins, secs = divmod(time_sec, 60)
                 timeformat = '{:02d}:{:02d}'.format(mins, secs)
@@ -385,7 +389,7 @@ class Game:
                 time.sleep(1)
                 time_sec -= 1
             else:
-                pygame.time.delay(500) # delay 0.5s
+                pygame.time.delay(1300) # delay 0.5s
                 self.run()  # start run() - main game
 
             pygame.display.update()
@@ -395,7 +399,7 @@ class Game:
         clock = pygame.time.Clock()
         running = True
         
-        music = pygame.mixer.Sound('assets\musics\cars-and-bikes-mokkkamusic.mp3')
+        music = pygame.mixer.Sound('assets\musics/round.mp3')
         music.play()
         
         announce1 = Announcement() 
@@ -426,8 +430,10 @@ class Game:
             if len(self.finished_players) == self.num_players:
                 print("All players reached the finish line!")
                 pygame.time.delay(1000)
+                music.stop()
                 self.show_rankings()
-                pygame.time.delay(2000)
+                pygame.mixer.Sound('assets\sfx/victory.mp3').play()
+                pygame.time.delay(4000)
                 running = False
                 # exit main loop
 
