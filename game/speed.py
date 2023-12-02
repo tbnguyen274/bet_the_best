@@ -349,6 +349,12 @@ class Game:
 
         # Draw the frame onto the main window
         window.blit(frame, frame_rect.topleft)
+        
+        # Get the current time and format it as a string
+        current_time = time.strftime("%H%M%S_%d%m%Y") 
+
+        # Save the entire window to a file with the current time in the filename
+        pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))
 
         pygame.display.flip()
 
