@@ -50,7 +50,7 @@ class Background:
 
 
 class Player:
-    def __init__(self, x, y, normal_image, turnaround_image):
+    def __init__(self, x, y, normal_image, turnaround_image, name):
         self.x = x  # player's x-coordinate
         self.y = y  # player's y-coordinate
         self.speed = random.uniform(1, 3)  
@@ -62,6 +62,7 @@ class Player:
         self.current_image = normal_image
         self.order = 0
         self.finished = False
+        self.name = name
 
 class PowerUpIcon:
     def __init__(self, x, y, type, image):
@@ -139,21 +140,24 @@ class Game:
         if bg.length == 2:
             self.players = [Player(0, bg.height - bg.image.get_height() +  85*i,
                         pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        f"Player {i+1}"
                         )
                     for i in range(self.num_players)]
         
         elif bg.length > 2:
             self.players = [Player(0, bg.height - bg.image.get_height() +  65*i,
                         pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        f"Player {i+1}"
                         )
                     for i in range(self.num_players)]
         
         else:   
             self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
                         pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)),
-                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False)
+                        pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (self.player_size, self.player_size)), True, False),
+                        f"Player {i+1}"
                         )
                     for i in range(self.num_players)]
         
@@ -272,11 +276,15 @@ class Game:
         # Blit the image onto the frame
         frame.blit(scaled_image, image_rect.topleft)
 
+         # Sort players based on their order
+        self.players.sort(key=lambda player: player.order)
+
         # Render and display ranking information
         myfont = pygame.font.SysFont('Comic Sans MS', 30)
         for i, player in enumerate(self.players):
-            rank_text = myfont.render('Rank {0}:'.format(player.order), False, (255, 0, 0))
-            frame.blit(rank_text, (frame_width // 2 - 40, image_rect.bottom + 20 + i * 30))
+            rank_text = myfont.render('{0}'.format(player.name), False, (255, 255, 255))
+            rank_text_position = (frame_width // 2 - rank_text.get_width() // 2, image_rect.top + 186 + i * 55)
+            frame.blit(rank_text, rank_text_position)
 
         # Calculate the position of the frame on the main window
         frame_rect = frame.get_rect(center=(self.width // 2, self.height // 2))
