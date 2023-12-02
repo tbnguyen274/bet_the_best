@@ -222,22 +222,28 @@ class Game:
         
         if player.power_up == "SpeedUp":
             player.speed_multiplier = 2.0
+            pygame.mixer.Sound('assets\sfx\speed-up.mp3').play()
             
         elif player.power_up == "SlowDown":
             player.speed_multiplier = 0.5
+            pygame.mixer.Sound('assets\sfx\slow-down.mp3').play()
             
         elif player.power_up == "TurnAround":
             player.speed_multiplier = -1.0
             player.current_image = player.turnaround_image
+            pygame.mixer.Sound('assets\sfx\quayxe.mp3').play()
             
         elif player.power_up == "Restart":
             player.x -= self.width - self.player_size
+            pygame.mixer.Sound('assets\sfx/restart.mp3').play()            
             
         elif player.power_up == "StraightToFinish":
             player.x = self.width - self.player_size
+            pygame.mixer.Sound('assets\sfx\speed-up.mp3').play()
             
         elif player.power_up == "Teleport":
             player.x = random.randint(0, self.width - self.player_size - 100)
+            pygame.mixer.Sound('assets\sfx/tele.mp3').play() 
             
         player.power_up = None
 
@@ -285,6 +291,8 @@ class Game:
                 player.current_image = player.normal_image
                 player.finished = True
                 player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
+                if player.order == 1:
+                    pygame.mixer.Sound('assets\sfx\winner.mp3').play()
                 self.text_finish = f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}"
                 print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
 
