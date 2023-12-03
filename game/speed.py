@@ -80,7 +80,7 @@ class PowerUpIcon:
         self.collided = False   # check if players meet the power-ups, set to False if they meet
         self.power_up_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
         self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport"]   # list of power-ups
-        self.power_up_probabilities = [0.03, 0.04, 0.03, 0.02, 0.005, 0.02] #The corresponding probabilities of power-ups in the list
+        self.power_up_probabilities = [0.1, 0.04, 0.03, 0.02, 0.005, 0.02] #The corresponding probabilities of power-ups in the list
         # Update and process power-ups' images
         self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (self.power_up_size, self.power_up_size)) for i, power_up in enumerate(self.power_ups)}
 
@@ -234,7 +234,7 @@ class Game:
             pygame.mixer.Sound('assets\sfx/reverse.mp3').play()
             
         elif player.power_up == "Restart":
-            player.x -= self.width - self.player_size
+            player.x = 0
             pygame.mixer.Sound('assets\sfx/reset.mp3').play()            
             
         elif player.power_up == "StraightToFinish":
@@ -254,7 +254,7 @@ class Game:
                 if player.power_up_timer > 0:
                     player.power_up_timer -= 1
                     self.apply_power_up(player)
-                    player.x += player.speed * player.speed_multiplier  
+                    player.x += player.speed * player.speed_multiplier 
                 else:
                     player.current_image = player.normal_image
                     player.x += random.uniform(2, 4)  # Tốc độ ngẫu nhiên
@@ -354,7 +354,7 @@ class Game:
         current_time = time.strftime("%H%M%S_%d%m%Y") 
 
         # Save the entire window to a file with the current time in the filename
-        pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))
+        pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
 
         pygame.display.flip()
 
