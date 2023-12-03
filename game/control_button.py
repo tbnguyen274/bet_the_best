@@ -145,10 +145,10 @@ random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgi
 class TextInput:
     def __init__(self, x, y, width, height, font_size):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_inactive = pygame.Color('#C2D9FF')
-        self.color_active = pygame.Color('#9BBEC8')
+        self.color_inactive = pygame.Color('#2F3C7E')
+        self.color_active = pygame.Color('#4831D4')
         self.color = self.color_inactive
-        self.font_color = pygame.Color('black')  # Add this line to set the font color
+        self.font_color = pygame.Color('#CCF381')  # Add this line to set the font color
         self.font = pygame.font.Font(None, font_size)
         self.text = ""
         self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
@@ -170,16 +170,16 @@ class TextInput:
                     self.text = self.text[:-1]
                 elif event.key == pygame.K_DELETE:
                     self.text = ''
-                elif event.key == pygame.K_SPACE: #random name khi nhan SPACE
-                    while self.text == "":
-                        self.text = random.choice(random_name)
-                        random_name.remove(self.text)
-
                 else:
                     temp_text = self.text + event.unicode
                     temp_surface = self.font.render(temp_text, True, self.font_color)
                     if temp_surface.get_width() < self.rect.w:
                         self.text = temp_text
+                self.txt_surface = self.font.render(self.text, True, self.font_color)
+            elif event.key == pygame.K_SPACE:
+                while self.text == "":
+                    self.text = random.choice(random_name)
+                    random_name.remove(self.text)
                 self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
 
     def draw(self, screen):
