@@ -4,6 +4,7 @@ import sys
 import os
 import time
 from PIL import Image
+from control_button import selector
 
 def run_race():
     # Set up display
@@ -12,18 +13,18 @@ def run_race():
     pygame.display.set_caption("Bet the Best - Racing Game")
 
     class Background:
-        def __init__(self, length, width, height, bg_type):
-            self.length = length
+        def __init__(self, width, height):
+            self.length = selector().activated_buttons[2]
             self.width = width
             self.height = height
-            self.race_scale = 0.8 if length > 2 else 1 if length == 2 else 1.2
-            self.bg_type = bg_type # can be modified to meet up with player's choice
+            self.race_scale = 0.8 if self.length == 'long' else 1 if self.length == 'mid' else 1.2
+            self.bg_type = selector.activated_buttons[0] # can be modified to meet up with player's choice
             self.load_images()
             
         def load_images(self):
             # Set background based on player's choice in control_button.py
-            self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 3 else
-                                                './assets/BG-pic/jungle.jpg' if self.bg_type == 2 else
+            self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 'galaxy' else
+                                                './assets/BG-pic/jungle.jpg' if self.bg_type == 'jungle' else
                                                 './assets/BG-pic/underwater.jpg')
                     
             self.image = self.load_and_scale_image('./assets/race/race-mid.png')
@@ -76,7 +77,7 @@ def run_race():
             self.timer = 0  # power-up's real image existing time
             self.active = True  # used to draw mystery power-ups on screen, set to False when the real ones appear
             self.collided = False   # check if players meet the power-ups, set to False if they meet
-            self.power_up_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
+            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
             self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport"]   # list of power-ups
             self.power_up_probabilities = [0.1, 0.04, 0.03, 0.02, 0.005, 0.02] #The corresponding probabilities of power-ups in the list
             # Update and process power-ups' images
@@ -106,7 +107,7 @@ def run_race():
 
             # power-ups will not appear behind the last player
             if x > min(player.x for player in game.players if player.y == y):
-                power_up_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
+                power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
                 mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (power_up_size, power_up_size))
                 # create a mystery power-up and add to the power_up_icons list
                 icon = PowerUpIcon(x, y, None, mystery_icon)
@@ -159,45 +160,52 @@ def run_race():
                 window.blit(self.announce_render, self.announce_position)
 
     class Game:
-        def __init__(self, num_player_set, num_power_up_icons):
+        def __init__(self, num_power_up_icons):
             self.width = 1280
             self.height = 720
             self.num_players = 6
-            self.num_player_set = num_player_set    # update set character based on what player choooses
+            # update set character based on what player choooses
+            self.num_player_set = ['Set 4' if selector().activated_buttons[1] == 'set4_uw' else
+                                   'Set 12' if selector().activated_buttons[1] == 'set12_uw' else
+                                   'Set 10' if selector().activated_buttons[1] == 'set10_g' else
+                                   'Set 11' if selector().activated_buttons[1] == 'set11_g' else
+                                   'Set 6' if selector().activated_buttons[1] == 'set6_j' else
+                                   'Set 13']
+            
             self.num_power_up_icons = num_power_up_icons    # modify the number of power-ups
             self.players = []
             self.finished_players = []
             self.power_up_icons = []
-            self.player_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
-            self.power_up_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
+            self.player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
             self.all_y_coordinates = [] # the set of player.y so that the power-ups can appear on their races
             self.available_y_coordinates = []   #the set of player.y but it instantly changes to create power-ups
             self.text_power_up = None   # text on board 1
             self.text_finish = None # text on board 2
             
         def create_players(self):
-            player_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
-            if bg.length == 2:
+            player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+            if bg.length == 'mid':
                 self.players = [Player(0, bg.height - bg.image.get_height() +  85*i,
-                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
-                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            f"Player {i+1}"
+                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
+                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
+                            selector().char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
-            elif bg.length > 2:
+            elif bg.length == 'long':
                 self.players = [Player(0, bg.height - bg.image.get_height() +  65*i,
-                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
-                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            f"Player {i+1}"
+                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
+                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
+                            selector().char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
             else:   
                 self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
-                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
-                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/Set {self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            f"Player {i+1}"
+                            pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
+                            pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
+                            selector().char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
@@ -332,7 +340,7 @@ def run_race():
 
                 # Calculate the position of the text to center it in the frame
                 rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 195 + i * 55)
-                player_postion = ((frame_width - rank_text_rect.width) // 2 + 260, image_rect.top + 185 + i * 55)
+                player_postion = (535, image_rect.top + 185 + i * 55)
 
                 # Draw the text onto the frame
                 frame.blit(rank_text_surface, rank_text_position)
@@ -467,11 +475,12 @@ def run_race():
             pygame.quit()
             sys.exit()
 
-    bg = Background(length = 2, width = 1280, height = 720, bg_type = 2)
+    
+    bg = Background(width = 1280, height = 720)
     bg.draw_background(window)
 
     # Initialize the game
-    game = Game(num_player_set = 3, num_power_up_icons = 20)
+    game = Game(num_power_up_icons = 20)
 
     # Create players and power-up icons
     game.create_players()

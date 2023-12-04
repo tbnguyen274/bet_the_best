@@ -1,6 +1,7 @@
 import pygame
 import login
 import speed
+import control_button
 
 # Initialize Pygame
 pygame.init()
@@ -15,6 +16,7 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     
 if __name__ == "__main__":
     login.display_intro(pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)))
+    login.start_login()
     speed.run_race()
     
 
