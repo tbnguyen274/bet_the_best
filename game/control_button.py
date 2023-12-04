@@ -215,6 +215,8 @@ class selector:
             TextInput(850, 300, 140, 40, 35),
             TextInput(1050, 300, 140, 40, 35),
         ]
+
+        #uw la underwater, j la jungle, g la galaxy
         self.set4_uw = ToggleButton(670, 330, '../assets/sets/Set 4/1.png', 0.3)
         self.set12_uw = ToggleButton(470, 330, '../assets/sets/Set 12/1.png', 0.3)
         self.set13_j = ToggleButton(470, 330, '../assets/sets/Set 13/1.png', 0.3)
@@ -274,6 +276,7 @@ class selector:
             ToggleButton(1050, 130, '../assets/sets/Set 13/6.png', 0.3),
         ]
 
+
         self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
         self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
         self.galaxy = ToggleButton(880, 70, '../assets/BG-pic/galaxy.jpg', 0.25)
@@ -281,6 +284,7 @@ class selector:
         self.next_img = pygame.image.load('../assets/icons/return.png')
         self.next_img = pygame.transform.flip(self.next_img, True, False)
         self.next = Button(1120, 600, self.next_img, 0.2)
+        self.next1 = Button(1120, 600, self.next_img, 0.2)
 
         self.back_img = pygame.image.load('../assets/icons/return.png')
         self.back = Button(20, 600, self.back_img, 0.2)
@@ -293,7 +297,12 @@ class selector:
         self.bg_j_loop = VideoPlayer(self.bg_j)
         self.bg_g = '../assets/videos/galaxy_background.mp4'
         self.bg_g_loop = VideoPlayer(self.bg_g)
+
+        # List bao gồm: [0] là background, [1] là set nhân vật, [2] là độ dài đường đua
         self.activated_buttons = []
+
+        # Dict lưu các nhân vật và tên tương ứng: key là số thứ tự nhân vật, value là tên nhân vật
+        self.char_dict = {}
 
     def select(self):
         check_j = False
@@ -301,7 +310,6 @@ class selector:
         check_g = False
         check_next = False
         running = True
-        self.activated_buttons = []
         self.screen.fill((255, 255, 255))
         while running:
             for event in pygame.event.get():
@@ -339,6 +347,8 @@ class selector:
 
                     if len(self.activated_buttons) == 3:
                         check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
+                        print(self.activated_buttons)
+
                 if self.back.clicked:
                     check_next = False
 
@@ -436,14 +446,19 @@ class selector:
                 for box in self.namebox:
                     box.draw(self.screen)
 
+                self.next1.draw(self.screen)
+
                 self.back.draw(self.screen)
+
+                if self.next1.clicked:
+                    for i in range(1, 7):
+                        self.char_dict[i] = self.namebox[i - 1].naming_character()
+
+                print(self.char_dict)
 
             pygame.display.update()
             pygame.display.flip()
             self.clock.tick(60)
-
-        sys.exit()
-
 
 if __name__ == '__main__':
     selector = selector()
