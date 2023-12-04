@@ -140,7 +140,7 @@ class Button:
 #random ten
 random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
                        "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
-                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben"]
+                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben", "Jarell", "Jurgen"]
 
 class TextInput:
     def __init__(self, x, y, width, height, font_size):
@@ -166,9 +166,14 @@ class TextInput:
                 if event.key == pygame.K_RETURN:
                     print(self.text)
                     self.text = ''
+                elif event.key == pygame.K_SPACE:
+                    if self.text == "":
+                        self.text = random.choice(random_name)
+                        random_name.remove(self.text)
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                 elif event.key == pygame.K_DELETE:
+                    random_name.append(self.text)
                     self.text = ''
                 else:
                     temp_text = self.text + event.unicode
@@ -176,8 +181,8 @@ class TextInput:
                     if temp_surface.get_width() < self.rect.w:
                         self.text = temp_text
                 self.txt_surface = self.font.render(self.text, True, self.font_color)
-            elif event.key == pygame.K_SPACE:
-                while self.text == "":
+            if event.key == pygame.K_SPACE:
+                if self.text == "":
                     self.text = random.choice(random_name)
                     random_name.remove(self.text)
                 self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
