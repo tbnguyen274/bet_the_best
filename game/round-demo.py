@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from PIL import Image
-char_dict = {1: 'Diogo', 2: 'Ryan', 3: ' hhaha', 4: 'Cody', 5: 'Stefan', 6: 'Anrew'}
+char_dict = {1: 'Hà', 2: 'Bảo', 3: ' Nguyên', 4: 'Dương', 5: 'Duy', 6: 'Dinh'}
 
 def run_race():
     # Set up display
@@ -131,17 +131,21 @@ def run_race():
                     
     class Announcement:
         def __init__(self):
-            self.announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+            self.announce_font = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             self.announce_render = None
             self.announce_position = None
             
         def update_power_up(self, text):
-            self.announce_render = self.announce_font.render(text, True, (22, 27, 33), (248,248,255))
-            self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 10 + self.announce_render.get_height() // 2)
+            self.announce_render = self.announce_font.render(text, True, (22, 27, 33))
+            self.announce_position = self.center_text(310, 15, 660, 50)
             
         def update_finish(self, text):
-            self.announce_render = self.announce_font.render(text, True, (244, 169, 80), (22, 27, 33))
-            self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 60 + self.announce_render.get_height() // 2)
+            self.announce_render = self.announce_font.render(text, True, (244, 169, 80))
+            self.announce_position = self.center_text(310, 66, 660, 50)
+        
+        def center_text(self, x, y, width, height):
+            text_width, text_height = self.announce_render.get_size()
+            return (x + (width - text_width) // 2, y + (height - text_height) // 2)
         
         def draw_power_up(self):
             board_1 = pygame.Rect(310, 15, 660, 50)     
@@ -326,13 +330,13 @@ def run_race():
             self.players.sort(key=lambda player: player.order)
 
             # Render and display ranking information
-            myfont = pygame.freetype.SysFont('Comic Sans MS', 30)
+            myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             for i, player in enumerate(self.players):
                 # Render the text onto a new Surface
                 rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
 
                 # Calculate the position of the text to center it in the frame
-                rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 195 + i * 55)
+                rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
                 player_postion = (535, image_rect.top + 185 + i * 55)
                 print(player_postion)
 
@@ -358,8 +362,8 @@ def run_race():
 
         def countdown(self):
             running = True
-            music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
-            music.play()
+            countdown_music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+            countdown_music.play()
             
             bg.draw_background(window)
             Player.draw_players()
@@ -404,8 +408,12 @@ def run_race():
             clock = pygame.time.Clock()
             running = True
             
-            music = pygame.mixer.Sound('assets\musics/round.mp3')
-            music.play()
+            race_music = pygame.mixer.Sound('assets\musics/round.mp3')
+            race_music.play()
+            
+            race_noise = pygame.mixer.Sound('assets\sfx/racing-noise.mp3')
+            pygame.mixer.Sound.set_volume(race_noise, 0.4)
+            race_noise.play()
             
             announce1 = Announcement() 
             announce2 = Announcement()
@@ -434,8 +442,10 @@ def run_race():
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
                     print("All players reached the finish line!")
+                    race_noise.stop()
                     pygame.time.delay(1000)
-                    music.stop()
+                    race_music.stop()
+                    
                     self.show_rankings()
                     pygame.mixer.Sound('assets\sfx/victory.mp3').play()
                     pygame.time.delay(4000)
@@ -469,11 +479,11 @@ def run_race():
             pygame.quit()
             sys.exit()
 
-    bg = Background(length = 2, width = 1280, height = 720, bg_type = 2)
+    bg = Background(length = 2, width = 1280, height = 720, bg_type = 3)
     bg.draw_background(window)
 
     # Initialize the game
-    game = Game(num_player_set = 3, num_power_up_icons = 20)
+    game = Game(num_player_set = 7, num_power_up_icons = 20)
 
     # Create players and power-up icons
     game.create_players()
