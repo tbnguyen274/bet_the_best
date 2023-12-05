@@ -222,65 +222,74 @@ class selector:
         ]
 
         #uw la underwater, j la jungle, g la galaxy
-        self.set4_uw = ToggleButton(670, 330, '../assets/sets/Set 4/1.png', 0.3)
-        self.set12_uw = ToggleButton(470, 330, '../assets/sets/Set 12/1.png', 0.3)
-        self.set13_j = ToggleButton(470, 330, '../assets/sets/Set 13/1.png', 0.3)
-        self.set6_j = ToggleButton(660, 330, '../assets/sets/Set 6/1.png', 0.3)
-        self.set11_g = ToggleButton(470, 330, '../assets/sets/Set 11/1.png', 0.3)
-        self.set10_g = ToggleButton(660, 330, '../assets/sets/Set 10/1.png', 0.3)
+        self.set1 = ToggleButton(450, 330, '../assets/sets/Set 1/1.png', 0.3)
+        self.set2 = ToggleButton(640, 330, '../assets/sets/Set 2/1.png', 0.3)
+        self.set3 = ToggleButton(470, 330, '../assets/sets/Set 3/1.png', 0.3)
+        self.set4 = ToggleButton(660, 360, '../assets/sets/Set 4/1.png', 0.3)
+        self.set5 = ToggleButton(470, 330, '../assets/sets/Set 5/1.png', 0.3)
+        self.set6 = ToggleButton(660, 330, '../assets/sets/Set 6/1.png', 0.3)
+        self.set7 = ToggleButton(470, 330, '../assets/sets/Set 7/1.png', 0.3)
 
+        self.set1_char = [
+            ToggleButton(20, 130, '../assets/sets/Set 1/1.png', 0.22),
+            ToggleButton(210, 130, '../assets/sets/Set 1/2.png', 0.22),
+            ToggleButton(460, 130, '../assets/sets/Set 1/3.png', 0.22),
+            ToggleButton(650, 130, '../assets/sets/Set 1/4.png', 0.22),
+            ToggleButton(850, 130, '../assets/sets/Set 1/5.png', 0.22),
+            ToggleButton(1050, 130, '../assets/sets/Set 1/6.png', 0.22),
+        ]
+        self.set2_char = [
+            ToggleButton(20, 130, '../assets/sets/Set 2/1.png', 0.2),
+            ToggleButton(210, 130, '../assets/sets/Set 2/2.png', 0.2),
+            ToggleButton(440, 130, '../assets/sets/Set 2/3.png', 0.2),
+            ToggleButton(660, 130, '../assets/sets/Set 2/4.png', 0.2),
+            ToggleButton(800, 130, '../assets/sets/Set 2/5.png', 0.2),
+            ToggleButton(1030, 130, '../assets/sets/Set 2/6.png', 0.2),
+        ]
+
+        self.set3_char = [
+            ToggleButton(50, 130, '../assets/sets/Set 3/1.png', 0.3),
+            ToggleButton(250, 130, '../assets/sets/Set 3/2.png', 0.3),
+            ToggleButton(450, 130, '../assets/sets/Set 3/3.png', 0.3),
+            ToggleButton(650, 130, '../assets/sets/Set 3/4.png', 0.3),
+            ToggleButton(850, 130, '../assets/sets/Set 3/5.png', 0.3),
+            ToggleButton(1050, 130, '../assets/sets/Set 3/6.png', 0.3),
+        ]
         self.set4_char = [
-            ToggleButton(20, 130, '../assets/sets/Set 4/1.png', 0.22),
-            ToggleButton(210, 130, '../assets/sets/Set 4/2.png', 0.22),
-            ToggleButton(460, 130, '../assets/sets/Set 4/3.png', 0.2),
-            ToggleButton(670, 130, '../assets/sets/Set 4/4.png', 0.22),
-            ToggleButton(850, 130, '../assets/sets/Set 4/5.png', 0.22),
-            ToggleButton(1050, 130, '../assets/sets/Set 4/6.png', 0.22),
-        ]
-        self.set12_char = [
-            ToggleButton(20, 130, '../assets/sets/Set 12/1.png', 0.25),
-            ToggleButton(210, 130, '../assets/sets/Set 12/2.png', 0.25),
-            ToggleButton(440, 130, '../assets/sets/Set 12/3.png', 0.25),
-            ToggleButton(600, 130, '../assets/sets/Set 12/4.png', 0.25),
-            ToggleButton(800, 130, '../assets/sets/Set 12/5.png', 0.25),
-            ToggleButton(1030, 130, '../assets/sets/Set 12/6.png', 0.25),
-        ]
-
-        self.set11_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 11/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 11/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 11/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 11/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 11/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 11/6.png', 0.3),
-        ]
-        self.set10_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 10/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 10/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 10/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 10/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 10/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 10/6.png', 0.3),
+            ToggleButton(50, 130, '../assets/sets/Set 4/1.png', 0.3),
+            ToggleButton(250, 130, '../assets/sets/Set 4/2.png', 0.3),
+            ToggleButton(450, 130, '../assets/sets/Set 4/3.png', 0.3),
+            ToggleButton(650, 130, '../assets/sets/Set 4/4.png', 0.3),
+            ToggleButton(850, 130, '../assets/sets/Set 4/5.png', 0.3),
+            ToggleButton(1050, 130, '../assets/sets/Set 4/6.png', 0.2),
 
         ]
+        self.set5_char = [
+            ToggleButton(50, 130, '../assets/sets/Set 5/1.png', 0.25),
+            ToggleButton(250, 130, '../assets/sets/Set 5/2.png', 0.2),
+            ToggleButton(450, 130, '../assets/sets/Set 5/3.png', 0.2),
+            ToggleButton(650, 130, '../assets/sets/Set 5/4.png', 0.25),
+            ToggleButton(850, 130, '../assets/sets/Set 5/5.png', 0.25),
+            ToggleButton(1050, 130, '../assets/sets/Set 5/6.png', 0.25),
+        ]
+
         self.set6_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 6/1.png', 0.25),
-            ToggleButton(250, 130, '../assets/sets/Set 6/2.png', 0.2),
-            ToggleButton(450, 130, '../assets/sets/Set 6/3.png', 0.2),
-            ToggleButton(650, 130, '../assets/sets/Set 6/4.png', 0.25),
-            ToggleButton(850, 130, '../assets/sets/Set 6/5.png', 0.25),
-            ToggleButton(1050, 130, '../assets/sets/Set 6/6.png', 0.25),
+            ToggleButton(50, 130, '../assets/sets/Set 6/1.png', 0.3),
+            ToggleButton(250, 130, '../assets/sets/Set 6/2.png', 0.3),
+            ToggleButton(450, 130, '../assets/sets/Set 6/3.png', 0.3),
+            ToggleButton(650, 130, '../assets/sets/Set 6/4.png', 0.3),
+            ToggleButton(850, 130, '../assets/sets/Set 6/5.png', 0.3),
+            ToggleButton(1050, 130, '../assets/sets/Set 6/6.png', 0.3),
         ]
 
-        self.set13_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 13/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 13/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 13/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 13/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 13/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 13/6.png', 0.3),
+        self.set7_char = [
+            ToggleButton(50, 130, '../assets/sets/Set 7/1.png', 0.3),
+            ToggleButton(250, 130, '../assets/sets/Set 7/2.png', 0.3),
+            ToggleButton(450, 130, '../assets/sets/Set 7/3.png', 0.3),
+            ToggleButton(650, 130, '../assets/sets/Set 7/4.png', 0.3),
+            ToggleButton(850, 130, '../assets/sets/Set 7/5.png', 0.3),
+            ToggleButton(1050, 130, '../assets/sets/Set 7/6.png', 0.3),
         ]
-
 
         self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
         self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
@@ -331,18 +340,20 @@ class selector:
                         self.activated_buttons.append('underwater')
                     elif self.galaxy.clicked:
                         self.activated_buttons.append('galaxy')
-                    if self.set6_j.clicked:
-                        self.activated_buttons.append('set6_j')
-                    elif self.set13_j.clicked:
-                        self.activated_buttons.append('set13_j')
-                    elif self.set10_g.clicked:
-                        self.activated_buttons.append('set10_g')
-                    elif self.set11_g.clicked:
-                        self.activated_buttons.append('set11_g')
-                    elif self.set12_uw.clicked:
-                        self.activated_buttons.append('set12_uw')
-                    elif self.set4_uw.clicked:
-                        self.activated_buttons.append('set4_uw')
+                    if self.set1.clicked:
+                        self.activated_buttons.append('set1')
+                    elif self.set2.clicked:
+                        self.activated_buttons.append('set2')
+                    elif self.set3.clicked:
+                        self.activated_buttons.append('set3')
+                    elif self.set4.clicked:
+                        self.activated_buttons.append('set4')
+                    elif self.set5.clicked:
+                        self.activated_buttons.append('5')
+                    elif self.set6.clicked:
+                        self.activated_buttons.append('set6')
+                    elif self.set7.clicked:
+                        self.activated_buttons.append('set7')
                     if self.midRace.clicked:
                         self.activated_buttons.append('mid')
                     elif self.longRace.clicked:
@@ -361,19 +372,19 @@ class selector:
                     ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
                     if self.jungle.clicked:
                         check_j = True
-                        ToggleButton.check_click(event, [self.set6_j, self.set13_j])
+                        ToggleButton.check_click(event, [self.set3, self.set4])
                     else:
                         check_j = False
 
                     if self.galaxy.clicked:
                         check_g = True
-                        ToggleButton.check_click(event, [self.set10_g, self.set11_g])
+                        ToggleButton.check_click(event, [self.set5, self.set6, self.set7])
                     else:
                         check_g = False
 
                     if self.underwater.clicked:
                         check_uw = True
-                        ToggleButton.check_click(event, [self.set12_uw, self.set4_uw])
+                        ToggleButton.check_click(event, [self.set1, self.set2])
                     else:
                         check_uw = False
 
@@ -381,35 +392,37 @@ class selector:
 
                 else:
                     # HIEN THI CAC SET NHAN VAT
-                    if self.activated_buttons[1] == 'set4_uw':
-                        ToggleButton.check_click(event, self.set4_char)
-                    if self.activated_buttons[1] == 'set12_uw':
-                        ToggleButton.check_click(event, self.set12_char)
-                    if self.activated_buttons[1] == 'set11_g':
-                        ToggleButton.check_click(event, self.set11_char)
-                    if self.activated_buttons[1] == 'set10_g':
-                        ToggleButton.check_click(event, self.set10_char)
-                    if self.activated_buttons[1] == 'set6_j':
+                    if self.activated_buttons[1] == 'set2':
+                        ToggleButton.check_click(event, self.set2_char)
+                    if self.activated_buttons[1] == 'set1':
+                        ToggleButton.check_click(event, self.set1_char)
+                    if self.activated_buttons[1] == 'set5':
+                        ToggleButton.check_click(event, self.set5_char)
+                    if self.activated_buttons[1] == 'set6':
                         ToggleButton.check_click(event, self.set6_char)
-                    if self.activated_buttons[1] == 'set13_j':
-                        ToggleButton.check_click(event, self.set13_char)
-
+                    if self.activated_buttons[1] == 'set3':
+                        ToggleButton.check_click(event, self.set3_char)
+                    if self.activated_buttons[1] == 'set4':
+                        ToggleButton.check_click(event, self.set4_char)
+                    if self.activated_buttons[1] == 'set7':
+                        ToggleButton.check_click(event, self.set7_char)
                     for box in self.namebox:
                         box.handle_event(event)
             if not check_next:
                 self.bg_default_loop.loop_background()
                 if check_j:
                     self.bg_j_loop.loop_background()
-                    self.set6_j.draw(self.screen)
-                    self.set13_j.draw(self.screen)
+                    self.set3.draw(self.screen)
+                    self.set4.draw(self.screen)
                 if check_g:
                     self.bg_g_loop.loop_background()
-                    self.set10_g.draw(self.screen)
-                    self.set11_g.draw(self.screen)
+                    self.set5.draw(self.screen)
+                    self.set6.draw(self.screen)
+                    self.set7.draw(self.screen)
                 if check_uw:
                     self.bg_uw_loop.loop_background()
-                    self.set12_uw.draw(self.screen)
-                    self.set4_uw.draw(self.screen)
+                    self.set1.draw(self.screen)
+                    self.set2.draw(self.screen)
 
                 self.underwater.draw(self.screen)
                 self.galaxy.draw(self.screen)
@@ -423,31 +436,34 @@ class selector:
             else:
                 if self.activated_buttons[0] == 'jungle':
                     self.bg_j_loop.loop_background()
-                    if self.activated_buttons[1] == 'set6_j':
+                    if self.activated_buttons[1] == 'set3':
                         for b in self.set6_char:
                             b.draw(self.screen)
-                    elif self.activated_buttons[1] == 'set13_j':
-                        for b in self.set13_char:
+                    elif self.activated_buttons[1] == 'set4':
+                        for b in self.set4_char:
                             b.draw(self.screen)
 
                 elif self.activated_buttons[0] == 'underwater':
                     self.bg_uw_loop.loop_background()
-                    if self.activated_buttons[1] == 'set4_uw':
-                        for b in self.set4_char:
+                    if self.activated_buttons[1] == 'set2':
+                        for b in self.set2_char:
                             b.draw(self.screen)
-                    elif self.activated_buttons[1] == 'set12_uw':
-                        for b in self.set12_char:
+                    elif self.activated_buttons[1] == 'set1':
+                        for b in self.set1_char:
                             b.draw(self.screen)
 
                 elif self.activated_buttons[0] == 'galaxy':
                     self.bg_g_loop.loop_background()
-                    if self.activated_buttons[1] == 'set10_g':
-                        for b in self.set10_char:
+                    if self.activated_buttons[1] == 'set5':
+                        for b in self.set5_char:
                             b.draw(self.screen)
-                    if self.activated_buttons[1] == 'set11_g':
-                        for b in self.set11_char:
+                    if self.activated_buttons[1] == 'set6':
+                        for b in self.set6_char:
                             b.draw(self.screen)
-
+                    if self.activated_buttons[1] == 'set7':
+                        for b in self.set7_char:
+                            b.draw(self.screen)
+                            
                 for box in self.namebox:
                     box.draw(self.screen)
 
@@ -455,9 +471,9 @@ class selector:
 
                 self.back.draw(self.screen)
 
-                if self.next1.clicked:
-                    for i in range(1, 7):
-                        self.char_dict[i] = self.namebox[i - 1].naming_character()
+
+                for i in range(1, 7):
+                    self.char_dict[i] = self.namebox[i - 1].naming_character()
 
                 print(self.char_dict)
 
