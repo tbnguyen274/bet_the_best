@@ -39,33 +39,26 @@ def mainmenu(loggedinuser):
             self.music_file_path = music_file_paths
             self.music_name_list = music_name_list
             self.volume = volume
-            self.music_end = pygame.USEREVENT + 1
             self.current_track_index = 0
             self.angle = 0
             self.bar_x = bar_x
             self.bar_y = bar_y
-
-            pygame.mixer.music.set_endevent(self.music_end)
+            self.current_display_index = 0
         
         def play(self):
-            for event in pygame.event.get():
-                if event.type == self.music_end:
-                    self.current_track_index = (self.current_track_index + 1) % len(self.music_file_path)
-                    pygame.mixer.music.load(self.music_file_path[self.current_track_index])
-                    pygame.mixer.music.set_volume(self.volume)
-                    pygame.mixer.music.play()
-
             if not pygame.mixer.music.get_busy():
                 pygame.mixer.music.load(self.music_file_path[self.current_track_index])
                 pygame.mixer.music.set_volume(self.volume)
                 pygame.mixer.music.play()
+                self.current_track_index = (self.current_track_index + 1) % len(self.music_file_path)
+                self.current_display_index = (self.current_track_index - 1) % len(self.music_file_path)
 
         def bar(self):
             r = int(127 + 127 * math.sin(math.radians(self.angle)))
             g = int(127 + 127 * math.sin(math.radians(self.angle + 120)))
             b = int(127 + 127 * math.sin(math.radians(self.angle + 240)))
 
-            current_track_text = pygame.font.Font(None, 40).render("Now Playing: " + self.music_name_list[self.current_track_index], True, (r, g, b))
+            current_track_text = pygame.font.Font(None, 40).render("Now Playing: " + self.music_name_list[self.current_display_index], True, (r, g, b))
             window.blit(current_track_text, (self.bar_x, self.bar_y))
 
             self.angle += 1
@@ -170,7 +163,7 @@ def mainmenu(loggedinuser):
             window.blit(self.tips, (10, self.height+ 10))
 
     background = background()
-    music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.15, 20, 680)
+    music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.3, 20, 680)
     user_status = user_status()
 
     button_play = button(740,170,'./assets/icons/buttons/play.png',1, True)
@@ -211,6 +204,7 @@ def mainmenu(loggedinuser):
     while isRunning:
         pygame.time.Clock().tick(60)
 
+        music.play() if isRunning else None
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 save_user_info(username, user_coin)
@@ -223,6 +217,7 @@ def mainmenu(loggedinuser):
                     save_user_info(username, user_coin)
                     isRunning = False
                 elif button_minigame.image_rect.collidepoint(mousepos) and button_minigame.visible:
+                    pygame.mixer.music.stop()
                     import minigame
                     user_coin += minigame.run()
                     save_user_info(username, user_coin)
@@ -230,7 +225,6 @@ def mainmenu(loggedinuser):
                     pass
 
         user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       
-        music.play() if isRunning else None
         GUI()
         
         pygame.display.update() #cap nhat man hinh game
