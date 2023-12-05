@@ -131,17 +131,21 @@ def run_race():
                     
     class Announcement:
         def __init__(self):
-            self.announce_font = pygame.font.Font(pygame.font.get_default_font(), 30)
+            self.announce_font = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             self.announce_render = None
             self.announce_position = None
             
         def update_power_up(self, text):
-            self.announce_render = self.announce_font.render(text, True, (22, 27, 33), (248,248,255))
-            self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 10 + self.announce_render.get_height() // 2)
+            self.announce_render = self.announce_font.render(text, True, (22, 27, 33))
+            self.announce_position = self.center_text(310, 15, 660, 50)
             
         def update_finish(self, text):
-            self.announce_render = self.announce_font.render(text, True, (244, 169, 80), (22, 27, 33))
-            self.announce_position = (bg.width // 2 - self.announce_render.get_width() // 2, 60 + self.announce_render.get_height() // 2)
+            self.announce_render = self.announce_font.render(text, True, (244, 169, 80))
+            self.announce_position = self.center_text(310, 66, 660, 50)
+        
+        def center_text(self, x, y, width, height):
+            text_width, text_height = self.announce_render.get_size()
+            return (x + (width - text_width) // 2, y + (height - text_height) // 2)
         
         def draw_power_up(self):
             board_1 = pygame.Rect(310, 15, 660, 50)     
@@ -165,12 +169,13 @@ def run_race():
             self.height = 720
             self.num_players = 6
             # update set character based on what player choooses
-            self.num_player_set = ['Set 4' if selector().activated_buttons[1] == 'set4_uw' else
-                                   'Set 12' if selector().activated_buttons[1] == 'set12_uw' else
-                                   'Set 10' if selector().activated_buttons[1] == 'set10_g' else
-                                   'Set 11' if selector().activated_buttons[1] == 'set11_g' else
-                                   'Set 6' if selector().activated_buttons[1] == 'set6_j' else
-                                   'Set 13']
+            self.num_player_set = ['Set 1' if selector().activated_buttons[1] == 'set1' else
+                                   'Set 2' if selector().activated_buttons[1] == 'set2' else
+                                   'Set 3' if selector().activated_buttons[1] == 'set3' else
+                                   'Set 4' if selector().activated_buttons[1] == 'set4' else
+                                   'Set 5' if selector().activated_buttons[1] == 'set5' else
+                                   'Set 6' if selector().activated_buttons[1] == 'set6' else
+                                   'Set 7']
             
             self.num_power_up_icons = num_power_up_icons    # modify the number of power-ups
             self.players = []
@@ -286,8 +291,8 @@ def run_race():
                             player.power_up = power_up_type
                             player.power_up_timer = random.uniform(60,90)  # Power-up duration
                             
-                            self.text_power_up = f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}"
-                            print(f"Player {self.players.index(player) + 1} got a power-up: {power_up_type}")
+                            self.text_power_up = f"{player.name} (p.{self.players.index(player) + 1}) got a power-up: {power_up_type}"
+                            print(f"{player.name} (p.{self.players.index(player) + 1}) got a power-up: {power_up_type}")
 
         def check_finish(self):
             for player in self.players:
@@ -297,8 +302,8 @@ def run_race():
                     player.order = sum(p.finished for p in self.players)  # Thứ tự kết thúc
                     if player.order == 1:
                         pygame.mixer.Sound('assets\sfx\winner.mp3').play()
-                    self.text_finish = f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}"
-                    print(f"Player {self.players.index(player) + 1} finished the race at rank: {player.order}")
+                    self.text_finish = f"{player.name} (p.{self.players.index(player) + 1}) finished the race at rank: {player.order}"
+                    print(f"{player.name} (p.{self.players.index(player) + 1}) finished the race at rank: {player.order}")
 
         def draw_players(self):
             Player.draw_players()
@@ -333,13 +338,13 @@ def run_race():
             self.players.sort(key=lambda player: player.order)
 
             # Render and display ranking information
-            myfont = pygame.freetype.SysFont('Comic Sans MS', 30)
+            myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             for i, player in enumerate(self.players):
                 # Render the text onto a new Surface
                 rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
 
                 # Calculate the position of the text to center it in the frame
-                rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 195 + i * 55)
+                rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
                 player_postion = (535, image_rect.top + 185 + i * 55)
 
                 # Draw the text onto the frame
@@ -364,8 +369,8 @@ def run_race():
 
         def countdown(self):
             running = True
-            music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
-            music.play()
+            countdown_music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
+            countdown_music.play()
             
             bg.draw_background(window)
             Player.draw_players()
@@ -410,8 +415,12 @@ def run_race():
             clock = pygame.time.Clock()
             running = True
             
-            music = pygame.mixer.Sound('assets\musics/round.mp3')
-            music.play()
+            race_music = pygame.mixer.Sound('assets\musics/round.mp3')
+            race_music.play()
+            
+            race_noise = pygame.mixer.Sound('assets\sfx/racing-noise.mp3')
+            pygame.mixer.Sound.set_volume(race_noise, 0.4)
+            race_noise.play()
             
             announce1 = Announcement() 
             announce2 = Announcement()
@@ -440,8 +449,10 @@ def run_race():
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
                     print("All players reached the finish line!")
+                    race_noise.stop()
                     pygame.time.delay(1000)
-                    music.stop()
+                    race_music.stop()
+                    
                     self.show_rankings()
                     pygame.mixer.Sound('assets\sfx/victory.mp3').play()
                     pygame.time.delay(4000)
