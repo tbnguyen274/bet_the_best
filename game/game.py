@@ -74,7 +74,7 @@ def mainmenu(loggedinuser):
 
     #Tao nut bam
     class button():
-        def __init__(self,x,y,image,scale):
+        def __init__(self,x,y,image,scale, visible):
             self.image = pygame.image.load(image)
             self.width = self.image.get_width()
             self.height = self.image.get_height()
@@ -86,6 +86,8 @@ def mainmenu(loggedinuser):
             self.hover_image = self.hover_effect(self.image)  # Tạo hình ảnh sậm đi khi nút được nhấn
             self.click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
             self.click_sound.set_volume(0.2)
+            self.visible = visible
+            
 
         
         def hover_effect(self, image):
@@ -95,17 +97,20 @@ def mainmenu(loggedinuser):
             return hover_image
 
         def display(self):
-            cursor_pos = pygame.mouse.get_pos()
-            if self.image_rect.collidepoint(cursor_pos):
-                window.blit(self.hover_image,(self.image_rect))
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                    self.clicked = True
-                    self.click_sound.play()
-            else:
-                window.blit(self.image,(self.image_rect.x,self.image_rect.y))   
+            if self.visible:
+                cursor_pos = pygame.mouse.get_pos()
+                if self.image_rect.collidepoint(cursor_pos):
+                    window.blit(self.hover_image,(self.image_rect))
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        self.click_sound.play()
+                else:
+                    window.blit(self.image,(self.image_rect.x,self.image_rect.y))   
 
-            if pygame.mouse.get_pressed()[0] == 0:
-                self.clicked = False
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+            else:
+                pass
 
     #Tao thanh tai khoan
     class user_status():
@@ -118,6 +123,7 @@ def mainmenu(loggedinuser):
             self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
             self.surface.fill((0,0,0, self.alpha))
             self.font = pygame.font.Font(None, 60)
+            self.minifont = pygame.font.Font(None, 28)
 
             # User info
             self.username = username
@@ -139,7 +145,11 @@ def mainmenu(loggedinuser):
             self.coin_icon_y = (self.height-self.coin_icon.get_height())//2
             self.coin_value = self.font.render(": " + str(self.coin), True, (255,255,255))
             self.coin_value_y = (self.height-self.coin_value.get_height())//2
-        
+
+            self.tips_list = ['','When you have less than 100 coins, you have to play minigame', 'Click on the avatar to change it', 'You can change the music by clicking next and previous button']
+            self.tips_index = 0
+            self.tips = self.minifont.render(self.tips_list[self.tips_index], True, (255, 85, 187))
+
         def numdisplay(self, num):
             if num / 1000000000 >= 1:
                 return str(num//1000000000) + "." + str(num%1000000000)[0] + "B"
@@ -154,21 +164,21 @@ def mainmenu(loggedinuser):
             window.blit(self.username_text, (self.avatar_x + 10, self.username_text_y))
 
             window.blit(self.coin_icon, (self.coin_icon_x, self.coin_icon_y))
-            user_coin = json.load(open(DATABASE,"r"))[username].get('coin')
             self.coin = user_coin
             self.coin_value = self.font.render(": " + self.numdisplay(self.coin), True, (255,255,255))
             window.blit(self.coin_value, (self.coin_icon_x + self.coin_icon.get_width() + 10, self.coin_value_y))
+            window.blit(self.tips, (10, self.height+ 10))
 
     background = background()
     music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.15, 20, 680)
     user_status = user_status()
 
-    button_play = button(740,170,'./assets/icons/buttons/play.png',1)
-    button_minigame = button(740,170,'./assets/icons/buttons/minigame.png',1)
-    button_shop = button(740,280,'./assets/icons/buttons/shop.png',1)
-    button_history = button(740,390,'./assets/icons/buttons/history.png',1)
-    button_help = button(740,500,'./assets/icons/buttons/help.png',1)
-    button_logout = button(740,610,'./assets/icons/buttons/logout.png',1)
+    button_play = button(740,170,'./assets/icons/buttons/play.png',1, True)
+    button_minigame = button(740,170,'./assets/icons/buttons/minigame.png',1, False)
+    button_shop = button(740,280,'./assets/icons/buttons/shop.png',1, True)
+    button_history = button(740,390,'./assets/icons/buttons/history.png',1, True)
+    button_help = button(740,500,'./assets/icons/buttons/help.png',1, True)
+    button_logout = button(740,610,'./assets/icons/buttons/logout.png',1, True)
 
     def display_text(x, y, text, color, size):
         font_model = pygame.font.Font(None, size)
@@ -180,12 +190,17 @@ def mainmenu(loggedinuser):
         background.display()
         user_status.display()
 
-        if user_coin < 100:
-            minigameText = pygame.font.Font(None, 32).render('Play minigame to earn some coin first!', True,(255,0,0))
-            window.blit(minigameText, (button_minigame.x + button_minigame.width//2 - minigameText.get_width()//2, button_minigame.y - minigameText.get_height() - 10))
-            button_minigame.display()
-        else:            
-            button_play.display()
+        if user_status.coin < 100:
+            user_status.tips_index = 1
+            button_minigame.visible = True
+            button_play.visible = False
+        else:
+            button_minigame.visible = False
+            button_play.visible = True
+            user_status.tips_index = 2
+
+        button_minigame.display()          
+        button_play.display()
         button_shop.display()
         button_history.display()
         button_help.display()
@@ -199,22 +214,22 @@ def mainmenu(loggedinuser):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 save_user_info(username, user_coin)
-
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
                 if button_logout.image_rect.collidepoint(mousepos):
                     pygame.mixer.music.stop()
                     save_user_info(username, user_coin)
-
                     isRunning = False
-                elif button_minigame.image_rect.collidepoint(mousepos) and user_coin < 100:
+                elif button_minigame.image_rect.collidepoint(mousepos) and button_minigame.visible:
                     import minigame
                     user_coin += minigame.run()
-
                     save_user_info(username, user_coin)
-                    
+                elif button_play.image_rect.collidepoint(mousepos) and button_play.visible:
+                    pass
+
+        user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       
         music.play() if isRunning else None
         GUI()
         
