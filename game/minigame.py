@@ -19,13 +19,13 @@ def run():
             self.gravity = 0
             self.jump_sound = pygame.mixer.Sound('assets/sfx/jumpsound.mp3')
             self.jump_sound.set_volume(0.5)
-
-
+            
         def player_input(self):
             keys = pygame.key.get_pressed()
             if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.rect.bottom >= 500:
                 self.gravity = -25
                 self.jump_sound.play()
+
         def apply_gravity(self):
             self.gravity += 1
             self.rect.y += self.gravity
@@ -146,7 +146,7 @@ def run():
     game_message2 = test_font.render('Press "SPACE" to start, "ESC" twice to exit', False, (188, 122, 249))
     game_message2_rect = game_message2.get_rect(midtop=(640, 550))
 
-    game_passed = test_font.render ("Returning to 'Bet the best' in 4 seconds...", False, (188, 122, 249))
+    game_passed = test_font.render ('Returning to "Bet the best" in 4 seconds..., False', (188, 122, 249))
     game_passed_rect = game_passed.get_rect(midtop = (640,530))
     # Timer
     obstacle_timer = pygame.USEREVENT + 1
