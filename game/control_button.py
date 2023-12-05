@@ -2,6 +2,7 @@ import cv2
 import sys
 import pygame
 import random
+
 pygame.init()
 
 
@@ -23,7 +24,7 @@ class VideoPlayer:
 
 
 class ToggleButton:
-    def __init__(self, x, y, image_path, scale=1.0 ):
+    def __init__(self, x, y, image_path, scale=1.0):
         self.x = x
         self.y = y
         self.image_path = image_path
@@ -137,10 +138,13 @@ class Button:
 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
-#random ten
+
+
+# random ten
 random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
-                       "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
-                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben", "Jarell", "Jurgen"]
+               "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
+               "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben", "Jarell", "Jurgen"]
+
 
 class TextInput:
     def __init__(self, x, y, width, height, font_size):
@@ -193,8 +197,10 @@ class TextInput:
 
         # Draw the text on the filled input box
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 8))
+
     def naming_character(self):
         return self.text
+
 
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -221,14 +227,14 @@ class selector:
             TextInput(1050, 300, 140, 40, 35),
         ]
 
-        #uw la underwater, j la jungle, g la galaxy
+        # uw la underwater, j la jungle, g la galaxy
         self.set1 = ToggleButton(450, 330, '../assets/sets/Set 1/1.png', 0.3)
         self.set2 = ToggleButton(640, 330, '../assets/sets/Set 2/1.png', 0.3)
         self.set3 = ToggleButton(470, 330, '../assets/sets/Set 3/1.png', 0.3)
         self.set4 = ToggleButton(660, 360, '../assets/sets/Set 4/1.png', 0.3)
         self.set5 = ToggleButton(470, 330, '../assets/sets/Set 5/1.png', 0.3)
         self.set6 = ToggleButton(660, 330, '../assets/sets/Set 6/1.png', 0.3)
-        self.set7 = ToggleButton(470, 330, '../assets/sets/Set 7/2.png', 0.3)
+        self.set7 = ToggleButton(470, 330, '../assets/sets/Set 7/1.png', 0.3)
 
         self.set1_char = [
             ToggleButton(20, 130, '../assets/sets/Set 1/1.png', 0.22),
@@ -251,7 +257,7 @@ class selector:
             ToggleButton(50, 130, '../assets/sets/Set 3/1.png', 0.3),
             ToggleButton(250, 130, '../assets/sets/Set 3/2.png', 0.3),
             ToggleButton(450, 130, '../assets/sets/Set 3/3.png', 0.3),
-            ToggleButton(680, 130, '../assets/sets/Set 3/4.png', 0.3),
+            ToggleButton(650, 130, '../assets/sets/Set 3/4.png', 0.3),
             ToggleButton(850, 130, '../assets/sets/Set 3/5.png', 0.3),
             ToggleButton(1050, 130, '../assets/sets/Set 3/6.png', 0.3),
         ]
@@ -300,6 +306,9 @@ class selector:
         self.next = Button(1120, 600, self.next_img, 0.2)
         self.next1 = Button(1120, 600, self.next_img, 0.2)
 
+        self.back_img = pygame.image.load('../assets/icons/return.png')
+        self.back = Button(20, 600, self.back_img, 0.2)
+
         self.bg_default = '../assets/videos/diffselectbg.mp4'
         self.bg_default_loop = VideoPlayer(self.bg_default)
         self.bg_uw = '../assets/videos/underwater_background.mp4'
@@ -315,165 +324,168 @@ class selector:
         # Dict lưu các nhân vật và tên tương ứng: key là số thứ tự nhân vật, value là tên nhân vật
         self.char_dict = {}
 
-        self.check_j = False
-        self.check_uw = False
-        self.check_g = False
-        self.check_next = False
     def select(self):
+        check_j = False
+        check_uw = False
+        check_g = False
+        check_next = False
+        running = True
+        self.screen.fill((255, 255, 255))
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
+                if self.next.clicked:
+                    # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
+                    self.activated_buttons = []
+                    if self.jungle.clicked:
+                        self.activated_buttons.append('jungle')
+                    elif self.underwater.clicked:
+                        self.activated_buttons.append('underwater')
+                    elif self.galaxy.clicked:
+                        self.activated_buttons.append('galaxy')
+                    if self.set1.clicked:
+                        self.activated_buttons.append('set1')
+                    elif self.set2.clicked:
+                        self.activated_buttons.append('set2')
+                    elif self.set3.clicked:
+                        self.activated_buttons.append('set3')
+                    elif self.set4.clicked:
+                        self.activated_buttons.append('set4')
+                    elif self.set5.clicked:
+                        self.activated_buttons.append('set5')
+                    elif self.set6.clicked:
+                        self.activated_buttons.append('set6')
+                    elif self.set7.clicked:
+                        self.activated_buttons.append('set7')
+                    if self.midRace.clicked:
+                        self.activated_buttons.append('mid')
+                    elif self.longRace.clicked:
+                        self.activated_buttons.append('long')
+                    elif self.shortRace.clicked:
+                        self.activated_buttons.append('short')
 
+                    if len(self.activated_buttons) == 3:
+                        check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
+                        print(self.activated_buttons)
 
+                if self.back.clicked:
+                    check_next = False
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if self.next.clicked:
-                # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
-                self.activated_buttons = []
-                if self.jungle.clicked:
-                    self.activated_buttons.append('2')
-                elif self.underwater.clicked:
-                    self.activated_buttons.append('1')
-                elif self.galaxy.clicked:
-                    self.activated_buttons.append('3')
-                if self.set1.clicked:
-                    self.activated_buttons.append('1')
-                elif self.set2.clicked:
-                    self.activated_buttons.append('2')
-                elif self.set3.clicked:
-                    self.activated_buttons.append('3')
-                elif self.set4.clicked:
-                    self.activated_buttons.append('4')
-                elif self.set5.clicked:
-                    self.activated_buttons.append('5')
-                elif self.set6.clicked:
-                    self.activated_buttons.append('6')
-                elif self.set7.clicked:
-                    self.activated_buttons.append('7')
-                if self.midRace.clicked:
-                    self.activated_buttons.append('mid')
-                elif self.longRace.clicked:
-                    self.activated_buttons.append('long')
-                elif self.shortRace.clicked:
-                    self.activated_buttons.append('short')
+                if not check_next:
+                    ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
+                    if self.jungle.clicked:
+                        check_j = True
+                        ToggleButton.check_click(event, [self.set3, self.set4])
+                    else:
+                        check_j = False
 
-                if len(self.activated_buttons) == 3:
-                    self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
-                    print(self.activated_buttons)
+                    if self.galaxy.clicked:
+                        check_g = True
+                        ToggleButton.check_click(event, [self.set5, self.set6, self.set7])
+                    else:
+                        check_g = False
 
+                    if self.underwater.clicked:
+                        check_uw = True
+                        ToggleButton.check_click(event, [self.set1, self.set2])
+                    else:
+                        check_uw = False
 
-            if not self.check_next:
-                ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
-                if self.jungle.clicked:
-                    self.check_j = True
-                    ToggleButton.check_click(event, [self.set3, self.set4])
+                    ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
+
                 else:
-                    self.check_j = False
+                    # HIEN THI CAC SET NHAN VAT
+                    if self.activated_buttons[1] == 'set2':
+                        ToggleButton.check_click(event, self.set2_char)
+                    if self.activated_buttons[1] == 'set1':
+                        ToggleButton.check_click(event, self.set1_char)
+                    if self.activated_buttons[1] == 'set5':
+                        ToggleButton.check_click(event, self.set5_char)
+                    if self.activated_buttons[1] == 'set6':
+                        ToggleButton.check_click(event, self.set6_char)
+                    if self.activated_buttons[1] == 'set3':
+                        ToggleButton.check_click(event, self.set3_char)
+                    if self.activated_buttons[1] == 'set4':
+                        ToggleButton.check_click(event, self.set4_char)
+                    if self.activated_buttons[1] == 'set7':
+                        ToggleButton.check_click(event, self.set7_char)
+                    for box in self.namebox:
+                        box.handle_event(event)
+            if not check_next:
+                self.bg_default_loop.loop_background()
+                if check_j:
+                    self.bg_j_loop.loop_background()
+                    self.set3.draw(self.screen)
+                    self.set4.draw(self.screen)
+                if check_g:
+                    self.bg_g_loop.loop_background()
+                    self.set5.draw(self.screen)
+                    self.set6.draw(self.screen)
+                    self.set7.draw(self.screen)
+                if check_uw:
+                    self.bg_uw_loop.loop_background()
+                    self.set1.draw(self.screen)
+                    self.set2.draw(self.screen)
 
-                if self.galaxy.clicked:
-                    self.check_g = True
-                    ToggleButton.check_click(event, [self.set5, self.set6, self.set7])
-                else:
-                    self.check_g = False
+                self.underwater.draw(self.screen)
+                self.galaxy.draw(self.screen)
+                self.jungle.draw(self.screen)
+                self.longRace.draw(self.screen)
+                self.midRace.draw(self.screen)
+                self.shortRace.draw(self.screen)
+                self.next.draw(self.screen)
 
-                if self.underwater.clicked:
-                    self.check_uw = True
-                    ToggleButton.check_click(event, [self.set1, self.set2])
-                else:
-                    self.check_uw = False
-
-                ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
 
             else:
-                # HIEN THI CAC SET NHAN VAT
-                if self.activated_buttons[1] == '2':
-                    ToggleButton.check_click(event, self.set2_char)
-                if self.activated_buttons[1] == '1':
-                    ToggleButton.check_click(event, self.set1_char)
-                if self.activated_buttons[1] == '5':
-                    ToggleButton.check_click(event, self.set5_char)
-                if self.activated_buttons[1] == '6':
-                    ToggleButton.check_click(event, self.set6_char)
-                if self.activated_buttons[1] == '3':
-                    ToggleButton.check_click(event, self.set3_char)
-                if self.activated_buttons[1] == '4':
-                    ToggleButton.check_click(event, self.set4_char)
-                if self.activated_buttons[1] == '7':
-                    ToggleButton.check_click(event, self.set7_char)
+                if self.activated_buttons[0] == 'jungle':
+                    self.bg_j_loop.loop_background()
+                    if self.activated_buttons[1] == 'set3':
+                        for b in self.set3_char:
+                            b.draw(self.screen)
+                    elif self.activated_buttons[1] == 'set4':
+                        for b in self.set4_char:
+                            b.draw(self.screen)
+
+                elif self.activated_buttons[0] == 'underwater':
+                    self.bg_uw_loop.loop_background()
+                    if self.activated_buttons[1] == 'set2':
+                        for b in self.set2_char:
+                            b.draw(self.screen)
+                    elif self.activated_buttons[1] == 'set1':
+                        for b in self.set1_char:
+                            b.draw(self.screen)
+
+                elif self.activated_buttons[0] == 'galaxy':
+                    self.bg_g_loop.loop_background()
+                    if self.activated_buttons[1] == 'set5':
+                        for b in self.set5_char:
+                            b.draw(self.screen)
+                    if self.activated_buttons[1] == 'set6':
+                        for b in self.set6_char:
+                            b.draw(self.screen)
+                    if self.activated_buttons[1] == 'set7':
+                        for b in self.set7_char:
+                            b.draw(self.screen)
+
                 for box in self.namebox:
-                    box.handle_event(event)
-        if not self.check_next:
-            self.bg_default_loop.loop_background()
-            if self.check_j:
-                self.bg_j_loop.loop_background()
-                self.set3.draw(self.screen)
-                self.set4.draw(self.screen)
-            if self.check_g:
-                self.bg_g_loop.loop_background()
-                self.set5.draw(self.screen)
-                self.set6.draw(self.screen)
-                self.set7.draw(self.screen)
-            if self.check_uw:
-                self.bg_uw_loop.loop_background()
-                self.set1.draw(self.screen)
-                self.set2.draw(self.screen)
+                    box.draw(self.screen)
 
-            self.underwater.draw(self.screen)
-            self.galaxy.draw(self.screen)
-            self.jungle.draw(self.screen)
-            self.longRace.draw(self.screen)
-            self.midRace.draw(self.screen)
-            self.shortRace.draw(self.screen)
-            self.next.draw(self.screen)
+                self.next1.draw(self.screen)
 
+                self.back.draw(self.screen)
 
-        else:
-            if self.activated_buttons[0] == '2':
+                for i in range(1, 7):
+                    self.char_dict[i] = self.namebox[i - 1].naming_character()
 
-                self.bg_j_loop.loop_background()
+                print(self.char_dict)
 
-                if self.activated_buttons[1] == '3':
-                    for b in self.set3_char:
-                        b.draw(self.screen)
-                elif self.activated_buttons[1] == '4':
-                    for b in self.set4_char:
-                        b.draw(self.screen)
+            pygame.display.update()
+            pygame.display.flip()
+            self.clock.tick(60)
 
-            elif self.activated_buttons[0] == '1':
-                self.bg_uw_loop.loop_background()
-                if self.activated_buttons[1] == '2':
-                    for b in self.set2_char:
-                        b.draw(self.screen)
-                elif self.activated_buttons[1] == '1':
-                    for b in self.set1_char:
-                        b.draw(self.screen)
-
-            elif self.activated_buttons[0] == '3':
-                self.bg_g_loop.loop_background()
-                if self.activated_buttons[1] == '5':
-                    for b in self.set5_char:
-                        b.draw(self.screen)
-                if self.activated_buttons[1] == '6':
-                    for b in self.set6_char:
-                        b.draw(self.screen)
-                if self.activated_buttons[1] == '7':
-                    for b in self.set7_char:
-                        b.draw(self.screen)
-
-            for box in self.namebox:
-                box.draw(self.screen)
-
-            self.next1.draw(self.screen)
-
-
-            for i in range(1, 7):
-                self.char_dict[i] = self.namebox[i - 1].naming_character()
-
-            print(self.char_dict)
-
-        pygame.display.update()
-        pygame.display.flip()
-        self.clock.tick(60)
 
 if __name__ == '__main__':
     selector = selector()
