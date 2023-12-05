@@ -1,6 +1,9 @@
 import pygame, sys
 
 def display_intro(screen):
+    pygame.display.set_caption("Bet The Best")
+    icon = pygame.image.load('./assets/icons/game-icon.png')
+    pygame.display.set_icon(icon)
     intro_image = pygame.image.load('./assets/icons/brand.png').convert_alpha()  # Replace 'studio_logo.png' with your image filename
     intro_rect = intro_image.get_rect()
     intro_rect.center = (screen.get_width() // 2, screen.get_height() // 2)

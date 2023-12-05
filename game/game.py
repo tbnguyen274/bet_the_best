@@ -1,21 +1,24 @@
 import pygame, cv2, math, sys, json, os
-import login
 
 DATABASE_DIRECTORY = 'db'
 DATABASE = os.path.join(DATABASE_DIRECTORY, "user_data.json")
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
+def save_user_info(username, coin):
+    with open(DATABASE, "r") as file:
+        data = json.load(file)
+        data[username]['coin'] = coin
+    with open(DATABASE, "w") as file:
+        json.dump(data,file, indent=4)
+
 def mainmenu(loggedinuser):
     pygame.init()
     username = loggedinuser
-    coin = json.load(open(DATABASE,"r"))[username].get('coin')
+    user_coin = json.load(open(DATABASE,"r"))[username].get('coin')
     isRunning = True
 
     window = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
-    pygame.display.set_caption("Bet The Best")
-    icon = pygame.image.load('./assets/icons/game-icon.png')
-    pygame.display.set_icon(icon)
 
     class background():
         def __init__(self):
@@ -106,7 +109,7 @@ def mainmenu(loggedinuser):
 
     #Tao thanh tai khoan
     class user_status():
-        global username, coin
+        global username, user_coin
         def __init__(self):
             # Set up bar
             self.height = 120
@@ -118,7 +121,7 @@ def mainmenu(loggedinuser):
 
             # User info
             self.username = username
-            self.coin = coin
+            self.coin = user_coin
 
             self.avatar_list = ['./assets/icons/user.png']
             self.current_avatar = self.avatar_list[0]
@@ -142,8 +145,6 @@ def mainmenu(loggedinuser):
                 return str(num//1000000000) + "." + str(num%1000000000)[0] + "B"
             elif num / 1000000 >= 1:
                 return str(num//1000000) + "." + str(num%1000000)[0] + "M"
-            elif num / 1000 >= 1:
-                return str(num//1000) + "." + str(num%1000) + "K"
             return str(num)
 
         def display(self):
@@ -153,24 +154,38 @@ def mainmenu(loggedinuser):
             window.blit(self.username_text, (self.avatar_x + 10, self.username_text_y))
 
             window.blit(self.coin_icon, (self.coin_icon_x, self.coin_icon_y))
+            user_coin = json.load(open(DATABASE,"r"))[username].get('coin')
+            self.coin = user_coin
             self.coin_value = self.font.render(": " + self.numdisplay(self.coin), True, (255,255,255))
             window.blit(self.coin_value, (self.coin_icon_x + self.coin_icon.get_width() + 10, self.coin_value_y))
 
     background = background()
-    music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3', ], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.15, 20, 680)
+    music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.15, 20, 680)
     user_status = user_status()
 
     button_play = button(740,170,'./assets/icons/buttons/play.png',1)
+    button_minigame = button(740,170,'./assets/icons/buttons/minigame.png',1)
     button_shop = button(740,280,'./assets/icons/buttons/shop.png',1)
     button_history = button(740,390,'./assets/icons/buttons/history.png',1)
     button_help = button(740,500,'./assets/icons/buttons/help.png',1)
     button_logout = button(740,610,'./assets/icons/buttons/logout.png',1)
 
+    def display_text(x, y, text, color, size):
+        font_model = pygame.font.Font(None, size)
+        text_surface = font_model.render(text, True, color)
+        text_rect = text_surface.get_rect(topleft = (x,y))
+        window.blit(text_surface, text_rect)
+
     def GUI():
         background.display()
         user_status.display()
 
-        button_play.display()
+        if user_coin < 100:
+            minigameText = pygame.font.Font(None, 32).render('Play minigame to earn some coin first!', True,(255,0,0))
+            window.blit(minigameText, (button_minigame.x + button_minigame.width//2 - minigameText.get_width()//2, button_minigame.y - minigameText.get_height() - 10))
+            button_minigame.display()
+        else:            
+            button_play.display()
         button_shop.display()
         button_history.display()
         button_help.display()
@@ -183,13 +198,23 @@ def mainmenu(loggedinuser):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_user_info(username, user_coin)
+
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
                 if button_logout.image_rect.collidepoint(mousepos):
                     pygame.mixer.music.stop()
+                    save_user_info(username, user_coin)
+
                     isRunning = False
+                elif button_minigame.image_rect.collidepoint(mousepos) and user_coin < 100:
+                    import minigame
+                    user_coin += minigame.run()
+
+                    save_user_info(username, user_coin)
+                    
         music.play() if isRunning else None
         GUI()
         

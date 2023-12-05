@@ -57,9 +57,9 @@ def start_login():
 
     # Tao cua so trinh dang nhap
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    login_icon = pygame.image.load('assets/icons/lock.png')
-    pygame.display.set_caption('Bet the Best - Login')
-    pygame.display.set_icon(login_icon)
+    pygame.display.set_caption("Bet The Best")
+    icon = pygame.image.load('./assets/icons/game-icon.png')
+    pygame.display.set_icon(icon)
 
     # loop bacground
     class background():
