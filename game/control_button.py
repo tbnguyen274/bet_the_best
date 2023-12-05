@@ -331,11 +331,11 @@ class selector:
                 # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
                 self.activated_buttons = []
                 if self.jungle.clicked:
-                    self.activated_buttons.append('jungle')
+                    self.activated_buttons.append('2')
                 elif self.underwater.clicked:
-                    self.activated_buttons.append('underwater')
+                    self.activated_buttons.append('1')
                 elif self.galaxy.clicked:
-                    self.activated_buttons.append('galaxy')
+                    self.activated_buttons.append('3')
                 if self.set1.clicked:
                     self.activated_buttons.append('1')
                 elif self.set2.clicked:
@@ -428,16 +428,18 @@ class selector:
 
 
         else:
-            if self.activated_buttons[0] == 'jungle':
+            if self.activated_buttons[0] == '2':
+
                 self.bg_j_loop.loop_background()
-                if self.activated_buttons[1] == 'set3':
+
+                if self.activated_buttons[1] == '3':
                     for b in self.set3_char:
                         b.draw(self.screen)
-                elif self.activated_buttons[1] == 'set4':
+                elif self.activated_buttons[1] == '4':
                     for b in self.set4_char:
                         b.draw(self.screen)
 
-            elif self.activated_buttons[0] == 'underwater':
+            elif self.activated_buttons[0] == '1':
                 self.bg_uw_loop.loop_background()
                 if self.activated_buttons[1] == '2':
                     for b in self.set2_char:
@@ -446,7 +448,7 @@ class selector:
                     for b in self.set1_char:
                         b.draw(self.screen)
 
-            elif self.activated_buttons[0] == 'galaxy':
+            elif self.activated_buttons[0] == '3':
                 self.bg_g_loop.loop_background()
                 if self.activated_buttons[1] == '5':
                     for b in self.set5_char:
