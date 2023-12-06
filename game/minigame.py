@@ -148,7 +148,7 @@ def run():
     game_message2 = test_font.render('Press "SPACE" to start, "ESC" twice to exit', False, (188, 122, 249))
     game_message2_rect = game_message2.get_rect(midtop=(640, game_message1_rect.y + game_message1.get_height() + 20))
 
-    game_passed = test_font.render ('Returning to "Bet the best" in 4 seconds..., False', (188, 122, 249))
+    game_passed = test_font.render ('Returning to "Bet the best" in 4 seconds...', False, (188, 122, 249))
     game_passed_rect = game_passed.get_rect(midtop = (640,530))
     # Timer
     obstacle_timer = pygame.USEREVENT + 1
