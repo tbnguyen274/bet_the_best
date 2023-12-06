@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from PIL import Image
-from control_button import run_test, sel
+from control_button import sel, run_test
 from firework import BulletFlyUp, FireWork, Random
 
 def run_race():
