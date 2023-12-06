@@ -2,6 +2,7 @@ import cv2
 import sys
 import pygame
 import random
+import datetime
 pygame.init()
 
 
@@ -148,11 +149,12 @@ class TextInput:
         self.color_inactive = pygame.Color('#2F3C7E')
         self.color_active = pygame.Color('#4831D4')
         self.color = self.color_inactive
-        self.font_color = pygame.Color('#CCF381')  # Add this line to set the font color
+        self.font_color = pygame.Color('#CCF381')
         self.font = pygame.font.Font(None, font_size)
         self.text = ""
-        self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
+        self.txt_surface = self.font.render(self.text, True, self.font_color)
         self.active = False
+        self.error_message = ""  # Add this line to store the error message
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -187,14 +189,52 @@ class TextInput:
                     random_name.remove(self.text)
                 self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
 
-    def draw(self, screen):
-        # Fill the input box with color
-        pygame.draw.rect(screen, self.color, self.rect)
+    def handle_event2(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.active = not self.active
+            else:
+                self.active = False
+            self.color = self.color_active if self.active else self.color_inactive
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    print(self.text)
+                    self.text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                elif event.key == pygame.K_DELETE:
+                    self.text = ''
+                else:
+                    temp_text = self.text + event.unicode
+                    temp_surface = self.font.render(temp_text, True, self.font_color)
+                    if temp_surface.get_width() < self.rect.w:
+                        self.text = temp_text
+                self.txt_surface = self.font.render(self.text, True, self.font_color)
 
-        # Draw the text on the filled input box
-        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 8))
+    def validate_input(self, current_money):
+        if self.text.isdigit():
+            number = int(self.text)
+            if number < 100 or number > current_money:
+                self.error_message = "Please enter a number between 100 and " + str(current_money)
+            else:
+                self.error_message = ""
+                now = datetime.datetime.now()  # Get the current date and time
+                # with open('spending_history.txt', 'a') as f:
+                #     f.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - {str(number)}\n")  # Write the date, time, and number to the file
+        elif self.text != "":
+            self.error_message = "Invalid number"
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect, 0)  # Fill the rectangle with color
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        error_surface = self.font.render(self.error_message, True, pygame.Color('black'))
+        screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 5))
+
+
     def naming_character(self):
         return self.text
+
+
 
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -220,6 +260,7 @@ class selector:
             TextInput(850, 300, 140, 40, 35),
             TextInput(1050, 300, 140, 40, 35),
         ]
+        self.bet_box = TextInput(380, 510, 200, 40, 25)
 
         #uw la underwater, j la jungle, g la galaxy
         self.set1 = ToggleButton(450, 330, '../assets/sets/Set 1/1.png', 0.3)
@@ -320,6 +361,8 @@ class selector:
         self.check_uw = False
         self.check_g = False
         self.check_next = False
+
+        self.state = 0
     def select_bgnset(self):
 
         for event in pygame.event.get():
@@ -358,7 +401,7 @@ class selector:
                 if len(self.activated_buttons) == 3:
                     self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
                     print(self.activated_buttons)
-
+                    self.state = 1
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -409,7 +452,8 @@ class selector:
         pygame.display.update()
         self.clock.tick(60)
 
-    def select_player_n_bet(self):
+    def select_player_n_bet(self, current_money = 500):
+        
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -418,6 +462,8 @@ class selector:
 
             for box in self.namebox:
                 box.handle_event(event)
+                
+            self.bet_box.handle_event2(event)
 
             if self.activated_buttons[1] == 'set2':
                 ToggleButton.check_click(event, self.set2_char)
@@ -472,13 +518,37 @@ class selector:
         print(self.char_dict)
 
         self.next1.draw(self.screen)
-        self.back.draw(self.screen)
 
+        pygame.draw.rect(self.screen, (100, 149, 237), (320, 425, 640, 216), border_radius=20)
+        pygame.draw.rect(self.screen, (255, 255, 255), (320, 425, 640, 216), 5, border_radius=20)
+        font = pygame.font.Font('../assets/font/game.ttf', 24)
+
+        self.bet_box.draw(self.screen)
+        self.bet_box.validate_input(1000)
+        update_money = font.render(f"You currently have: {current_money}", True, (255, 255, 255))
+        self.screen.blit(update_money, (335, 440))
+        instruction_text = font.render("Enter the amount of money you want to bet: ", True, (255, 255, 255))
+        screen.blit(instruction_text, (335, 470))  # Điều chỉnh vị trí hiển thị hướng dẫn
+
+        print(self.bet_box.text)
+
+        self.back.draw(self.screen)
+        if self.back.clicked:
+            self.state = 0
         pygame.display.update()
         self.clock.tick(60)
 
+sel = selector()
+def run_test():
+    while True:
+        if sel.state == 0:
+            sel.select_bgnset()
+        elif sel.state == 1:
+            sel.select_player_n_bet()
 
-if __name__ == '__main__':
-    selector = selector()
-    selector.select_bgnset()
-    selector.select_charnbet()
+run_test()
+
+# if __name__ == '__main__':
+#     selector = selector()
+#     selector.select_bgnset()
+#     selector.select_player_n_bet()
