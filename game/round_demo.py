@@ -4,13 +4,21 @@ import sys
 import os
 import time
 from PIL import Image
+from firework import Dot, BulletFlyUp, Bullet, FireWork, Random
+
+
+
+
 char_dict = {1: 'Hà', 2: 'Bảo', 3: ' Nguyên', 4: 'Dương', 5: 'Duy', 6: 'Dinh'}
 
+# Set up display
+width, height = 1280, 720
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Bet the Best - Racing Game")
+
+
 def run_race():
-    # Set up display
-    width, height = 1280, 720
-    window = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Bet the Best - Racing Game")
+    
 
     class Background:
         def __init__(self, length, width, height, bg_type):
@@ -474,6 +482,66 @@ def run_race():
             # Quit Pygame
             pygame.quit()
             sys.exit()
+            
+        def firework(self):
+            pygame.init()
+            clock = pygame.time.Clock()
+            
+            fireWorks = []
+            time_create = 20 # Khoảng thời gian liên tiếp giữa 2 lần bắn
+            bulletFlyUps = []
+            
+            display_timer = 300
+
+            while True:
+                bg.draw_background(window)
+                # Draw players
+                self.draw_players()
+                
+                
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                        
+                if (display_timer > -1):
+                    
+                    if time_create == 20: # Tạo (những) viên đạn bay lên sau khoảng thời gian xác đinh
+                        for i in range(Random.num_fireworks()):
+                            bulletFlyUps.append(BulletFlyUp(Random.randomBulletFlyUp_speed(), Random.randomBulletFlyUp_x(), window))
+
+                    for bulletFlyUp in bulletFlyUps:
+                        bulletFlyUp.draw()
+                        bulletFlyUp.update()
+
+                    for fireWork in fireWorks:
+                        fireWork.draw()
+                        fireWork.update()
+
+                    for bulletFlyUp in bulletFlyUps:
+                        if bulletFlyUp.speed <= 0: # Viên đạn bay lên đạt độ cao tối đa
+                            fireWorks.append(FireWork(bulletFlyUp.x, bulletFlyUp.y, window)) # Tạo quả pháo ngay vị trí viên đạn
+                            bulletFlyUps.pop(bulletFlyUps.index(bulletFlyUp)) # Xoá viên đạn đó
+
+                    # Xoá quả pháo hoa khi kích thước những viên đạn <= 0
+                    for fireWork in fireWorks:
+                        if fireWork.bullets[0].size <= 0:
+                            fireWorks.pop(fireWorks.index(fireWork))
+
+                    # Đếm khoảng thời gian bắn
+                    if time_create <= 20:
+                        time_create += 1
+                    else:
+                        time_create = 0
+                        
+                    display_timer -= 1
+                    
+                pygame.display.update()
+                clock.tick(60)
+
+            
+            
+            
 
         def run(self):
             # Main game loop
@@ -515,7 +583,7 @@ def run_race():
                 if len(self.finished_players) == self.num_players:
                     print("All players reached the finish line!")
                     race_noise.stop()
-                    pygame.time.delay(1000)
+                    self.firework()
                     race_music.stop()
                     
                     # self.show_rankings()
