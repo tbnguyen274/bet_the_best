@@ -366,6 +366,7 @@ class selector:
         self.state = 0
     def select_bgnset(self):
 
+        self.state = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -402,7 +403,7 @@ class selector:
                 if len(self.activated_buttons) == 3:
                     self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
                     print(self.activated_buttons)
-                    self.state = 1
+                    self.state = 2
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -453,9 +454,10 @@ class selector:
         pygame.display.update()
         self.clock.tick(60)
 
-    def select_player_n_bet(self, current_money):
-        
 
+    def select_player_n_bet(self):
+
+        self.state = 2
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -526,6 +528,7 @@ class selector:
         font = pygame.font.Font(None, 60)
 
         self.bet_box.draw(self.screen)
+        current_money = 1000
         self.bet_box.validate_input(current_money)
         update_money = font.render(f"You currently have: {current_money}", True, 'black')
         self.screen.blit(update_money, (350, 440))
@@ -536,23 +539,23 @@ class selector:
 
         self.back.draw(self.screen)
         if self.back.clicked:
-            self.state = '0'
-
+            self.state = 1
 
 
         pygame.display.update()
         self.clock.tick(60)
 
 sel = selector()
-def run_test(username, current_money):
-    if sel.state == 0:
-        sel.select_bgnset()
-    elif sel.state == 1:
-        sel.select_player_n_bet(current_money)
+def run_test():
+    sel.state = 1
+    while True:
+        if sel.state == 1:
+            sel.select_bgnset()
+        elif sel.state == 2 and len(sel.activated_buttons) == 3:
+            sel.select_player_n_bet()
 
-while True:
-    run_test(1, 12345)
 
+run_test()
 # if __name__ == '__main__':
 #     selector = selector()
 #     selector.select_bgnset()
