@@ -19,13 +19,13 @@ def run():
             self.gravity = 0
             self.jump_sound = pygame.mixer.Sound('assets/sfx/jumpsound.mp3')
             self.jump_sound.set_volume(0.5)
-
-
+            
         def player_input(self):
             keys = pygame.key.get_pressed()
             if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.rect.bottom >= 500:
-                self.gravity = -25
+                self.gravity = -23
                 self.jump_sound.play()
+
         def apply_gravity(self):
             self.gravity += 1
             self.rect.y += self.gravity
@@ -142,21 +142,28 @@ def run():
     game_beat_rect = game_beat.get_rect(center=(640, 80))
 
 
+    game_message1 = test_font.render('Press "SPACE" to jump', False, (111, 196, 169))
+    game_message1_rect = game_message1.get_rect(midtop=(640, 530))
 
     game_message2 = test_font.render('Press "SPACE" to start, "ESC" twice to exit', False, (188, 122, 249))
-    game_message2_rect = game_message2.get_rect(midtop=(640, 550))
+    game_message2_rect = game_message2.get_rect(midtop=(640, game_message1_rect.y + game_message1.get_height() + 20))
 
-    game_passed = test_font.render ("Returning to 'Bet the best' in 4 seconds...", False, (188, 122, 249))
+    game_passed = test_font.render ('Returning to "Bet the best" in 4 seconds..., False', (188, 122, 249))
     game_passed_rect = game_passed.get_rect(midtop = (640,530))
     # Timer
     obstacle_timer = pygame.USEREVENT + 1
-
-
     pygame.time.set_timer(obstacle_timer, 800)
 
     #Choi nhac
     pygame.mixer.music.load('assets/musics/Minigame.mp3')
+    pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.play(loops=-1)
+
+    fail_sound = pygame.mixer.Sound('assets/sfx/minigamefail.mp3')
+    fail_sound.set_volume(0.5)
+    fail_sound_play = win_sound_play = False
+    win_sound = pygame.mixer.Sound('assets/sfx/minigamewin.mp3')
+    win_sound.set_volume(0.4)
 
     while isRunning:
         for event in pygame.event.get():
@@ -198,6 +205,7 @@ def run():
                             return 0
 
         if game_active:
+            pygame.mixer.music.set_volume(0.3)
             screen.blit(sky_surface, (0, -150))
             screen.blit(ground_surface, (0, 500))
             score = display_score()
@@ -209,6 +217,7 @@ def run():
             obstacle_group.update()
 
             game_active = collision_sprite()
+            fail_sound_play = False
             if score == 100:
                 game_active = False
         else:
@@ -224,10 +233,14 @@ def run():
 
             if score == 0:
                 screen.blit(game_name, game_name_rect)
+                screen.blit(game_message1,game_message1_rect)
                 screen.blit(game_message2,game_message2_rect)
             elif score == 100:
                 start_time = pygame.time.get_ticks()
                 pygame.mixer.music.stop()
+                if not win_sound_play:
+                    win_sound.play()
+                    win_sound_play = True
                 while pygame.time.get_ticks() - start_time < 4000:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
@@ -244,6 +257,10 @@ def run():
                 screen.blit(score_message2,score_message2_rect)
                 screen.blit(score_message, score_message_rect)
                 screen.blit(game_over,game_over_rect)
+                pygame.mixer.music.set_volume(0)
+                if not fail_sound_play:
+                    fail_sound.play()
+                    fail_sound_play = True
 
         pygame.display.update()
         clock.tick(60)
