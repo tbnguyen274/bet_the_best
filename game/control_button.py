@@ -142,14 +142,13 @@ class Button:
 random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
                        "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
                        "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben", "Jarell", "Jurgen"]
-
 class TextInput:
-    def __init__(self, x, y, width, height, font_size):
+    def __init__(self, x, y, width, height, font_size, color_inactive, color_active, font_color):
         self.rect = pygame.Rect(x, y, width, height)
-        self.color_inactive = pygame.Color('#2F3C7E')
-        self.color_active = pygame.Color('#4831D4')
+        self.color_inactive = color_inactive
+        self.color_active = color_active
         self.color = self.color_inactive
-        self.font_color = pygame.Color('#CCF381')
+        self.font_color = font_color
         self.font = pygame.font.Font(None, font_size)
         self.text = ""
         self.txt_surface = self.font.render(self.text, True, self.font_color)
@@ -183,7 +182,7 @@ class TextInput:
                     if temp_surface.get_width() < self.rect.w:
                         self.text = temp_text
                 self.txt_surface = self.font.render(self.text, True, self.font_color)
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE :
                 if self.text == "":
                     self.text = random.choice(random_name)
                     random_name.remove(self.text)
@@ -215,20 +214,22 @@ class TextInput:
     def validate_input(self, current_money):
         if self.text.isdigit():
             number = int(self.text)
-            if number < 100 or number > current_money:
-                self.error_message = "Please enter a number between 100 and " + str(current_money)
+            if number > current_money:
+                self.error_message = "Not enough money!"
+            elif number < 100:
+                self.error_message = "Minimum bet is 100!"
             else:
                 self.error_message = ""
                 now = datetime.datetime.now()  # Get the current date and time
                 # with open('spending_history.txt', 'a') as f:
                 #     f.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - {str(number)}\n")  # Write the date, time, and number to the file
         elif self.text != "":
-            self.error_message = "Invalid number"
+            self.error_message = "Invalid number!"
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect, 0)  # Fill the rectangle with color
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
-        error_surface = self.font.render(self.error_message, True, pygame.Color('black'))
-        screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 5))
+        error_surface = self.font.render(self.error_message, True, pygame.Color('firebrick2'))
+        screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 20))
 
 
     def naming_character(self):
@@ -253,14 +254,14 @@ class selector:
 
         # Ô ĐẶT TÊN
         self.namebox = [
-            TextInput(50, 300, 140, 40, 35),
-            TextInput(250, 300, 140, 40, 35),
-            TextInput(450, 300, 140, 40, 35),
-            TextInput(650, 300, 140, 40, 35),
-            TextInput(850, 300, 140, 40, 35),
-            TextInput(1050, 300, 140, 40, 35),
+            TextInput(50, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
+            TextInput(250, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
+            TextInput(450, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
+            TextInput(650, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
+            TextInput(850, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
+            TextInput(1050, 300, 140, 40, 35, pygame.color.Color('#2F3C7E'), pygame.color.Color('#4831D4'), pygame.color.Color('#CCF381')),
         ]
-        self.bet_box = TextInput(380, 510, 200, 40, 25)
+        self.bet_box = TextInput(450, 495, 200, 35, 35, 'grey70', 'grey80', 'black')
 
         #uw la underwater, j la jungle, g la galaxy
         self.set1 = ToggleButton(450, 330, '../assets/sets/Set 1/1.png', 0.3)
@@ -452,7 +453,7 @@ class selector:
         pygame.display.update()
         self.clock.tick(60)
 
-    def select_player_n_bet(self, current_money = 500):
+    def select_player_n_bet(self, current_money):
         
 
         for event in pygame.event.get():
@@ -515,38 +516,42 @@ class selector:
 
         for i in range(1, 7):
             self.char_dict[i] = self.namebox[i - 1].naming_character()
+
         print(self.char_dict)
 
         self.next1.draw(self.screen)
 
-        pygame.draw.rect(self.screen, (100, 149, 237), (320, 425, 640, 216), border_radius=20)
-        pygame.draw.rect(self.screen, (255, 255, 255), (320, 425, 640, 216), 5, border_radius=20)
-        font = pygame.font.Font('../assets/font/game.ttf', 24)
+        pygame.draw.rect(self.screen, 'white', (320, 425, 640, 170), border_radius=20)
+
+        font = pygame.font.Font(None, 60)
 
         self.bet_box.draw(self.screen)
-        self.bet_box.validate_input(1000)
-        update_money = font.render(f"You currently have: {current_money}", True, (255, 255, 255))
-        self.screen.blit(update_money, (335, 440))
-        instruction_text = font.render("Enter the amount of money you want to bet: ", True, (255, 255, 255))
-        screen.blit(instruction_text, (335, 470))  # Điều chỉnh vị trí hiển thị hướng dẫn
+        self.bet_box.validate_input(current_money)
+        update_money = font.render(f"You currently have: {current_money}", True, 'black')
+        self.screen.blit(update_money, (350, 440))
+        instruction_text = font.render("Bet: ", True, 'black')
+        screen.blit(instruction_text, (350, 495))  # Điều chỉnh vị trí hiển thị hướng dẫn
 
         print(self.bet_box.text)
 
         self.back.draw(self.screen)
         if self.back.clicked:
-            self.state = 0
+            self.state = '0'
+
+
+
         pygame.display.update()
         self.clock.tick(60)
 
 sel = selector()
-def run_test():
-    while True:
-        if sel.state == 0:
-            sel.select_bgnset()
-        elif sel.state == 1:
-            sel.select_player_n_bet()
+def run_test(username, current_money):
+    if sel.state == 0:
+        sel.select_bgnset()
+    elif sel.state == 1:
+        sel.select_player_n_bet(current_money)
 
-run_test()
+while True:
+    run_test(1, 12345)
 
 # if __name__ == '__main__':
 #     selector = selector()
