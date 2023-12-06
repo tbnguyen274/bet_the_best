@@ -86,8 +86,8 @@ def run_race():
             self.active = True  # used to draw mystery power-ups on screen, set to False when the real ones appear
             self.collided = False   # check if players meet the power-ups, set to False if they meet
             self.power_up_size = 40 if bg.length > 2 else 50 if bg.length == 2 else 60
-            self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport"]   # list of power-ups
-            self.power_up_probabilities = [0.1, 0.04, 0.03, 0.02, 0.005, 0.02] #The corresponding probabilities of power-ups in the list
+            self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport", "Stun"]   # list of power-ups
+            self.power_up_probabilities = [0.1, 0.04, 0.03, 0.02, 0.005, 0.02, 0.03] #The corresponding probabilities of power-ups in the list
             # Update and process power-ups' images
             self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (self.power_up_size, self.power_up_size)) for i, power_up in enumerate(self.power_ups)}
 
@@ -248,12 +248,15 @@ def run_race():
                 
             elif player.power_up == "StraightToFinish":
                 player.x = self.width - self.player_size
-                pygame.mixer.Sound('assets\sfx\stun.mp3').play()
+                pygame.mixer.Sound('assets\sfx/tele.mp3').play()
                 
             elif player.power_up == "Teleport":
                 player.x = random.randint(0, self.width - self.player_size - 100)
                 pygame.mixer.Sound('assets\sfx/teleport.mp3').play() 
                 
+            elif player.power_up == "Stun":
+                player.speed_multiplier = 0
+                pygame.mixer.Sound('assets\sfx/stun.mp3').play() 
             player.power_up = None
 
 
