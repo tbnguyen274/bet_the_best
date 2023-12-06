@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from PIL import Image
-from firework import Dot, BulletFlyUp, Bullet, FireWork, Random
+from firework import BulletFlyUp, FireWork, Random
 
 
 
@@ -474,7 +474,7 @@ def run_race():
                     time.sleep(1)
                     time_sec -= 1
                 else:
-                    pygame.time.delay(1300) # delay 0.5s
+                    pygame.time.delay(700) # delay 0.5s
                     self.run()  # start run() - main game
 
                 pygame.display.update()
@@ -484,29 +484,33 @@ def run_race():
             sys.exit()
             
         def firework(self):
-            pygame.init()
             clock = pygame.time.Clock()
+            running = True
             
             fireWorks = []
-            time_create = 20 # Khoảng thời gian liên tiếp giữa 2 lần bắn
+            time_create = 30 # Khoảng thời gian liên tiếp giữa 2 lần bắn
             bulletFlyUps = []
+            display_timer = 300 # Khoảng thời gian bắn pháo hoa
+   
             
-            display_timer = 300
-
-            while True:
-                bg.draw_background(window)
-                # Draw players
-                self.draw_players()
-                
-                
+            while running:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
+                
+                # draw background
+                bg.draw_background(window)
+                
+                # Draw players
+                self.draw_players()
+                
+                announce1.draw_power_up()
+                announce2.draw_finish()
                         
                 if (display_timer > -1):
-                    
-                    if time_create == 20: # Tạo (những) viên đạn bay lên sau khoảng thời gian xác đinh
+
+                    if time_create == 30: # Tạo (những) viên đạn bay lên sau khoảng thời gian xác đinh
                         for i in range(Random.num_fireworks()):
                             bulletFlyUps.append(BulletFlyUp(Random.randomBulletFlyUp_speed(), Random.randomBulletFlyUp_x(), window))
 
@@ -529,21 +533,23 @@ def run_race():
                             fireWorks.pop(fireWorks.index(fireWork))
 
                     # Đếm khoảng thời gian bắn
-                    if time_create <= 20:
+                    if time_create <= 30:
                         time_create += 1
                     else:
                         time_create = 0
                         
                     display_timer -= 1
-                    
-                pygame.display.update()
-                clock.tick(60)
+     
+                    pygame.display.flip()
+                    clock.tick(60)
+                
+                else:
+                    pygame.display.flip()
+                    running = False
 
-            
-            
-            
 
         def run(self):
+            global announce1, announce2
             # Main game loop
             clock = pygame.time.Clock()
             running = True
@@ -579,22 +585,6 @@ def run_race():
                 # Check for players reaching the finish line
                 self.check_finish()
 
-                # Check for winners
-                if len(self.finished_players) == self.num_players:
-                    print("All players reached the finish line!")
-                    race_noise.stop()
-                    self.firework()
-                    race_music.stop()
-                    
-                    # self.show_rankings()
-                    self.win_or_lose()
-                    pygame.mixer.Sound('assets\sfx/victory.mp3').play()
-                    pygame.time.delay(4000)
-                    
-                    
-                    running = False
-                    # exit main loop
-
                 # Draw background
                 bg.draw_background(window)
 
@@ -611,6 +601,20 @@ def run_race():
                 # Draw announcements
                 announce1.draw_power_up()
                 announce2.draw_finish()
+                
+                # Check for winners
+                if len(self.finished_players) == self.num_players:
+                    print("All players reached the finish line!")
+                    race_noise.stop()
+                    self.firework()
+                    race_music.stop()
+                    
+                    # show leaderboard
+                    self.show_rankings()
+                    pygame.mixer.Sound('assets\sfx/victory.mp3').play()
+                    pygame.time.delay(4000)
+                    running = False
+                    # exit main loop
 
                 # Update display
                 pygame.display.flip()
