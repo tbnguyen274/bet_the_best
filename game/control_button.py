@@ -540,6 +540,8 @@ class selector:
         self.back.draw(self.screen)
         if self.back.clicked:
             self.state = 1
+        if self.next1.clicked:
+            self.state = 3
 
 
         pygame.display.update()
@@ -548,14 +550,17 @@ class selector:
 sel = selector()
 def run_test():
     sel.state = 1
-    while True:
+    running = True
+    while running:
         if sel.state == 1:
             sel.select_bgnset()
         elif sel.state == 2 and len(sel.activated_buttons) == 3:
             sel.select_player_n_bet()
+        else:
+            running = False
 
 
-run_test()
+
 # if __name__ == '__main__':
 #     selector = selector()
 #     selector.select_bgnset()
