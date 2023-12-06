@@ -409,7 +409,7 @@ class selector:
         pygame.display.update()
         self.clock.tick(60)
 
-    def select_charnbet(self):
+    def select_player_n_bet(self):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
