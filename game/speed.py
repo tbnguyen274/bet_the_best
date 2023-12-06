@@ -4,7 +4,7 @@ import sys
 import os
 import time
 from PIL import Image
-from control_button import selector
+from control_button import selector, run_test, sel
 from firework import BulletFlyUp, FireWork, Random
 
 def run_race():
@@ -15,11 +15,11 @@ def run_race():
 
     class Background:
         def __init__(self, width, height):
-            self.length = selector().activated_buttons[2]
+            self.length = sel.activated_buttons[2]
             self.width = width
             self.height = height
             self.race_scale = 0.8 if self.length == 'long' else 1 if self.length == 'mid' else 1.2
-            self.bg_type = selector.activated_buttons[0] # can be modified to meet up with player's choice
+            self.bg_type = sel.activated_buttons[0] # can be modified to meet up with player's choice
             self.load_images()
             
         def load_images(self):
@@ -170,13 +170,13 @@ def run_race():
             self.height = 720
             self.num_players = 6
             # update set character based on what player choooses
-            self.num_player_set = ['Set 1' if selector().activated_buttons[1] == 'set1' else
-                                   'Set 2' if selector().activated_buttons[1] == 'set2' else
-                                   'Set 3' if selector().activated_buttons[1] == 'set3' else
-                                   'Set 4' if selector().activated_buttons[1] == 'set4' else
-                                   'Set 5' if selector().activated_buttons[1] == 'set5' else
-                                   'Set 6' if selector().activated_buttons[1] == 'set6' else
-                                   'Set 7']
+            self.num_player_set = 'Set 1' if sel.activated_buttons[1] == 'set1' else \
+                      'Set 2' if sel.activated_buttons[1] == 'set2' else \
+                      'Set 3' if sel.activated_buttons[1] == 'set3' else \
+                      'Set 4' if sel.activated_buttons[1] == 'set4' else \
+                      'Set 5' if sel.activated_buttons[1] == 'set5' else \
+                      'Set 6' if sel.activated_buttons[1] == 'set6' else \
+                      'Set 7'
             
             self.num_power_up_icons = num_power_up_icons    # modify the number of power-ups
             self.players = []
@@ -195,7 +195,7 @@ def run_race():
                 self.players = [Player(0, bg.height - bg.image.get_height() +  85*i,
                             pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
                             pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            selector().char_dict[i+1]
+                            sel.char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
@@ -203,7 +203,7 @@ def run_race():
                 self.players = [Player(0, bg.height - bg.image.get_height() +  65*i,
                             pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
                             pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            selector().char_dict[i+1]
+                            sel.char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
@@ -211,7 +211,7 @@ def run_race():
                 self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
                             pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
                             pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
-                            selector().char_dict[i+1]
+                            sel.char_dict[i+1]
                             )
                         for i in range(self.num_players)]
             
@@ -573,4 +573,5 @@ if __name__ == "__main__":
     # Initialize Pygame
     pygame.init()
     pygame.mixer.init()
+    run_test()
     run_race()

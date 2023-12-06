@@ -2,6 +2,7 @@ import cv2
 import sys
 import pygame
 import random
+import datetime
 pygame.init()
 
 
@@ -33,7 +34,7 @@ class ToggleButton:
                                                                   int(self.original_image.get_height() * scale)))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
-        self.click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
+        self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
 
     def draw(self, screen):
         border_size = 3  # Kích thước viền
@@ -81,7 +82,7 @@ class ToggleButton2:
         self.clicked_image = self.darken_image(self.original_image)  # Tạo hình ảnh sậm đi khi nút được nhấn
         self.rect_clicked = self.clicked_image.get_rect(topleft=(x, y))
         self.clicked = False
-        self.click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
+        self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
 
     def darken_image(self, image):
         # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
@@ -124,7 +125,7 @@ class Button:
         self.image_alpha.set_alpha(160)
 
     def draw(self, screen):
-        click_sound = pygame.mixer.Sound('../assets/sfx/pop-click-sound.mp3')
+        click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
         cursor_pos = pygame.mouse.get_pos()
         if self.image_rect.collidepoint(cursor_pos):
             screen.blit(self.image_alpha, (self.image_rect.x, self.image_rect.y))
@@ -148,11 +149,12 @@ class TextInput:
         self.color_inactive = pygame.Color('#2F3C7E')
         self.color_active = pygame.Color('#4831D4')
         self.color = self.color_inactive
-        self.font_color = pygame.Color('#CCF381')  # Add this line to set the font color
+        self.font_color = pygame.Color('#CCF381')
         self.font = pygame.font.Font(None, font_size)
         self.text = ""
-        self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
+        self.txt_surface = self.font.render(self.text, True, self.font_color)
         self.active = False
+        self.error_message = ""  # Add this line to store the error message
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -187,14 +189,52 @@ class TextInput:
                     random_name.remove(self.text)
                 self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
 
-    def draw(self, screen):
-        # Fill the input box with color
-        pygame.draw.rect(screen, self.color, self.rect)
+    def handle_event2(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.active = not self.active
+            else:
+                self.active = False
+            self.color = self.color_active if self.active else self.color_inactive
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    print(self.text)
+                    self.text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                elif event.key == pygame.K_DELETE:
+                    self.text = ''
+                else:
+                    temp_text = self.text + event.unicode
+                    temp_surface = self.font.render(temp_text, True, self.font_color)
+                    if temp_surface.get_width() < self.rect.w:
+                        self.text = temp_text
+                self.txt_surface = self.font.render(self.text, True, self.font_color)
 
-        # Draw the text on the filled input box
-        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 8))
+    def validate_input(self, current_money):
+        if self.text.isdigit():
+            number = int(self.text)
+            if number < 100 or number > current_money:
+                self.error_message = "Please enter a number between 100 and " + str(current_money)
+            else:
+                self.error_message = ""
+                now = datetime.datetime.now()  # Get the current date and time
+                # with open('spending_history.txt', 'a') as f:
+                #     f.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - {str(number)}\n")  # Write the date, time, and number to the file
+        elif self.text != "":
+            self.error_message = "Invalid number"
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect, 0)  # Fill the rectangle with color
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
+        error_surface = self.font.render(self.error_message, True, pygame.Color('black'))
+        screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 5))
+
+
     def naming_character(self):
         return self.text
+
+
 
 WIDTH, HEIGHT = 1280, 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -207,9 +247,9 @@ class selector:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((1280, 720))
 
-        self.shortRace = ToggleButton2(280, 600, '../assets/icons/buttons/button_short.png')
-        self.midRace = ToggleButton2(530, 600, '../assets/icons/buttons/button_medium.png')
-        self.longRace = ToggleButton2(780, 600, '../assets/icons/buttons/button_long.png')
+        self.shortRace = ToggleButton2(280, 600, 'assets/icons/buttons/button_short.png')
+        self.midRace = ToggleButton2(530, 600, 'assets/icons/buttons/button_medium.png')
+        self.longRace = ToggleButton2(780, 600, 'assets/icons/buttons/button_long.png')
 
         # Ô ĐẶT TÊN
         self.namebox = [
@@ -220,94 +260,95 @@ class selector:
             TextInput(850, 300, 140, 40, 35),
             TextInput(1050, 300, 140, 40, 35),
         ]
+        self.bet_box = TextInput(380, 510, 200, 40, 25)
 
         #uw la underwater, j la jungle, g la galaxy
-        self.set1 = ToggleButton(450, 330, '../assets/sets/Set 1/1.png', 0.3)
-        self.set2 = ToggleButton(640, 330, '../assets/sets/Set 2/1.png', 0.3)
-        self.set3 = ToggleButton(470, 330, '../assets/sets/Set 3/1.png', 0.3)
-        self.set4 = ToggleButton(660, 360, '../assets/sets/Set 4/1.png', 0.3)
-        self.set5 = ToggleButton(370, 330, '../assets/sets/Set 5/1.png', 0.3)
-        self.set6 = ToggleButton(560, 330, '../assets/sets/Set 6/1.png', 0.3)
-        self.set7 = ToggleButton(770, 330, '../assets/sets/Set 7/2.png', 0.3)
+        self.set1 = ToggleButton(450, 330, 'assets/sets/Set 1/1.png', 0.3)
+        self.set2 = ToggleButton(640, 330, 'assets/sets/Set 2/1.png', 0.3)
+        self.set3 = ToggleButton(470, 330, 'assets/sets/Set 3/1.png', 0.3)
+        self.set4 = ToggleButton(660, 360, 'assets/sets/Set 4/1.png', 0.3)
+        self.set5 = ToggleButton(370, 330, 'assets/sets/Set 5/1.png', 0.3)
+        self.set6 = ToggleButton(560, 330, 'assets/sets/Set 6/1.png', 0.3)
+        self.set7 = ToggleButton(770, 330, 'assets/sets/Set 7/2.png', 0.3)
 
         self.set1_char = [
-            ToggleButton(20, 130, '../assets/sets/Set 1/1.png', 0.22),
-            ToggleButton(210, 130, '../assets/sets/Set 1/2.png', 0.22),
-            ToggleButton(460, 130, '../assets/sets/Set 1/3.png', 0.22),
-            ToggleButton(650, 130, '../assets/sets/Set 1/4.png', 0.22),
-            ToggleButton(850, 130, '../assets/sets/Set 1/5.png', 0.22),
-            ToggleButton(1050, 130, '../assets/sets/Set 1/6.png', 0.22),
+            ToggleButton(20, 130, 'assets/sets/Set 1/1.png', 0.22),
+            ToggleButton(210, 130, 'assets/sets/Set 1/2.png', 0.22),
+            ToggleButton(460, 130, 'assets/sets/Set 1/3.png', 0.22),
+            ToggleButton(650, 130, 'assets/sets/Set 1/4.png', 0.22),
+            ToggleButton(850, 130, 'assets/sets/Set 1/5.png', 0.22),
+            ToggleButton(1050, 130, 'assets/sets/Set 1/6.png', 0.22),
         ]
         self.set2_char = [
-            ToggleButton(20, 130, '../assets/sets/Set 2/1.png', 0.2),
-            ToggleButton(210, 130, '../assets/sets/Set 2/2.png', 0.2),
-            ToggleButton(440, 130, '../assets/sets/Set 2/3.png', 0.2),
-            ToggleButton(660, 130, '../assets/sets/Set 2/4.png', 0.2),
-            ToggleButton(800, 130, '../assets/sets/Set 2/5.png', 0.2),
-            ToggleButton(1030, 130, '../assets/sets/Set 2/6.png', 0.2),
+            ToggleButton(20, 130, 'assets/sets/Set 2/1.png', 0.2),
+            ToggleButton(210, 130, 'assets/sets/Set 2/2.png', 0.2),
+            ToggleButton(440, 130, 'assets/sets/Set 2/3.png', 0.2),
+            ToggleButton(660, 130, 'assets/sets/Set 2/4.png', 0.2),
+            ToggleButton(800, 130, 'assets/sets/Set 2/5.png', 0.2),
+            ToggleButton(1030, 130, 'assets/sets/Set 2/6.png', 0.2),
         ]
 
         self.set3_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 3/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 3/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 3/3.png', 0.3),
-            ToggleButton(680, 130, '../assets/sets/Set 3/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 3/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 3/6.png', 0.3),
+            ToggleButton(50, 130, 'assets/sets/Set 3/1.png', 0.3),
+            ToggleButton(250, 130, 'assets/sets/Set 3/2.png', 0.3),
+            ToggleButton(450, 130, 'assets/sets/Set 3/3.png', 0.3),
+            ToggleButton(680, 130, 'assets/sets/Set 3/4.png', 0.3),
+            ToggleButton(850, 130, 'assets/sets/Set 3/5.png', 0.3),
+            ToggleButton(1050, 130, 'assets/sets/Set 3/6.png', 0.3),
         ]
         self.set4_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 4/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 4/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 4/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 4/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 4/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 4/6.png', 0.2),
+            ToggleButton(50, 130, 'assets/sets/Set 4/1.png', 0.3),
+            ToggleButton(250, 130, 'assets/sets/Set 4/2.png', 0.3),
+            ToggleButton(450, 130, 'assets/sets/Set 4/3.png', 0.3),
+            ToggleButton(650, 130, 'assets/sets/Set 4/4.png', 0.3),
+            ToggleButton(850, 130, 'assets/sets/Set 4/5.png', 0.3),
+            ToggleButton(1050, 130, 'assets/sets/Set 4/6.png', 0.2),
 
         ]
         self.set5_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 5/1.png', 0.25),
-            ToggleButton(250, 130, '../assets/sets/Set 5/2.png', 0.2),
-            ToggleButton(450, 130, '../assets/sets/Set 5/3.png', 0.2),
-            ToggleButton(650, 130, '../assets/sets/Set 5/4.png', 0.25),
-            ToggleButton(850, 130, '../assets/sets/Set 5/5.png', 0.25),
-            ToggleButton(1050, 130, '../assets/sets/Set 5/6.png', 0.25),
+            ToggleButton(50, 130, 'assets/sets/Set 5/1.png', 0.25),
+            ToggleButton(250, 130, 'assets/sets/Set 5/2.png', 0.2),
+            ToggleButton(450, 130, 'assets/sets/Set 5/3.png', 0.2),
+            ToggleButton(650, 130, 'assets/sets/Set 5/4.png', 0.25),
+            ToggleButton(850, 130, 'assets/sets/Set 5/5.png', 0.25),
+            ToggleButton(1050, 130, 'assets/sets/Set 5/6.png', 0.25),
         ]
 
         self.set6_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 6/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 6/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 6/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 6/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 6/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 6/6.png', 0.3),
+            ToggleButton(50, 130, 'assets/sets/Set 6/1.png', 0.3),
+            ToggleButton(250, 130, 'assets/sets/Set 6/2.png', 0.3),
+            ToggleButton(450, 130, 'assets/sets/Set 6/3.png', 0.3),
+            ToggleButton(650, 130, 'assets/sets/Set 6/4.png', 0.3),
+            ToggleButton(850, 130, 'assets/sets/Set 6/5.png', 0.3),
+            ToggleButton(1050, 130, 'assets/sets/Set 6/6.png', 0.3),
         ]
 
         self.set7_char = [
-            ToggleButton(50, 130, '../assets/sets/Set 7/1.png', 0.3),
-            ToggleButton(250, 130, '../assets/sets/Set 7/2.png', 0.3),
-            ToggleButton(450, 130, '../assets/sets/Set 7/3.png', 0.3),
-            ToggleButton(650, 130, '../assets/sets/Set 7/4.png', 0.3),
-            ToggleButton(850, 130, '../assets/sets/Set 7/5.png', 0.3),
-            ToggleButton(1050, 130, '../assets/sets/Set 7/6.png', 0.3),
+            ToggleButton(50, 130, 'assets/sets/Set 7/1.png', 0.3),
+            ToggleButton(250, 130, 'assets/sets/Set 7/2.png', 0.3),
+            ToggleButton(450, 130, 'assets/sets/Set 7/3.png', 0.3),
+            ToggleButton(650, 130, 'assets/sets/Set 7/4.png', 0.3),
+            ToggleButton(850, 130, 'assets/sets/Set 7/5.png', 0.3),
+            ToggleButton(1050, 130, 'assets/sets/Set 7/6.png', 0.3),
         ]
 
-        self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
-        self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
-        self.galaxy = ToggleButton(880, 70, '../assets/BG-pic/galaxy.jpg', 0.25)
+        self.underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
+        self.jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
+        self.galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
 
-        self.next_img = pygame.image.load('../assets/icons/return.png')
+        self.next_img = pygame.image.load('assets/icons/return.png')
         self.next_img = pygame.transform.flip(self.next_img, True, False)
         self.next = Button(1120, 600, self.next_img, 0.2)
         self.next1 = Button(1120, 600, self.next_img, 0.2)
-        self.back = Button(50, 600, pygame.image.load('../assets/icons/return.png'), 0.2)
+        self.back = Button(50, 600, pygame.image.load('assets/icons/return.png'), 0.2)
 
-        self.bg_default = '../assets/videos/diffselectbg.mp4'
+        self.bg_default = 'assets/videos/diffselectbg.mp4'
         self.bg_default_loop = VideoPlayer(self.bg_default)
-        self.bg_uw = '../assets/videos/underwater_background.mp4'
+        self.bg_uw = 'assets/videos/underwater_background.mp4'
         self.bg_uw_loop = VideoPlayer(self.bg_uw)
-        self.bg_j = '../assets/videos/jungle_background.mp4'
+        self.bg_j = 'assets/videos/jungle_background.mp4'
         self.bg_j_loop = VideoPlayer(self.bg_j)
-        self.bg_g = '../assets/videos/galaxy_background.mp4'
+        self.bg_g = 'assets/videos/galaxy_background.mp4'
         self.bg_g_loop = VideoPlayer(self.bg_g)
 
         # List bao gồm: [0] là background, [1] là set nhân vật, [2] là độ dài đường đua
@@ -320,6 +361,8 @@ class selector:
         self.check_uw = False
         self.check_g = False
         self.check_next = False
+
+        self.state = 0
     def select_bgnset(self):
 
         for event in pygame.event.get():
@@ -358,7 +401,7 @@ class selector:
                 if len(self.activated_buttons) == 3:
                     self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
                     print(self.activated_buttons)
-
+                    self.state = 1
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -409,8 +452,9 @@ class selector:
         pygame.display.update()
         self.clock.tick(60)
 
-    def select_player_n_bet(self):
-
+    def select_player_n_bet(self, current_money = 500):
+        
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -418,6 +462,8 @@ class selector:
 
             for box in self.namebox:
                 box.handle_event(event)
+                
+            self.bet_box.handle_event2(event)
 
             if self.activated_buttons[1] == 'set2':
                 ToggleButton.check_click(event, self.set2_char)
@@ -472,13 +518,43 @@ class selector:
         print(self.char_dict)
 
         self.next1.draw(self.screen)
-        self.back.draw(self.screen)
 
+        pygame.draw.rect(self.screen, (100, 149, 237), (320, 425, 640, 216), border_radius=20)
+        pygame.draw.rect(self.screen, (255, 255, 255), (320, 425, 640, 216), 5, border_radius=20)
+        font = pygame.font.Font('assets/font/game.ttf', 24)
+
+        self.bet_box.draw(self.screen)
+        self.bet_box.validate_input(1000)
+        update_money = font.render(f"You currently have: {current_money}", True, (255, 255, 255))
+        self.screen.blit(update_money, (335, 440))
+        instruction_text = font.render("Enter the amount of money you want to bet: ", True, (255, 255, 255))
+        screen.blit(instruction_text, (335, 470))  # Điều chỉnh vị trí hiển thị hướng dẫn
+
+        print(self.bet_box.text)
+
+        self.back.draw(self.screen)
+        if self.back.clicked:
+            self.state = 0
+            
+        if self.next1.clicked:
+            self.state = 3
         pygame.display.update()
         self.clock.tick(60)
 
+sel = selector()
+def run_test():
+    running = True
+    while running:
+        if sel.state == 0:
+            sel.select_bgnset()
+        elif sel.state == 1:
+            sel.select_player_n_bet()
+        else:
+            running = False
 
-if __name__ == '__main__':
-    selector = selector()
-    selector.select_bgnset()
-    selector.select_charnbet()
+run_test()
+
+# if __name__ == '__main__':
+#     selector = selector()
+#     selector.select_bgnset()
+#     selector.select_player_n_bet()
