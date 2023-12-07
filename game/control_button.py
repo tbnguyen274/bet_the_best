@@ -3,6 +3,7 @@ import sys
 import pygame
 import random
 import datetime
+import time
 pygame.init()
 
 
@@ -154,6 +155,7 @@ class TextInput:
         self.txt_surface = self.font.render(self.text, True, self.font_color)
         self.active = False
         self.error_message = ""  # Add this line to store the error message
+        self.error_time = 0
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -215,22 +217,29 @@ class TextInput:
         if self.text.isdigit():
             number = int(self.text)
             if number > current_money:
-                self.error_message = "Not enough money!"
+                self.set_error_message(self, "Not enough money!")
             elif number < 100:
-                self.error_message = "Minimum bet is 100!"
+                self.set_error_message("Minimum bet is 100!")
             else:
                 self.error_message = ""
                 now = datetime.datetime.now()  # Get the current date and time
                 # with open('spending_history.txt', 'a') as f:
                 #     f.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - {str(number)}\n")  # Write the date, time, and number to the file
         elif self.text != "":
-            self.error_message = "Invalid number!"
+            self.set_error_message("Invalid number!")
+
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect, 0)  # Fill the rectangle with color
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
-        error_surface = self.font.render(self.error_message, True, pygame.Color('firebrick2'))
-        screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 20))
 
+        # Only draw the error message if it's been less than 1.5 seconds
+        if time.time() - self.error_time < 1.5:
+            error_surface = self.font.render(self.error_message, True, pygame.Color('firebrick2'))
+            screen.blit(error_surface, (self.rect.x, self.rect.y + self.rect.h + 20))
+
+    def set_error_message(self, message):
+        self.error_message = message
+        self.error_time = time.time()
 
     def naming_character(self):
         return self.text
@@ -333,6 +342,9 @@ class selector:
             ToggleButton(1050, 130, '../assets/sets/Set 7/6.png', 0.3),
         ]
 
+        self.set_char = [self.set1_char, self.set2_char, self.set3_char, self.set4_char, self.set5_char, self.set6_char,
+                         self.set7_char]
+
         self.underwater = ToggleButton(80, 70, '../assets/BG-pic/underwater.jpg', 0.25)
         self.jungle = ToggleButton(480, 70, '../assets/BG-pic/jungle.jpg', 0.25)
         self.galaxy = ToggleButton(880, 70, '../assets/BG-pic/galaxy.jpg', 0.25)
@@ -343,7 +355,7 @@ class selector:
         self.next1 = Button(1120, 600, self.next_img, 0.2)
         self.back = Button(50, 600, pygame.image.load('../assets/icons/return.png'), 0.2)
 
-        self.player = ()
+        self.player = -1
 
         self.bg_default = '../assets/videos/diffselectbg.mp4'
         self.bg_default_loop = VideoPlayer(self.bg_default)
@@ -366,8 +378,9 @@ class selector:
         self.check_next = False
 
         self.state = 0
-    def select_bgnset(self):
 
+    def select_bgnset(self):
+        previous_click = False
         self.state = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -458,7 +471,7 @@ class selector:
 
 
     def select_player_n_bet(self):
-
+        previous_click = False
         self.state = 2
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -474,7 +487,9 @@ class selector:
                 ToggleButton.check_click(event, self.set2_char)
                 for i in range(0, 6):
                     if self.set2_char[i].clicked:
-                        self.player = (i + 1)
+                        self.player = i + 1
+
+
             if self.activated_buttons[1] == 'set1':
                 ToggleButton.check_click(event, self.set1_char)
             if self.activated_buttons[1] == 'set5':
@@ -487,8 +502,6 @@ class selector:
                 ToggleButton.check_click(event, self.set4_char)
             if self.activated_buttons[1] == 'set7':
                 ToggleButton.check_click(event, self.set7_char)
-
-
 
         if self.activated_buttons[0] == 'jungle':
             self.bg_j_loop.loop_background()
@@ -548,13 +561,20 @@ class selector:
         self.back.draw(self.screen)
         if self.back.clicked:
             self.state = 1
+
         if self.next1.clicked:
+            self.player = -1
+            for i in range(7):
+                for j in range(6):
+                    if self.set_char[i][j].clicked:
+                        self.player = j + 1
             if not all(self.char_dict.values()):
-                self.bet_box.error_message = "Please enter the characters names!"
-            elif self.bet_box.text != "":
-                self.bet_box.error_message = "Please enter your bet!"
-            if self.bet_box.text != "" and all(self.char_dict.values()):
-                self.bet = self.bet_box.text
+                self.bet_box.set_error_message("Please enter the characters names!")
+            elif self.bet_box.text == "":
+                self.bet_box.set_error_message("Please enter your bet!")
+            elif self.player == -1:
+                self.bet_box.set_error_message("Please choose your character!")
+            elif self.bet_box.text != "" and all(self.char_dict.values()):
                 self.state = 3
 
         print(self.player)
