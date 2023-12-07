@@ -541,7 +541,10 @@ class selector:
         if self.back.clicked:
             self.state = 1
         if self.next1.clicked:
-            self.state = 3
+            if self.bet_box.text != "":
+                self.state = 3
+            else:
+                self.bet_box.error_message = "Please enter your bet!"
 
 
         pygame.display.update()
@@ -558,7 +561,7 @@ def run_test():
             sel.select_player_n_bet()
         else:
             running = False
-
+run_test()
 
 
 # if __name__ == '__main__':
