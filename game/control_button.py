@@ -536,15 +536,18 @@ class selector:
         screen.blit(instruction_text, (350, 495))  # Điều chỉnh vị trí hiển thị hướng dẫn
 
         print(self.bet_box.text)
+        
 
         self.back.draw(self.screen)
         if self.back.clicked:
             self.state = 1
         if self.next1.clicked:
-            if self.bet_box.text != "":
-                self.state = 3
-            else:
+            if not all(self.char_dict.values()):
+                self.bet_box.error_message = "Please enter the characters names!"
+            elif self.bet_box.text != "":
                 self.bet_box.error_message = "Please enter your bet!"
+            if self.bet_box.text != "" and all(self.char_dict.values()):
+                self.state = 3
 
 
         pygame.display.update()
@@ -561,7 +564,7 @@ def run_test():
             sel.select_player_n_bet()
         else:
             running = False
-run_test()
+# run_test()
 
 
 # if __name__ == '__main__':
