@@ -6,6 +6,7 @@ import time
 from PIL import Image
 from control_button import sel, run_test
 from firework import BulletFlyUp, FireWork, Random
+import mainmenu
 
 def run_race():
     # Set up display
@@ -434,6 +435,50 @@ def run_race():
             # Save the entire window to a file with the current time in the filename
             pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
 
+            pygame.display.flip()
+            
+        def win_or_lose(self):
+            bg.draw_background(window)
+
+           # Set the dimensions of the rectangle
+            rect_width = 620 # 620 = 2480/4
+            rect_height = 545   #545 = 2180/4
+
+            # Calculate the position of the rectangle to place it at the center of the window
+            rect_x = (self.width - rect_width) // 2
+            rect_y = (self.height - rect_height) // 2
+            
+            pygame.draw.rect(window, 'red', (rect_x -5, rect_y -5, rect_width+10, rect_height+10), border_radius=20)
+            pygame.draw.rect(window, 'white', (rect_x, rect_y, rect_width, rect_height), border_radius=15)
+            
+            font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
+            font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
+            
+            def center_text(x, y, width, height, render):
+                text_width, text_height = render.get_size()
+                return (x + (width - text_width) // 2, y + (height - text_height) // 2)
+            
+            
+            winning_state = ("CONGRATULATIONS!" if self.players[sel.player - 1].order in (1, 2, 3)
+                            else "IT'S SUCH A SHAME!")
+            
+            update_bet = (f"You have won {sel.bet} coins from the game" if self.players[sel.player - 1].order in (1, 2, 3)
+                          else f"You have lost {sel.bet} coins from the game")
+            
+            update_coin = f"Your current coins: {mainmenu.user_coin + sel.bet}"
+            
+            winning_state_render = font_big.render(winning_state, True, (22, 27, 33))
+            update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
+            update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
+            
+            winning_state_position = center_text(rect_x, rect_y - 100, rect_width, rect_height, winning_state_render)
+            update_bet_position = center_text(rect_x, rect_y, rect_width, rect_height, update_bet_render)
+            update_coin_position = center_text(rect_x, rect_y + 80, rect_width, rect_height, update_coin_render)
+            
+            window.blit(winning_state_render, winning_state_position)
+            window.blit(update_bet_render, update_bet_position)
+            window.blit(update_coin_render, update_coin_position)
+            
             pygame.display.flip()
 
 

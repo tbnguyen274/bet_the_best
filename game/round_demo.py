@@ -372,13 +372,11 @@ def run_race():
             pygame.display.flip()
 
         def win_or_lose(self):
-            
             bg.draw_background(window)
-            
 
            # Set the dimensions of the rectangle
-            rect_width = 620
-            rect_height = 545
+            rect_width = 620 # 620 = 2480/4
+            rect_height = 545   #545 = 2180/4
 
             # Calculate the position of the rectangle to place it at the center of the window
             rect_x = (self.width - rect_width) // 2
@@ -387,21 +385,28 @@ def run_race():
             pygame.draw.rect(window, 'red', (rect_x -5, rect_y -5, rect_width+10, rect_height+10), border_radius=20)
             pygame.draw.rect(window, 'white', (rect_x, rect_y, rect_width, rect_height), border_radius=15)
             
-            font = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
+            font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
+            font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             
-            def center_text(x, y, width, height):
-                text_width, text_height = announce_render.get_size()
+            def center_text(x, y, width, height, render):
+                text_width, text_height = render.get_size()
                 return (x + (width - text_width) // 2, y + (height - text_height) // 2)
             
             winning_state = "CONGRATULATIONS!" if 1 == 2 else "IT'S SUCH A SHAME!"
             update_bet = f"You have won ... from the game"
             update_coin = f"Your current coins: ..."
-            announce_render = font.render("Hello", True, (22, 27, 33))
-            announce_position = center_text(rect_x, rect_y, rect_width, rect_height)
             
-            window.blit(announce_render, announce_position)
+            winning_state_render = font_big.render(winning_state, True, (22, 27, 33))
+            update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
+            update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
             
-        
+            winning_state_position = center_text(rect_x, rect_y - 100, rect_width, rect_height, winning_state_render)
+            update_bet_position = center_text(rect_x, rect_y, rect_width, rect_height, update_bet_render)
+            update_coin_position = center_text(rect_x, rect_y + 80, rect_width, rect_height, update_coin_render)
+            
+            window.blit(winning_state_render, winning_state_position)
+            window.blit(update_bet_render, update_bet_position)
+            window.blit(update_coin_render, update_coin_position)
             
             pygame.display.flip()
             

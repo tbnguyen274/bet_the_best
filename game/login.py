@@ -1,7 +1,7 @@
 import pygame, json, os, sys, cv2, face_recognition, numpy as np, re, smtplib, math
 from email.message import EmailMessage
 from intro import display_intro
-import game
+import mainmenu
 
 # Xây dựng Database
 DATABASE_DIRECTORY = 'db'
@@ -24,7 +24,7 @@ def isempty(s):
 # khối lệnh sẽ dc thực hiện khi đăng nhập thành công
 def login_success(username):
     pygame.mixer.music.stop()
-    game.mainmenu(username)
+    mainmenu.mainmenu(username)
 
 # Kích thước cửa sổ
 WINDOW_WIDTH = 1280
