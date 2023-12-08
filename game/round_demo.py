@@ -363,81 +363,45 @@ def run_race():
             # Draw the frame onto the main window
             window.blit(frame, frame_rect.topleft)
             
-            # Get the current time and format it as a string
-            current_time = time.strftime("%H%M%S_%d%m%Y") 
+            # # Get the current time and format it as a string
+            # current_time = time.strftime("%H%M%S_%d%m%Y") 
 
-            # Save the entire window to a file with the current time in the filename
-            pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
+            # # Save the entire window to a file with the current time in the filename
+            # pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
 
             pygame.display.flip()
 
         def win_or_lose(self):
             
             bg.draw_background(window)
-
-            # Load RankingImg
-            RankingImg = Image.open("assets/BG-pic/buletin.png")
-
-            # Calculate the dimensions of the frame
-            frame_width = int(RankingImg.width * 1.5)
-            frame_height = int(RankingImg.width * 1.5)
-            # Create a Surface with per-pixel alpha
-            frame = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
-
-            # Fill the surface with a transparent color
-            frame.fill((0, 0, 0, 0))
-
-            # Calculate the dimensions of the image display area
-            image_width = frame_width 
-            image_height = frame_height 
-
-            # Resize and center the image
-            RankingImg = RankingImg.resize((image_width, image_height), Image.Resampling.LANCZOS)
-            scaled_image = pygame.image.fromstring(RankingImg.tobytes(), RankingImg.size, RankingImg.mode)
-            image_rect = scaled_image.get_rect(center=(frame_width // 2, frame_height // 2))
-
-            # Blit the image onto the frame
-            frame.blit(scaled_image, image_rect.topleft)
-
-
-            #Render and display ranking information
-            myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             
-            #     # Render the text onto a new Surface
-            #     rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
 
-            #     # Calculate the position of the text to center it in the frame
-            #     rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
-            #     player_postion = (535, image_rect.top + 185 + i * 55)
-            #     print(player_postion)
+           # Set the dimensions of the rectangle
+            rect_width = 620
+            rect_height = 545
 
-            #     # Draw the text onto the frame
-            #     frame.blit(rank_text_surface, rank_text_position)
-                
-            #     player_img = pygame.transform.scale(player.normal_image, (50, 50))
-            #     frame.blit(player_img, player_postion)
+            # Calculate the position of the rectangle to place it at the center of the window
+            rect_x = (self.width - rect_width) // 2
+            rect_y = (self.height - rect_height) // 2
             
+            pygame.draw.rect(window, 'red', (rect_x -5, rect_y -5, rect_width+10, rect_height+10), border_radius=20)
+            pygame.draw.rect(window, 'white', (rect_x, rect_y, rect_width, rect_height), border_radius=15)
             
-            # for i, player in enumerate(self.players):
-            #     # Render the text onto a new Surface
-            #     rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
-
-            #     # Calculate the position of the text to center it in the frame
-            #     rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
-            #     player_postion = (535, image_rect.top + 185 + i * 55)
-            #     print(player_postion)
-
-            #     # Draw the text onto the frame
-            #     frame.blit(rank_text_surface, rank_text_position)
-                
-            #     player_img = pygame.transform.scale(player.normal_image, (50, 50))
-            #     frame.blit(player_img, player_postion)
-
-            # Calculate the position of the frame on the main window
-            frame_rect = frame.get_rect(center=(self.width // 2, self.height // 2))
-
-            # Draw the frame onto the main window
-            window.blit(frame, frame_rect.topleft)
+            font = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
+            
+            def center_text(x, y, width, height):
+                text_width, text_height = announce_render.get_size()
+                return (x + (width - text_width) // 2, y + (height - text_height) // 2)
+            
+            winning_state = "CONGRATULATIONS!" if 1 == 2 else "IT'S SUCH A SHAME!"
+            update_bet = f"You have won ... from the game"
+            update_coin = f"Your current coins: ..."
+            announce_render = font.render("Hello", True, (22, 27, 33))
+            announce_position = center_text(rect_x, rect_y, rect_width, rect_height)
+            
+            window.blit(announce_render, announce_position)
+            
+        
             
             pygame.display.flip()
             
@@ -613,7 +577,7 @@ def run_race():
                     race_music.stop()
                     
                     # show leaderboard
-                    self.show_rankings()
+                    self.win_or_lose()
                     pygame.mixer.Sound('assets\sfx/victory.mp3').play()
                     pygame.time.delay(4000)
                     running = False
