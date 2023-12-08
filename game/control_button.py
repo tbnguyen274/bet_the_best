@@ -217,7 +217,7 @@ class TextInput:
         if self.text.isdigit():
             number = int(self.text)
             if number > current_money:
-                self.set_error_message(self, "Not enough money!")
+                self.set_error_message("Not enough money!")
             elif number < 100:
                 self.set_error_message("Minimum bet is 100!")
             else:
@@ -354,7 +354,7 @@ class selector:
         self.next = Button(1120, 600, self.next_img, 0.2)
         self.next1 = Button(1120, 600, self.next_img, 0.2)
         self.back = Button(50, 600, pygame.image.load('../assets/icons/return.png'), 0.2)
-
+        self.back1 = Button(50, 600, pygame.image.load('../assets/icons/return.png'), 0.2)
         self.player = -1
 
         self.bg_default = '../assets/videos/diffselectbg.mp4'
@@ -419,6 +419,11 @@ class selector:
                     self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
                     print(self.activated_buttons)
                     self.state = 2
+            if self.back.clicked: #QUAY VE LOBBY
+                self.state = 0
+                self.check_next = False
+                self.activated_buttons = []
+
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -465,6 +470,7 @@ class selector:
         self.midRace.draw(self.screen)
         self.shortRace.draw(self.screen)
         self.next.draw(self.screen)
+        self.back.draw(self.screen)
 
         pygame.display.update()
         self.clock.tick(60)
@@ -558,8 +564,8 @@ class selector:
         print(self.bet_box.text)
         
 
-        self.back.draw(self.screen)
-        if self.back.clicked:
+        self.back1.draw(self.screen)
+        if self.back1.clicked:
             self.state = 1
 
         if self.next1.clicked:
