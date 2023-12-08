@@ -491,11 +491,6 @@ class selector:
 
             if self.activated_buttons[1] == 'set2':
                 ToggleButton.check_click(event, self.set2_char)
-                for i in range(0, 6):
-                    if self.set2_char[i].clicked:
-                        self.player = i + 1
-
-
             if self.activated_buttons[1] == 'set1':
                 ToggleButton.check_click(event, self.set1_char)
             if self.activated_buttons[1] == 'set5':
