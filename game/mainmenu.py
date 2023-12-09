@@ -222,7 +222,10 @@ def mainmenu(loggedinuser):
                     user_coin += minigame.run()
                     save_user_info(username, user_coin)
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible:
-                    pass
+                    import control_button
+                    pygame.mixer.music.stop()
+                    user_coin += control_button.run_test(user_coin)
+                    save_user_info(username, user_coin)
 
         user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       
         GUI()

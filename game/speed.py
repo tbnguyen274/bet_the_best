@@ -8,7 +8,7 @@ from control_button import sel, run_test
 from firework import BulletFlyUp, FireWork, Random
 import mainmenu
 
-def run_race():
+def run_race(usermoney):
     # Set up display
     width, height = 1280, 720
     window = pygame.display.set_mode((width, height))
@@ -404,12 +404,20 @@ def run_race():
             # Blit the image onto the frame
             frame.blit(scaled_image, image_rect.topleft)
 
-            # Sort players based on their order
-            self.players.sort(key=lambda player: player.order)
+            # Tạo một bản sao của danh sách trước khi sắp xếp
+            players_copy = self.players.copy()
+
+            # Sắp xếp danh sách gốc dựa trên giá trị order
+            sorted_players = sorted(self.players, key=lambda player: player.order)
+            print(self.players[sel.player - 1].order)
+
+            
+
 
             # Render and display ranking information
             myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
-            for i, player in enumerate(self.players):
+            # Sử dụng bản sao để hiển thị thông tin và giữ nguyên thứ tự ban đầu
+            for i, player in enumerate(sorted_players):
                 # Render the text onto a new Surface
                 rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
 
@@ -436,8 +444,8 @@ def run_race():
             pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
 
             pygame.display.flip()
-            
-        def win_or_lose(self):
+
+        def win_or_lose(self, usermoney):
             bg.draw_background(window)
 
            # Set the dimensions of the rectangle
@@ -457,15 +465,27 @@ def run_race():
             def center_text(x, y, width, height, render):
                 text_width, text_height = render.get_size()
                 return (x + (width - text_width) // 2, y + (height - text_height) // 2)
-            
+
+            a = 0
+            if self.players[sel.player - 1].order == 1:
+                print(int(int(sel.bet_box.text)))
+                a = int(int(sel.bet_box.text))
+            elif self.players[sel.player - 1].order == 2:
+                print(int(int(sel.bet_box.text)*0.5))
+                a =  int(int(sel.bet_box.text)*0.5)
+            elif self.players[sel.player - 1].order == 3:
+                print(int(int(sel.bet_box.text)*0.2))
+                a = int(int(sel.bet_box.text)*0.2)
+            else:
+                a = -int(sel.bet_box.text)
             
             winning_state = ("CONGRATULATIONS!" if self.players[sel.player - 1].order in (1, 2, 3)
                             else "IT'S SUCH A SHAME!")
             
-            update_bet = (f"You have won {sel.bet} coins from the game" if self.players[sel.player - 1].order in (1, 2, 3)
-                          else f"You have lost {sel.bet} coins from the game")
+            update_bet = (f"You have won {a} coins from the game" if self.players[sel.player - 1].order in (1, 2, 3)
+                          else f"You have lost {a*-1} coins from the game")
             
-            update_coin = f"Your current coins: {mainmenu.user_coin + sel.bet}"
+            update_coin = f"Your current coins: {usermoney + a}"
             
             winning_state_render = font_big.render(winning_state, True, (22, 27, 33))
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
@@ -482,7 +502,7 @@ def run_race():
             pygame.display.flip()
 
 
-        def countdown(self):
+        def countdown(self, usermoney):
             running = True
             countdown_music = pygame.mixer.Sound('assets\sfx/race-countdown.mp3')
             countdown_music.play()
@@ -517,7 +537,7 @@ def run_race():
                     time_sec -= 1
                 else:
                     pygame.time.delay(800) # delay 0.5s
-                    self.run()  # start run() - main game
+                    return self.run(usermoney)  # start run() - main game
 
                 pygame.display.update()
             
@@ -525,13 +545,14 @@ def run_race():
             pygame.quit()
             sys.exit()
 
-        def run(self):
+        def run(self, usermoney):
             global announce1, announce2
             
             # Main game loop
             clock = pygame.time.Clock()
             running = True
-            
+            showOnce = True
+
             race_music = pygame.mixer.Sound('assets\musics/round.mp3')
             race_music.play()
             
@@ -546,6 +567,19 @@ def run_race():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE and showOnce == False:
+                            if self.players[sel.player - 1].order == 1:
+                                print(int(int(sel.bet_box.text)))
+                                return int(int(sel.bet_box.text))
+                            elif self.players[sel.player - 1].order == 2:
+                                print(int(int(sel.bet_box.text)*0.5))
+                                return int(int(sel.bet_box.text)*0.5)
+                            elif self.players[sel.player - 1].order == 3:
+                                print(int(int(sel.bet_box.text)*0.2))
+                                return int(int(sel.bet_box.text)*0.2)
+                            else:
+                                return -int(sel.bet_box.text)
 
                 self.finished_players = [player for player in self.players if player.finished]
                 
@@ -582,17 +616,24 @@ def run_race():
                 
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
-                    print("All players reached the finish line!")
-                    race_noise.stop()
-                    self.firework()
-                    race_music.stop()
+                    print(self.players[sel.player - 1].order)
+                    if showOnce:
+                        print(self.players[sel.player - 1].order)
+                        print("All players reached the finish line!")
+                        print(self.players[sel.player - 1].order)
+                        race_noise.stop()
+                        self.firework()
+                        race_music.stop()
+                        # show leaderboard
+                        self.show_rankings()
+                        pygame.mixer.Sound('assets\sfx/victory.mp3').play()
+                        pygame.time.delay(4000)
+                    showOnce = False
+                    # print(self.players[sel.player - 1].order + 1)
                     
-                    # show leaderboard
-                    self.show_rankings()
-                    pygame.mixer.Sound('assets\sfx/victory.mp3').play()
-                    pygame.time.delay(4000)
-                    running = False
-                    # exit main loop
+                    self.win_or_lose(usermoney)
+
+
 
                 # Update display
                 pygame.display.flip()
@@ -616,11 +657,10 @@ def run_race():
     game.create_power_up_icons()
 
     # Run the game
-    game.countdown()
+    return game.countdown(usermoney)
     
 if __name__ == "__main__":
     # Initialize Pygame
     pygame.init()
     pygame.mixer.init()
-    run_test()
-    run_race()
+    run_test(1000)
