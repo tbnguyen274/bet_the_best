@@ -370,6 +370,7 @@ def start_login():
             self.pop_noface = login_pop_up("No face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_exist = login_pop_up("User already exist!", PURPLE, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_loginfail = login_pop_up("User doesn't exist!", NEONGREEN, form.x + form.width - 330, self.button_register.y - 40)
+            self.pop_manyfaces = login_pop_up("So many face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
 
             self.register_clicked = self.login_clicked = False
             self.start_time = 0
@@ -380,7 +381,7 @@ def start_login():
                 user_data[username] = {
                     "password": '', 
                     "face_encoding": face_encoding.tolist(), 
-                    "coin": 0,
+                    "coin": 300,
                     'email': ''
                     }
             save_to_database(user_data)
@@ -428,6 +429,7 @@ def start_login():
                         else:
                             self.input_username.text += event.unicode
             
+            tolerance = 0.45
             if self.register_clicked:
                 enhanced_frame = frame.copy()
                 enhanced_frame = cv2.resize(enhanced_frame, (700,700))
@@ -437,7 +439,9 @@ def start_login():
 
                 face_locations = face_recognition.face_locations(gray_frame)
 
-                if len(face_locations) > 0: # Kiểm tra có detect dc khuôn mặt không
+                if len(face_locations) > 1:
+                    self.pop_manyfaces.display = True
+                elif len(face_locations) == 1: # Kiểm tra có detect dc khuôn mặt không
                     face_encodings = face_recognition.face_encodings(enhanced_frame, face_locations)
                     face_encodings_from_db = []
                     with open(DATABASE) as file:
@@ -450,7 +454,7 @@ def start_login():
                         for known_face_encoding in face_encodings_from_db:
                             if known_face_encoding.shape == (0,):  # Skip empty face encodings
                                 continue
-                            match = face_recognition.compare_faces([known_face_encoding], face_encoding)
+                            match = face_recognition.compare_faces([known_face_encoding], face_encoding, tolerance=tolerance)
                             if match[0]:
                                 face_encoding_exists = True
                                 break
@@ -476,7 +480,9 @@ def start_login():
 
                 face_locations = face_recognition.face_locations(gray_frame)
 
-                if len(face_locations) > 0:
+                if len(face_locations) > 1:
+                    self.pop_manyfaces.display = True
+                elif len(face_locations) == 1:
                     face_encodings = face_recognition.face_encodings(enhanced_frame, face_locations)
                     with open(DATABASE, "r") as database:
                         user_data = json.load(database)
@@ -486,7 +492,7 @@ def start_login():
                                 stored_face_encoding = np.array(user_info.get("face_encoding"))
                                 if stored_face_encoding.shape == (0,):  # Skip empty face encodings
                                     continue
-                                match = face_recognition.compare_faces([stored_face_encoding], face_encoding)
+                                match = face_recognition.compare_faces([stored_face_encoding], face_encoding, tolerance=tolerance)
                                 if match[0]:  # If a match is found in the database
                                     found_match = True
                                     login_success(face_username)
@@ -515,8 +521,10 @@ def start_login():
                     self.pop_exist.pop()
                 elif self.pop_loginfail.display:
                     self.pop_loginfail.pop()
+                elif self.pop_manyfaces.display:
+                    self.pop_manyfaces.pop()
             else:
-                self.pop_empty.display = self.pop_noface.display = self.pop_registersuccess.display = self.pop_exist.display = self.pop_loginfail.display = False
+                self.pop_empty.display = self.pop_manyfaces.display = self.pop_noface.display = self.pop_registersuccess.display = self.pop_exist.display = self.pop_loginfail.display = False
 
     class register():
         def __init__(self):
@@ -575,7 +583,7 @@ def start_login():
                 user_data[username] = {
                     'password': password,
                     'face_encoding': [], 
-                    'coin': 0,
+                    'coin': 300,
                     'email': email
                     }
             save_to_database(user_data)
@@ -747,5 +755,7 @@ def start_login():
 
 if __name__ == "__main__":
     pygame.init()
+    pygame.mixer.init()
+    pygame.mixer.music.stop()
     display_intro(pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)))
     start_login()

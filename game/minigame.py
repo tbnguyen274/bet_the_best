@@ -1,6 +1,7 @@
 import pygame
 import sys
-from random import randint, choice
+import random
+from random import choice
 
 def run():
     class Player(pygame.sprite.Sprite):
@@ -85,9 +86,17 @@ def run():
             if self.rect.x <= -100:
                 self.kill()
 
+    def generate_points():
+        random_number_1 = random.randint(100, 1000)
+        random_number_2 = random.randint(100, 1000)
+
+        # Choose the minimum of the two numbers
+        random_number = min(random_number_1, random_number_2)
+
+        return random_number
 
     def display_score():
-        current_time = int(pygame.time.get_ticks() / 350) - start_time
+        current_time = int(pygame.time.get_ticks() / 150) - start_time
         score_surf = test_font.render(f'Score: {current_time}', False, (179, 19, 18))
         score_rect = score_surf.get_rect(center=(640, 50))
         screen.blit(score_surf, score_rect)
@@ -190,7 +199,7 @@ def run():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         game_active = True
-                        start_time = int(pygame.time.get_ticks() / 350)
+                        start_time = int(pygame.time.get_ticks() / 150)
                     elif event.key == pygame.K_ESCAPE:
                         current_time = pygame.time.get_ticks()
                         if current_time - last_esc_time < 1000:  # Check if ESC was pressed within 1 second
@@ -252,7 +261,7 @@ def run():
 
                     pygame.display.update()
 
-                return 100
+                return generate_points()
             else:
                 screen.blit(score_message2,score_message2_rect)
                 screen.blit(score_message, score_message_rect)
