@@ -168,8 +168,8 @@ def mainmenu(loggedinuser):
 
     button_play = button(740,170,'./assets/icons/buttons/play.png',1, True)
     button_minigame = button(740,170,'./assets/icons/buttons/minigame.png',1, False)
-    button_shop = button(740,280,'./assets/icons/buttons/shop.png',1, True)
-    button_history = button(740,390,'./assets/icons/buttons/history.png',1, True)
+    button_credit = button(740,390,'./assets/icons/buttons/credit.png',1, True)
+    button_history = button(740,280,'./assets/icons/buttons/history.png',1, True)
     button_help = button(740,500,'./assets/icons/buttons/help.png',1, True)
     button_logout = button(740,610,'./assets/icons/buttons/logout.png',1, True)
 
@@ -194,7 +194,7 @@ def mainmenu(loggedinuser):
 
         button_minigame.display()          
         button_play.display()
-        button_shop.display()
+        button_credit.display()
         button_history.display()
         button_help.display()
         button_logout.display()
@@ -224,7 +224,7 @@ def mainmenu(loggedinuser):
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible:
                     import control_button
                     pygame.mixer.music.stop()
-                    user_coin += control_button.run_test(user_coin)
+                    user_coin += control_button.run_test(user_coin) 
                     save_user_info(username, user_coin)
 
         user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       

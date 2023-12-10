@@ -496,6 +496,8 @@ def start_login():
                                 if match[0]:  # If a match is found in the database
                                     found_match = True
                                     login_success(face_username)
+                                    faceid.display = False
+                                    password.display = True
                                     break
                             if found_match:
                                 break
