@@ -382,6 +382,7 @@ def run_race(usermoney):
         
         
         def show_rankings(self):
+            global history_time
             bg.draw_background(window)
 
             # Load RankingImg
@@ -438,14 +439,16 @@ def run_race(usermoney):
             window.blit(frame, frame_rect.topleft)
             
             # Get the current time and format it as a string
-            current_time = time.strftime("%H%M%S_%d%m%Y") 
-
+            current_time = time.strftime("%H%M%S_%d%m%Y")
+            history_time = time.strftime("%d/%m/%Y")
+            
             # Save the entire window to a file with the current time in the filename
             pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
 
             pygame.display.flip()
 
         def win_or_lose(self, usermoney):
+            global reward
             bg.draw_background(window)
 
            # Set the dimensions of the rectangle
@@ -466,26 +469,28 @@ def run_race(usermoney):
                 text_width, text_height = render.get_size()
                 return (x + (width - text_width) // 2, y + (height - text_height) // 2)
 
-            a = 0
+            reward = 0
             if self.players[sel.player - 1].order == 1:
                 print(int(int(sel.bet_box.text)))
-                a = int(int(sel.bet_box.text))
+                reward = int(int(sel.bet_box.text))
             elif self.players[sel.player - 1].order == 2:
                 print(int(int(sel.bet_box.text)*0.5))
-                a =  int(int(sel.bet_box.text)*0.5)
+                reward =  int(int(sel.bet_box.text)*0.5)
             elif self.players[sel.player - 1].order == 3:
                 print(int(int(sel.bet_box.text)*0.2))
-                a = int(int(sel.bet_box.text)*0.2)
+                reward = int(int(sel.bet_box.text)*0.2)
             else:
-                a = -int(sel.bet_box.text)
+                reward = -int(sel.bet_box.text)
             
             winning_state = ("CONGRATULATIONS!" if self.players[sel.player - 1].order in (1, 2, 3)
                             else "IT'S SUCH A SHAME!")
             
-            update_bet = (f"You have won {a} coins from the game" if self.players[sel.player - 1].order in (1, 2, 3)
-                          else f"You have lost {a*-1} coins from the game")
+            update_bet = (f"You have won {reward} coins from the game" if self.players[sel.player - 1].order in (1, 2, 3)
+                          else f"You have lost {reward*-1} coins from the game")
             
-            update_coin = f"Your current coins: {usermoney + a}"
+            total = usermoney + reward
+            update_coin = f"Your current coins: {total}"
+            
             
             winning_state_render = font_big.render(winning_state, True, (22, 27, 33))
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
@@ -546,7 +551,7 @@ def run_race(usermoney):
             sys.exit()
 
         def run(self, usermoney):
-            global announce1, announce2
+            global announce1, announce2, history
             
             # Main game loop
             clock = pygame.time.Clock()
@@ -562,6 +567,8 @@ def run_race(usermoney):
             
             announce1 = Announcement() 
             announce2 = Announcement()
+            
+            history = []
         
             while running:
                 for event in pygame.event.get():
@@ -569,17 +576,13 @@ def run_race(usermoney):
                         running = False
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and showOnce == False:
-                            if self.players[sel.player - 1].order == 1:
-                                print(int(int(sel.bet_box.text)))
-                                return int(int(sel.bet_box.text))
-                            elif self.players[sel.player - 1].order == 2:
-                                print(int(int(sel.bet_box.text)*0.5))
-                                return int(int(sel.bet_box.text)*0.5)
-                            elif self.players[sel.player - 1].order == 3:
-                                print(int(int(sel.bet_box.text)*0.2))
-                                return int(int(sel.bet_box.text)*0.2)
-                            else:
-                                return -int(sel.bet_box.text)
+                            
+                            history.append(self.players[sel.player - 1].name)
+                            history.append(history_time)
+                            history.append(reward)
+                            print(history)
+                            
+                            return history
 
                 self.finished_players = [player for player in self.players if player.finished]
                 
@@ -616,7 +619,7 @@ def run_race(usermoney):
                 
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
-                    print(self.players[sel.player - 1].order)
+                    
                     if showOnce:
                         print(self.players[sel.player - 1].order)
                         print("All players reached the finish line!")
@@ -632,6 +635,7 @@ def run_race(usermoney):
                     # print(self.players[sel.player - 1].order + 1)
                     
                     self.win_or_lose(usermoney)
+                    
 
 
 
