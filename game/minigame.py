@@ -87,8 +87,8 @@ def run():
                 self.kill()
 
     def generate_points():
-        random_number_1 = random.randint(100, 1000)
-        random_number_2 = random.randint(100, 1000)
+        random_number_1 = random.randint(100, 500)
+        random_number_2 = random.randint(100, 500)
 
         # Choose the minimum of the two numbers
         random_number = min(random_number_1, random_number_2)

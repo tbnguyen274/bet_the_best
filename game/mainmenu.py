@@ -12,6 +12,31 @@ def save_user_info(username, coin):
     with open(DATABASE, "w") as file:
         json.dump(data,file, indent=4)
 
+def save_to_database(data):
+    with open(DATABASE, 'w') as file:
+        json.dump(data, file, indent=4)
+
+def update_history_values(username, new_history_value):
+    with open(DATABASE, "r") as file:
+        user_data = json.load(file)
+        
+        # Check if the user exists in the database
+        if username in user_data:
+            # Shift the history values
+            for i in range(5, 1, -1):
+                prev_key = f"history{i - 1}"
+                current_key = f"history{i}"
+                user_data[username][current_key] = user_data[username][prev_key]
+            
+            # Update history1 with the new value
+            user_data[username]["history1"] = new_history_value
+            
+            # Remove history5
+            user_data[username].pop("history5", None)
+            
+            # Save the updated data to the database
+            save_to_database(user_data)
+
 def mainmenu(loggedinuser):
     pygame.init()
     username = loggedinuser
@@ -80,8 +105,7 @@ def mainmenu(loggedinuser):
             self.click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
             self.click_sound.set_volume(0.2)
             self.visible = visible
-            
-
+            self.clickable = True
         
         def hover_effect(self, image):
             # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
@@ -92,18 +116,15 @@ def mainmenu(loggedinuser):
         def display(self):
             if self.visible:
                 cursor_pos = pygame.mouse.get_pos()
-                if self.image_rect.collidepoint(cursor_pos):
-                    window.blit(self.hover_image,(self.image_rect))
-                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                        self.clicked = True
-                        self.click_sound.play()
-                else:
-                    window.blit(self.image,(self.image_rect.x,self.image_rect.y))   
-
-                if pygame.mouse.get_pressed()[0] == 0:
-                    self.clicked = False
-            else:
-                pass
+                window.blit(self.image,(self.image_rect.x,self.image_rect.y)) 
+                if self.clickable:
+                    if self.image_rect.collidepoint(cursor_pos):
+                        window.blit(self.hover_image,(self.image_rect))
+                        if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                            self.clicked = True
+                            self.click_sound.play()
+                    if pygame.mouse.get_pressed()[0] == 0:
+                        self.clicked = False
 
     #Tao thanh tai khoan
     class user_status():
@@ -162,6 +183,80 @@ def mainmenu(loggedinuser):
             window.blit(self.coin_value, (self.coin_icon_x + self.coin_icon.get_width() + 10, self.coin_value_y))
             window.blit(self.tips, (10, self.height+ 10))
 
+    class history():
+        def __init__(self):
+            self.update_history()
+            self.display = False
+
+            self.width = 620
+            self.height = 545
+            self.x = (WINDOW_WIDTH - self.width)//2
+            self.y = (WINDOW_HEIGHT - self.height)//2
+            self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+            self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+            self.background.fill((0,0,0,170))
+
+            self.big_font = pygame.font.Font(None, 80)
+            self.normal_font = pygame.font.Font(None, 50)
+
+
+            
+        def update_history(self):
+            self.history_1 = json.load(open(DATABASE,"r"))[username].get('history1')
+            self.history_2 = json.load(open(DATABASE,"r"))[username].get('history2')
+            self.history_3 = json.load(open(DATABASE,"r"))[username].get('history3')
+            self.history_4 = json.load(open(DATABASE,"r"))[username].get('history4')
+            self.history_5 = json.load(open(DATABASE,"r"))[username].get('history5')
+
+        def history_value(self, number):
+            if number == 0:
+                return ""
+            elif number > 0:
+                return f"+ {number}"
+            else:
+                return f"- {number}"
+        
+        def history_color(self, number):
+            if number == 0:
+                return (0,0,0)
+            elif number > 0:
+                return (101, 183, 65)
+            else:
+                return (190, 49, 68)
+            
+        def display_history(self):
+            history_label = self.big_font.render('HISTORY', True, (0,0,0))
+            history_label_rect = history_label.get_rect(topleft = (self.x + (self.width - history_label.get_width())//2, self.y + 50))
+            window.blit(history_label, history_label_rect)
+            history1 = self.normal_font.render(self.history_value(self.history_1), True, self.history_color(self.history_1))
+            history1_rect = history1.get_rect(topleft = (self.x + (self.width - history1.get_width())//2,history_label_rect.y + history_label.get_height()+ 40))
+            history2 = self.normal_font.render(self.history_value(self.history_2), True, self.history_color(self.history_2))
+            history2_rect = history2.get_rect(topleft = (self.x + (self.width - history2.get_width())//2,history1_rect.y + history1.get_height() + 40))
+            history3 = self.normal_font.render(self.history_value(self.history_3), True, self.history_color(self.history_3))
+            history3_rect = history3.get_rect(topleft = (self.x + (self.width - history3.get_width())//2,history2_rect.y + history2.get_height() + 40))
+            history4 = self.normal_font.render(self.history_value(self.history_4), True, self.history_color(self.history_4))
+            history4_rect = history4.get_rect(topleft = (self.x + (self.width - history4.get_width())//2,history3_rect.y + history3.get_height() + 40))
+            history5 = self.normal_font.render(self.history_value(self.history_5), True, self.history_color(self.history_5))
+            history5_rect = history5.get_rect(topleft = (self.x + (self.width - history5.get_width())//2,history4_rect.y + history4.get_height() + 40))
+            window.blit(history1, history1_rect)
+            window.blit(history2, history2_rect)
+            window.blit(history3, history3_rect)
+            window.blit(history4, history4_rect)
+            window.blit(history5, history5_rect)
+
+        
+        def run(self):
+            if self.display:
+                window.blit(self.background, (0,0))
+                pygame.draw.rect(window, (221, 230, 237), self.rect, border_radius=15)
+
+                self.update_history()
+                self.display_history()
+                button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+            else:
+                button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+        
+
     background = background()
     music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.3, 20, 680)
     user_status = user_status()
@@ -172,6 +267,7 @@ def mainmenu(loggedinuser):
     button_history = button(740,280,'./assets/icons/buttons/history.png',1, True)
     button_help = button(740,500,'./assets/icons/buttons/help.png',1, True)
     button_logout = button(740,610,'./assets/icons/buttons/logout.png',1, True)
+    history = history()
 
     def display_text(x, y, text, color, size):
         font_model = pygame.font.Font(None, size)
@@ -181,6 +277,7 @@ def mainmenu(loggedinuser):
 
     def GUI():
         background.display()
+        music.bar()
         user_status.display()
 
         if user_status.coin < 100:
@@ -198,8 +295,7 @@ def mainmenu(loggedinuser):
         button_history.display()
         button_help.display()
         button_logout.display()
-
-        music.bar()
+        history.run()
 
     while isRunning:
         pygame.time.Clock().tick(60)
@@ -212,20 +308,26 @@ def mainmenu(loggedinuser):
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
-                if button_logout.image_rect.collidepoint(mousepos):
+                if button_logout.image_rect.collidepoint(mousepos) and button_logout.clickable:
                     pygame.mixer.music.stop()
                     save_user_info(username, user_coin)
                     isRunning = False
-                elif button_minigame.image_rect.collidepoint(mousepos) and button_minigame.visible:
+                elif button_minigame.image_rect.collidepoint(mousepos) and button_minigame.visible and button_minigame.clickable:
                     pygame.mixer.music.stop()
                     import minigame
                     user_coin += minigame.run()
                     save_user_info(username, user_coin)
-                elif button_play.image_rect.collidepoint(mousepos) and button_play.visible:
+                elif button_play.image_rect.collidepoint(mousepos) and button_play.visible and button_play.clickable:
                     import control_button
                     pygame.mixer.music.stop()
-                    user_coin += control_button.run_test(user_coin) 
+                    new_coin = control_button.run_test(user_coin)
+                    user_coin += new_coin
+                    update_history_values(username, new_coin)
                     save_user_info(username, user_coin)
+                elif button_history.image_rect.collidepoint(mousepos) and history.display == False and button_history.clickable:
+                    history.display = True
+                elif not history.rect.collidepoint(mousepos) and history.display == True:
+                    history.display = False
 
         user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       
         GUI()
@@ -233,6 +335,8 @@ def mainmenu(loggedinuser):
         pygame.display.update() #cap nhat man hinh game
         
 
-
-
-     
+if __name__ == "__main__":
+    # Initialize Pygame
+    pygame.init()
+    pygame.mixer.init()
+    mainmenu("abc")
