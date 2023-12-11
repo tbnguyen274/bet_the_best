@@ -419,8 +419,11 @@ def run_race(usermoney):
             myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             # Sử dụng bản sao để hiển thị thông tin và giữ nguyên thứ tự ban đầu
             for i, player in enumerate(sorted_players):
-                # Render the text onto a new Surface
-                rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
+                if player == self.players[sel.player - 1]:
+                    rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), 'red')
+                else:
+                    # Render the text onto a new Surface
+                    rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
 
                 # Calculate the position of the text to center it in the frame
                 rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
