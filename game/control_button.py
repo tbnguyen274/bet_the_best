@@ -640,7 +640,7 @@ def run_test(usermoney):
         else:
             import speed
             return speed.run_race(usermoney)
-run_test(1000)
+
 # if __name__ == '__main__':
 #     selector = selector()
 #     selector.select_bgnset()
