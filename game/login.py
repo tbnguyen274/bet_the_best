@@ -383,11 +383,11 @@ def start_login():
                     "face_encoding": face_encoding.tolist(), 
                     "coin": 300,
                     'email': '',
-                    "history1": 0,
-                    "history2": 0,
-                    "history3": 0,
-                    "history4": 0,
-                    "history5": 0
+                    "history1": ["","",0],
+                    "history2": ["","",0],
+                    "history3": ["","",0],
+                    "history4": ["","",0],
+                    "history5": ["","",0]
                     }
             save_to_database(user_data)
 
@@ -592,11 +592,11 @@ def start_login():
                     'face_encoding': [], 
                     'coin': 300,
                     'email': email,
-                    "history1": 0,
-                    "history2": 0,
-                    "history3": 0,
-                    "history4": 0,
-                    "history5": 0
+                    "history1": ["","",0],
+                    "history2": ["","",0],
+                    "history3": ["","",0],
+                    "history4": ["","",0],
+                    "history5": ["","",0]
                     }
             save_to_database(user_data)
 

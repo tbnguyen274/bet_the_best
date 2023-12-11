@@ -22,17 +22,12 @@ def update_history_values(username, new_history_value):
         
         # Check if the user exists in the database
         if username in user_data:
-            # Shift the history values
-            for i in range(5, 1, -1):
-                prev_key = f"history{i - 1}"
-                current_key = f"history{i}"
-                user_data[username][current_key] = user_data[username][prev_key]
-            
-            # Update history1 with the new value
+            # Update history5 with the value of history4
+            user_data[username]["history5"] = user_data[username]["history4"]
+            user_data[username]["history4"] = user_data[username]["history3"]
+            user_data[username]["history3"] = user_data[username]["history2"]
+            user_data[username]["history2"] = user_data[username]["history1"]
             user_data[username]["history1"] = new_history_value
-            
-            # Remove history5
-            user_data[username].pop("history5", None)
             
             # Save the updated data to the database
             save_to_database(user_data)
@@ -175,7 +170,7 @@ def mainmenu(loggedinuser):
             window.blit(self.surface,(0,0))
             window.blit(self.avatar,(30,self.avatar_y))
 
-            window.blit(self.username_text, (self.avatar_x + 10, self.username_text_y))
+            window.blit(self.username_text, (self.avatar_x - 5, self.username_text_y))
 
             window.blit(self.coin_icon, (self.coin_icon_x, self.coin_icon_y))
             self.coin = user_coin
@@ -202,19 +197,28 @@ def mainmenu(loggedinuser):
 
             
         def update_history(self):
-            self.history_1 = json.load(open(DATABASE,"r"))[username].get('history1')
-            self.history_2 = json.load(open(DATABASE,"r"))[username].get('history2')
-            self.history_3 = json.load(open(DATABASE,"r"))[username].get('history3')
-            self.history_4 = json.load(open(DATABASE,"r"))[username].get('history4')
-            self.history_5 = json.load(open(DATABASE,"r"))[username].get('history5')
+            self.history_1 = json.load(open(DATABASE,"r"))[username]['history1']
+            self.history_2 = json.load(open(DATABASE,"r"))[username]['history2']
+            self.history_3 = json.load(open(DATABASE,"r"))[username]['history3']
+            self.history_4 = json.load(open(DATABASE,"r"))[username]['history4']
+            self.history_5 = json.load(open(DATABASE,"r"))[username]['history5']
+
+        def numdisplay(self, num):
+            if num / 1000000000 >= 1:
+                return str(num//1000000000) + "." + str(num%1000000000)[0] + "B"
+            elif num / 1000000 >= 1:
+                return str(num//1000000) + "." + str(num%1000000)[0] + "M"
+            elif num / 1000 >= 1:
+                return str(num//1000) + "." + str(num%1000)[0] + "K"
+            return str(num)
 
         def history_value(self, number):
             if number == 0:
                 return ""
             elif number > 0:
-                return f"+ {number}"
+                return f"+ {self.numdisplay(number)}"
             else:
-                return f"- {number}"
+                return f"- {self.numdisplay(abs(number))}"
         
         def history_color(self, number):
             if number == 0:
@@ -223,26 +227,87 @@ def mainmenu(loggedinuser):
                 return (101, 183, 65)
             else:
                 return (190, 49, 68)
+        
+        class history_values():
+            def __init__(self, text, color, position, y):
+                self.text = text
+                self.color = color
+                self.position = position
+                self.normal_font = pygame.font.Font(None, 50)
+                self.text_surface = self.normal_font.render(self.text, True, self.color)
+                self.y = y
+                if position == 1:
+                    self.x = (WINDOW_WIDTH - 620)//2 + 60
+                elif position == 2:
+                    self.x = (WINDOW_WIDTH - self.text_surface.get_width())//2 - 20
+                elif position == 3:
+                    self.x = (WINDOW_WIDTH - 620)//2 + 620 - 60 - self.text_surface.get_width()
+                self.rect = self.text_surface.get_rect(topleft = (self.x, self.y))
             
+            def display(self):
+                window.blit(self.text_surface,(self.x,self.y))
+
+
         def display_history(self):
             history_label = self.big_font.render('HISTORY', True, (0,0,0))
             history_label_rect = history_label.get_rect(topleft = (self.x + (self.width - history_label.get_width())//2, self.y + 50))
             window.blit(history_label, history_label_rect)
-            history1 = self.normal_font.render(self.history_value(self.history_1), True, self.history_color(self.history_1))
-            history1_rect = history1.get_rect(topleft = (self.x + (self.width - history1.get_width())//2,history_label_rect.y + history_label.get_height()+ 40))
-            history2 = self.normal_font.render(self.history_value(self.history_2), True, self.history_color(self.history_2))
-            history2_rect = history2.get_rect(topleft = (self.x + (self.width - history2.get_width())//2,history1_rect.y + history1.get_height() + 40))
-            history3 = self.normal_font.render(self.history_value(self.history_3), True, self.history_color(self.history_3))
-            history3_rect = history3.get_rect(topleft = (self.x + (self.width - history3.get_width())//2,history2_rect.y + history2.get_height() + 40))
-            history4 = self.normal_font.render(self.history_value(self.history_4), True, self.history_color(self.history_4))
-            history4_rect = history4.get_rect(topleft = (self.x + (self.width - history4.get_width())//2,history3_rect.y + history3.get_height() + 40))
-            history5 = self.normal_font.render(self.history_value(self.history_5), True, self.history_color(self.history_5))
-            history5_rect = history5.get_rect(topleft = (self.x + (self.width - history5.get_width())//2,history4_rect.y + history4.get_height() + 40))
-            window.blit(history1, history1_rect)
-            window.blit(history2, history2_rect)
-            window.blit(history3, history3_rect)
-            window.blit(history4, history4_rect)
-            window.blit(history5, history5_rect)
+            empty = self.normal_font.render("", True, (0,0,0))
+
+
+            history1 = self.normal_font.render(f"{self.history_value(self.history_1[2])}:    {self.history_1[1]} - {self.history_1[0]}", True, self.history_color(self.history_1[2]))
+            history1_rect = history1.get_rect(topleft = (self.x + 70,history_label_rect.y + history_label.get_height()+ 40))
+
+            history1_1 = self.history_values(self.history_value(self.history_1[2]), self.history_color(self.history_1[2]), 1, history_label_rect.y + history_label.get_height()+ 40)
+            history1_2 = self.history_values(self.history_1[1],  self.history_color(self.history_1[2]), 2, history_label_rect.y + history_label.get_height()+ 40)
+            history1_3 = self.history_values(self.history_1[0],  self.history_color(self.history_1[2]), 3, history_label_rect.y + history_label.get_height()+ 40)
+
+            history2_1 = self.history_values(self.history_value(self.history_2[2]), self.history_color(self.history_2[2]), 1, history1_1.y + 40 + history1_1.text_surface.get_height())
+            history2_2 = self.history_values(self.history_2[1],  self.history_color(self.history_2[2]), 2, history1_1.y + 40 + history1_1.text_surface.get_height())
+            history2_3 = self.history_values(self.history_2[0],  self.history_color(self.history_2[2]), 3, history1_1.y + 40 + history1_1.text_surface.get_height())
+
+            history3_1 = self.history_values(self.history_value(self.history_3[2]), self.history_color(self.history_3[2]), 1, history2_1.y + 40 + history1_1.text_surface.get_height())
+            history3_2 = self.history_values(self.history_3[1],  self.history_color(self.history_3[2]), 2, history2_1.y + 40 + history1_1.text_surface.get_height())
+            history3_3 = self.history_values(self.history_3[0],  self.history_color(self.history_3[2]), 3, history2_1.y + 40 + history1_1.text_surface.get_height())
+
+            history4_1 = self.history_values(self.history_value(self.history_4[2]), self.history_color(self.history_4[2]), 1, history3_1.y + 40 + history1_1.text_surface.get_height())
+            history4_2 = self.history_values(self.history_4[1],  self.history_color(self.history_4[2]), 2, history3_1.y + 40 + history1_1.text_surface.get_height())
+            history4_3 = self.history_values(self.history_4[0],  self.history_color(self.history_4[2]), 3, history3_1.y + 40 + history1_1.text_surface.get_height())
+
+            history5_1 = self.history_values(self.history_value(self.history_5[2]), self.history_color(self.history_5[2]), 1, history4_1.y + 40 + history1_1.text_surface.get_height())
+            history5_2 = self.history_values(self.history_5[1],  self.history_color(self.history_5[2]), 2, history4_1.y + 40 + history1_1.text_surface.get_height())
+            history5_3 = self.history_values(self.history_5[0],  self.history_color(self.history_5[2]), 3, history4_1.y + 40 + history1_1.text_surface.get_height())
+
+            if self.history_1[2] == 0:
+                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history1_1.y))
+            else:
+                history1_1.display()
+                history1_2.display()
+                history1_3.display()
+            if self.history_2[2] == 0:
+                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history2_1.y))
+            else:
+                history2_1.display()
+                history2_2.display()
+                history2_3.display()
+            if self.history_3[2] == 0:
+                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history3_1.y))
+            else:
+                history3_1.display()
+                history3_2.display()
+                history3_3.display()
+            if self.history_4[2] == 0:
+                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history4_1.y))
+            else:
+                history4_1.display()
+                history4_2.display()
+                history4_3.display()
+            if self.history_5[2] == 0:
+                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history5_1.y))
+            else:
+                history5_1.display()
+                history5_2.display()
+                history5_3.display()
 
         
         def run(self):
@@ -320,10 +385,13 @@ def mainmenu(loggedinuser):
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible and button_play.clickable:
                     import control_button
                     pygame.mixer.music.stop()
-                    new_coin = control_button.run_test(user_coin)
-                    user_coin += new_coin
-                    update_history_values(username, new_coin)
-                    save_user_info(username, user_coin)
+                    new_value = control_button.run_test(user_coin)
+                    if new_value == ["","",0]:
+                        pass
+                    else:
+                        user_coin += new_value[2]
+                        update_history_values(username, new_value)
+                        save_user_info(username, user_coin)
                 elif button_history.image_rect.collidepoint(mousepos) and history.display == False and button_history.clickable:
                     history.display = True
                 elif not history.rect.collidepoint(mousepos) and history.display == True:
