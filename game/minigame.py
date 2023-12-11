@@ -141,8 +141,8 @@ def run():
     player_stand = pygame.transform.rotozoom(player_stand, 0, 4)
     player_stand_rect = player_stand.get_rect(midbottom=(640,500 ))
 
-    game_name = test_font.render("Reach 100 points to earn coins!" , False, (111, 196, 169))
-    game_name_rect = game_name.get_rect(center=(640, 80))
+    game_rule = test_font.render("Reach 100 points to earn coins!" , False, (111, 196, 169))
+    game_rule_rect = game_rule.get_rect(center=(640, 80))
 
     game_over = test_font.render('Game Over!', False, (111, 196, 169))
     game_over_rect = game_over.get_rect(center=(640, 80))
@@ -151,11 +151,11 @@ def run():
     game_beat_rect = game_beat.get_rect(center=(640, 80))
 
 
-    game_message1 = test_font.render('Press "SPACE" to jump', False, (111, 196, 169))
-    game_message1_rect = game_message1.get_rect(midtop=(640, 530))
+    game_instruction = test_font.render('Press "SPACE" to jump', False, (111, 196, 169))
+    game_instruction_rect = game_instruction.get_rect(midtop=(640, 530))
 
-    game_message2 = test_font.render('Press "SPACE" to start, "ESC" twice to exit', False, (188, 122, 249))
-    game_message2_rect = game_message2.get_rect(midtop=(640, game_message1_rect.y + game_message1.get_height() + 20))
+    game_instruction2 = test_font.render('Press "SPACE" to start, "ESC" twice to exit', False, (188, 122, 249))
+    game_instruction2_rect = game_instruction2.get_rect(midtop=(640, game_instruction_rect.y + game_instruction.get_height() + 20))
 
     game_passed = test_font.render ('Returning to "Bet the best" in 4 seconds...', False, (188, 122, 249))
     game_passed_rect = game_passed.get_rect(midtop = (640,530))
@@ -241,9 +241,9 @@ def run():
             score_message2_rect = score_message2.get_rect(midtop=(640, score_message_rect.y + score_message.get_height() + 20))
 
             if score == 0:
-                screen.blit(game_name, game_name_rect)
-                screen.blit(game_message1,game_message1_rect)
-                screen.blit(game_message2,game_message2_rect)
+                screen.blit(game_rule, game_rule_rect)
+                screen.blit(game_instruction,game_instruction_rect)
+                screen.blit(game_instruction2,game_instruction2_rect)
             elif score == 100:
                 start_time = pygame.time.get_ticks()
                 pygame.mixer.music.stop()
