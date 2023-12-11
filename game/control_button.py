@@ -70,6 +70,10 @@ class ToggleButton:
                             if other_button != button:
                                 other_button.clicked = False
 
+    @staticmethod
+    def turn_off_all(buttons):
+        for button in buttons:
+            button.clicked = False
 
 class ToggleButton2:
     def __init__(self, x, y, image_path, scale=1.0):
@@ -111,6 +115,11 @@ class ToggleButton2:
                         for other_button in buttons:
                             if other_button != button:
                                 other_button.clicked = False
+    
+    @staticmethod
+    def turn_off_all(buttons):
+        for button in buttons:
+            button.clicked = False
 
 
 class Button:
@@ -168,7 +177,7 @@ class TextInput:
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    print(self.text)
+                    
                     self.text = ''
                 elif event.key == pygame.K_SPACE:
                     if self.text == "":
@@ -201,7 +210,7 @@ class TextInput:
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    print(self.text)
+                    
                     self.text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
@@ -218,11 +227,10 @@ class TextInput:
         if self.text.isdigit():
             number = int(self.text)
             if number > current_money:
-                self.set_error_message(self, "Not enough money!")
+                self.set_error_message("Not enough money!")
             elif number < 100:
                 self.set_error_message("Minimum bet is 100!")
             else:
-                self.error_message = ""
                 now = datetime.datetime.now()  # Get the current date and time
                 # with open('spending_history.txt', 'a') as f:
                 #     f.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} - {str(number)}\n")  # Write the date, time, and number to the file
@@ -376,50 +384,73 @@ class selector:
         self.check_j = False
         self.check_uw = False
         self.check_g = False
-        self.check_next = False
+
+        self.popup_message = ""
+        self.popup_time = 0
 
         self.state = 0
 
     def select_bgnset(self):
-        previous_click = False
+        
         self.state = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if self.next.clicked:
-                # LƯU LẠI CÁC THÔNG TIN TRƯỚC KHI CHUYỂN QUA MÀN HÌNH MỚI
-                self.activated_buttons = []
-                if self.jungle.clicked:
-                    self.activated_buttons.append('jungle')
-                elif self.underwater.clicked:
-                    self.activated_buttons.append('underwater')
-                elif self.galaxy.clicked:
-                    self.activated_buttons.append('galaxy')
-                if self.set1.clicked:
-                    self.activated_buttons.append('set1')
-                elif self.set2.clicked:
-                    self.activated_buttons.append('set2')
-                elif self.set3.clicked:
-                    self.activated_buttons.append('set3')
-                elif self.set4.clicked:
-                    self.activated_buttons.append('set4')
-                elif self.set5.clicked:
-                    self.activated_buttons.append('set5')
-                elif self.set6.clicked:
-                    self.activated_buttons.append('set6')
-                elif self.set7.clicked:
-                    self.activated_buttons.append('set7')
-                if self.midRace.clicked:
-                    self.activated_buttons.append('mid')
-                elif self.longRace.clicked:
-                    self.activated_buttons.append('long')
-                elif self.shortRace.clicked:
-                    self.activated_buttons.append('short')
-                if len(self.activated_buttons) == 3:
-                    self.check_next = True  # ĐÁNH DẤU LÀ ĐÃ BẤM NEXT
-                    print(self.activated_buttons)
+
+                ToggleButton.turn_off_all(self.set1_char)
+                ToggleButton.turn_off_all(self.set2_char)
+                ToggleButton.turn_off_all(self.set3_char)
+                ToggleButton.turn_off_all(self.set4_char)
+                ToggleButton.turn_off_all(self.set5_char)
+                ToggleButton.turn_off_all(self.set6_char)
+                ToggleButton.turn_off_all(self.set7_char)
+                
+                button_map = {
+
+                    self.jungle: 'jungle',
+                    self.underwater: 'underwater',
+                    self.galaxy: 'galaxy',
+
+                    self.set1: 'set1',
+                    self.set2: 'set2',
+                    self.set3: 'set3',
+                    self.set4: 'set4',
+                    self.set5: 'set5',
+                    self.set6: 'set6',
+                    self.set7: 'set7',
+
+                    self.midRace: 'mid',
+                    self.longRace: 'long',
+                    self.shortRace: 'short'
+                }
+
+                map_button = None
+                set_button = None
+                race_track_button = None
+
+                for button, value in button_map.items():
+                    if button.clicked:
+                        if value in ['jungle', 'underwater', 'galaxy']:
+                            map_button = value
+                        elif value in ['set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'set7']:
+                            set_button = value
+                        elif value in ['mid', 'long', 'short']:
+                            race_track_button = value
+
+                self.activated_buttons = [map_button, set_button, race_track_button]
+
+                
+                
+                if None in self.activated_buttons:
+                    self.popup_message = "  Please choose all options"
+                    self.popup_time = time.time()
+                else:
+                    self.check_next = True  # Mark as next clicked
                     self.state = 2
+                    
+        
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -441,20 +472,22 @@ class selector:
 
             ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
 
-
         # CÁC HÀM VẼ PHẢI ĐƯỢC ĐẶT NGOÀI VÒNG EVENT
         self.bg_default_loop.loop_background()
 
         if self.check_j:
+            ToggleButton.turn_off_all([self.set1, self.set2, self.set5, self.set6, self.set7])
             self.bg_j_loop.loop_background()
             self.set3.draw(self.screen)
             self.set4.draw(self.screen)
         if self.check_g:
+            ToggleButton.turn_off_all([self.set1, self.set2, self.set3, self.set4])
             self.bg_g_loop.loop_background()
             self.set5.draw(self.screen)
             self.set6.draw(self.screen)
             self.set7.draw(self.screen)
         if self.check_uw:
+            ToggleButton.turn_off_all([self.set3, self.set4, self.set5, self.set6, self.set7])
             self.bg_uw_loop.loop_background()
             self.set1.draw(self.screen)
             self.set2.draw(self.screen)
@@ -467,12 +500,19 @@ class selector:
         self.shortRace.draw(self.screen)
         self.next.draw(self.screen)
 
+        if time.time() - self.popup_time < 1.5:
+            popup_surface = pygame.Surface((400, 50), pygame.SRCALPHA)
+            popup_surface.fill((255, 255, 255, 160))
+            popup_text = pygame.font.Font(None, 40).render(self.popup_message, True, pygame.Color('firebrick2'))
+            popup_surface.blit(popup_text, (10, 10))
+            self.screen.blit(popup_surface, (440, 510)) 
+
         pygame.display.update()
         self.clock.tick(60)
 
 
     def select_player_n_bet(self, usermoney):
-        previous_click = False
+        pygame.surface.Surface.fill(self.screen, 'white')
         self.state = 2
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -535,7 +575,7 @@ class selector:
         for i in range(1, 7):
             self.char_dict[i] = self.namebox[i - 1].naming_character()
 
-        print(self.char_dict)
+        
 
         self.next1.draw(self.screen)
 
@@ -551,15 +591,23 @@ class selector:
         instruction_text = font.render("Bet: ", True, 'black')
         screen.blit(instruction_text, (350, 495))  # Điều chỉnh vị trí hiển thị hướng dẫn
 
-        print(self.bet_box.text)
+        
         
 
         self.back.draw(self.screen)
         if self.back.clicked:
+            print("back")
             self.state = 1
+
+            for box in self.namebox:
+                box.text = ""
+                box.active = False
+                box.color = box.color_inactive
+                box.txt_surface = box.font.render(box.text, True, box.font_color)
 
         if self.next1.clicked:
             self.player = -1
+
             for i in range(7):
                 for j in range(6):
                     if self.set_char[i][j].clicked:
@@ -570,11 +618,13 @@ class selector:
                 self.bet_box.set_error_message("Please enter your bet!")
             elif self.player == -1:
                 self.bet_box.set_error_message("Please choose your character!")
+        
+                
             elif self.bet_box.text != "" and all(self.char_dict.values()):
                 self.state = 3
 
-        print(self.player)
-        print(self.bet)
+
+        
         pygame.display.update()
         self.clock.tick(60)
 
@@ -585,12 +635,12 @@ def run_test(usermoney):
     while running:
         if sel.state == 1:
             sel.select_bgnset()
-        elif sel.state == 2 and len(sel.activated_buttons) == 3:
+        elif sel.state == 2:
             sel.select_player_n_bet(usermoney)
         else:
             import speed
             return speed.run_race(usermoney)
-
+run_test(1000)
 # if __name__ == '__main__':
 #     selector = selector()
 #     selector.select_bgnset()
