@@ -549,7 +549,6 @@ def mainmenu(loggedinuser):
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible and button_play.clickable:
                     import control_button
                     pygame.mixer.music.stop()
-                    loading.run(2)
                     new_value = control_button.run_test(user_coin)
                     if new_value == ["","",0]:
                         pass

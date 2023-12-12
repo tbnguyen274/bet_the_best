@@ -37,6 +37,7 @@ class ToggleButton:
         self.rect = self.image.get_rect(topleft=(x, y))
         self.clicked = False
         self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+        self.click_sound.set_volume(0.2)
 
     def draw(self, screen):
         border_size = 3  # Kích thước viền
@@ -89,6 +90,7 @@ class ToggleButton2:
         self.rect_clicked = self.clicked_image.get_rect(topleft=(x, y))
         self.clicked = False
         self.click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+        self.click_sound.set_volume(0.2)
 
     def darken_image(self, image):
         # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
@@ -137,6 +139,7 @@ class Button:
 
     def draw(self, screen):
         click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
+        click_sound.set_volume(0.2)
         cursor_pos = pygame.mouse.get_pos()
         if self.image_rect.collidepoint(cursor_pos):
             screen.blit(self.image_alpha, (self.image_rect.x, self.image_rect.y))
@@ -358,7 +361,7 @@ class selector:
 
         self.underwater = ToggleButton(80, 70, 'assets/BG-pic/underwater.jpg', 0.25)
         self.jungle = ToggleButton(480, 70, 'assets/BG-pic/jungle.jpg', 0.25)
-        self.galaxy = ToggleButton(880, 70, 'assets/BG-pic/galaxy.jpg', 0.25)
+        self.galaxy = ToggleButton(880, 70, 'assets/BG-pic/space.jpg', 0.25)
 
         self.next_img = pygame.image.load('assets/icons/return.png')
         self.next_img = pygame.transform.flip(self.next_img, True, False)
@@ -646,6 +649,8 @@ def run_test(usermoney):
             sel.select_player_n_bet(usermoney)
         else:
             sel.state = 1
+            import loading
+            loading.run(2)
             import speed
             return speed.run_race(usermoney)
         if exitSelect:

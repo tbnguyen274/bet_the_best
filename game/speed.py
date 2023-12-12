@@ -25,7 +25,7 @@ def run_race(usermoney):
          
         def load_images(self):
             # Set background based on player's choice in control_button.py
-            self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 'galaxy' else
+            self.background = pygame.image.load('./assets/BG-pic/space.jpg' if self.bg_type == 'galaxy' else
                                                 './assets/BG-pic/jungle.jpg' if self.bg_type == 'jungle' else
                                                 './assets/BG-pic/underwater.jpg')
                     
@@ -602,7 +602,7 @@ def run_race(usermoney):
             race_music.play()
             
             race_noise = pygame.mixer.Sound('assets\sfx/racing-noise.mp3')
-            pygame.mixer.Sound.set_volume(race_noise, 0.4)
+            pygame.mixer.Sound.set_volume(race_noise, 0.15)
             race_noise.play()
             
             announce1 = Announcement() 
