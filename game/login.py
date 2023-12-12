@@ -1,7 +1,6 @@
 import pygame, json, os, sys, cv2, face_recognition, numpy as np, re, smtplib, math
 from email.message import EmailMessage
 from intro import display_intro
-import mainmenu
 
 # Xây dựng Database
 DATABASE_DIRECTORY = 'db'
@@ -24,6 +23,9 @@ def isempty(s):
 # khối lệnh sẽ dc thực hiện khi đăng nhập thành công
 def login_success(username):
     pygame.mixer.music.stop()
+    import loading
+    loading.run(0.5)
+    import mainmenu
     mainmenu.mainmenu(username)
 
 # Kích thước cửa sổ
@@ -387,7 +389,8 @@ def start_login():
                     "history2": ["","",0],
                     "history3": ["","",0],
                     "history4": ["","",0],
-                    "history5": ["","",0]
+                    "history5": ["","",0],
+                    "avatar": 0
                     }
             save_to_database(user_data)
 
@@ -596,7 +599,8 @@ def start_login():
                     "history2": ["","",0],
                     "history3": ["","",0],
                     "history4": ["","",0],
-                    "history5": ["","",0]
+                    "history5": ["","",0],
+                    "avatar": 0
                     }
             save_to_database(user_data)
 

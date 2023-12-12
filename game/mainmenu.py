@@ -1,20 +1,26 @@
 import pygame, cv2, math, sys, json, os
+import loading
 
 DATABASE_DIRECTORY = 'db'
 DATABASE = os.path.join(DATABASE_DIRECTORY, "user_data.json")
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
-def save_user_info(username, coin):
-    with open(DATABASE, "r") as file:
-        data = json.load(file)
-        data[username]['coin'] = coin
-    with open(DATABASE, "w") as file:
-        json.dump(data,file, indent=4)
-
 def save_to_database(data):
     with open(DATABASE, 'w') as file:
         json.dump(data, file, indent=4)
+
+def save_coins(username, coin):
+    with open(DATABASE, "r") as file:
+        data = json.load(file)
+        data[username]['coin'] = coin
+    save_to_database(data)
+
+def save_avatar(username, index):
+    with open(DATABASE, "r") as file:
+        data = json.load(file)
+        data[username]['avatar'] = index
+    save_to_database(data)
 
 def update_history_values(username, new_history_value):
     with open(DATABASE, "r") as file:
@@ -120,6 +126,8 @@ def mainmenu(loggedinuser):
                             self.click_sound.play()
                     if pygame.mouse.get_pressed()[0] == 0:
                         self.clicked = False
+                else:
+                    pass
 
     #Tao thanh tai khoan
     class user_status():
@@ -138,12 +146,12 @@ def mainmenu(loggedinuser):
             self.username = username
             self.coin = user_coin
 
-            self.avatar_list = ['./assets/icons/user.png']
-            self.current_avatar = self.avatar_list[0]
+            self.avatar_list = ['./assets/icons/avatars/1.png','./assets/icons/avatars/2.png','./assets/icons/avatars/3.png','./assets/icons/avatars/4.png','./assets/icons/avatars/5.png','./assets/icons/avatars/6.png','./assets/icons/avatars/7.png','./assets/icons/avatars/8.png','./assets/icons/avatars/9.png']
+            self.avatar_index = 0
+            self.current_avatar = self.avatar_list[self.avatar_index]
             self.avatar = pygame.image.load(self.current_avatar).convert_alpha()
             self.avatar = pygame.transform.scale(self.avatar,(80,80))
-            self.avatar_x = 130
-            self.avatar_y = (self.height-self.avatar.get_height())//2
+            self.avatar_rect = self.avatar.get_rect(topleft = (30,(self.height-self.avatar.get_height())//2))
 
             self.username_text = self.font.render(self.username, True, (255,255,255))
             self.username_text_y = (self.height-self.username_text.get_height())//2
@@ -168,15 +176,112 @@ def mainmenu(loggedinuser):
 
         def display(self):
             window.blit(self.surface,(0,0))
-            window.blit(self.avatar,(30,self.avatar_y))
+            self.avatar_index = json.load(open(DATABASE,"r"))[username].get('avatar')   
+            self.current_avatar = self.avatar_list[self.avatar_index]
+            self.avatar = pygame.image.load(self.current_avatar).convert_alpha()
+            self.avatar = pygame.transform.scale(self.avatar,(80,80))
+            window.blit(self.avatar,self.avatar_rect)
 
-            window.blit(self.username_text, (self.avatar_x - 5, self.username_text_y))
+            window.blit(self.username_text, (self.avatar_rect.x + self.avatar.get_width() + 10, self.username_text_y))
 
             window.blit(self.coin_icon, (self.coin_icon_x, self.coin_icon_y))
             self.coin = user_coin
             self.coin_value = self.font.render(": " + self.numdisplay(self.coin), True, (255,255,255))
             window.blit(self.coin_value, (self.coin_icon_x + self.coin_icon.get_width() + 10, self.coin_value_y))
             window.blit(self.tips, (10, self.height+ 10))
+
+    class avatar_select():
+        def __init__(self):
+            self.display = False
+            
+            self.width = 570
+            self.height = int(self.width*545/620)
+            self.x = (WINDOW_WIDTH - self.width)//2
+            self.y = (WINDOW_HEIGHT - self.height)//2
+            self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+            self.frame = pygame.image.load('assets/icons/frame3.png')
+            self.frame = pygame.transform.scale(self.frame, (600,int(600*545/620)))
+            self.frame_rect = self.frame.get_rect(center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
+            self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+            self.background.fill((0,0,0,170))
+
+            self.ava1 = self.avatars('assets/icons/avatars/1.png',1,1)
+            self.ava2 = self.avatars('assets/icons/avatars/2.png',2,1)
+            self.ava3 = self.avatars('assets/icons/avatars/3.png',3,1)
+            self.ava4 = self.avatars('assets/icons/avatars/4.png',1,2)
+            self.ava5 = self.avatars('assets/icons/avatars/5.png',2,2)
+            self.ava6 = self.avatars('assets/icons/avatars/6.png',3,2)
+            self.ava7 = self.avatars('assets/icons/avatars/7.png',1,3)
+            self.ava8 = self.avatars('assets/icons/avatars/8.png',2,3)
+            self.ava9 = self.avatars('assets/icons/avatars/9.png',3,3)
+
+        class avatars():
+            def __init__(self, image, posx, posy):
+                self.width = 620
+                self.height = 545
+                self.mother_x = (WINDOW_WIDTH - self.width)//2
+                self.mother_y = (WINDOW_HEIGHT - self.height)//2
+                self.image = pygame.image.load(image).convert_alpha()
+                self.image = pygame.transform.scale(self.image,(100,100))
+                self.hover_image = self.hover_effect(self.image)
+                if posx == 1:
+                    self.x = self.mother_x + self.width//4
+                elif posx == 2:
+                    self.x = self.mother_x + self.width//2
+                elif posx == 3:
+                    self.x = self.mother_x + self.width*3//4
+                if posy == 1:
+                    self.y = self.mother_y + self.height//4
+                elif posy == 2:
+                    self.y = self.mother_y + self.height//2
+                elif posy == 3:
+                    self.y = self.mother_y + self.height*3//4
+                self.rect = self.image.get_rect(center=(self.x,self.y))
+                self.clicked = False
+                self.click_sound = pygame.mixer.Sound('./assets/sfx/pop-click-sound.mp3')
+                self.click_sound.set_volume(0.2)
+
+            def hover_effect(self, image):
+                # Tạo bản sao của hình ảnh gốc với màu sậm đi (ở đây tôi chọn màu đen nhẹ)
+                hover_image = image.copy()
+                hover_image.fill((70, 70, 70), special_flags=pygame.BLEND_RGB_SUB)  # Điều chỉnh mức độ sậm màu
+                return hover_image
+            
+            def display(self):
+                window.blit(self.image, self.rect)
+                mousepos = pygame.mouse.get_pos()
+                if self.rect.collidepoint(mousepos):
+                    window.blit(self.hover_image,(self.rect))
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        self.click_sound.play()
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+        def disable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+        
+        def enable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+
+        def run(self):
+            if self.display:
+                window.blit(self.background, (0,0))
+                pygame.draw.rect(window, (221, 230, 237), self.rect)
+                window.blit(self.frame, self.frame_rect)
+
+                self.ava1.display()
+                self.ava2.display()
+                self.ava3.display()
+                self.ava4.display()
+                self.ava5.display()
+                self.ava6.display()
+                self.ava7.display()
+                self.ava8.display()
+                self.ava9.display()
+                self.disable_buttons()
+            elif not history.display and not help.display:
+                self.enable_buttons()
+
 
     class history():
         def __init__(self):
@@ -188,13 +293,18 @@ def mainmenu(loggedinuser):
             self.x = (WINDOW_WIDTH - self.width)//2
             self.y = (WINDOW_HEIGHT - self.height)//2
             self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+            self.frame = pygame.image.load('assets/icons/frame2.png')
+            self.frame = pygame.transform.scale(self.frame, (690,int(690*545/620)))
+            self.frame_rect = self.frame.get_rect(center=(WINDOW_WIDTH//2,WINDOW_HEIGHT//2))
             self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
             self.background.fill((0,0,0,170))
 
-            self.big_font = pygame.font.Font(None, 80)
+            self.big_font = pygame.font.SysFont(None, 80)
             self.normal_font = pygame.font.Font(None, 50)
 
-
+            self.history_label = self.big_font.render('HISTORY', True, (45, 67, 86))
+            self.history_label_rect = self.history_label.get_rect(topleft = (self.x + (self.width - self.history_label.get_width())//2 - 140, self.y + 40))
+            self.empty = self.normal_font.render("", True, (0,0,0))
             
         def update_history(self):
             self.history_1 = json.load(open(DATABASE,"r"))[username]['history1']
@@ -247,20 +357,13 @@ def mainmenu(loggedinuser):
             def display(self):
                 window.blit(self.text_surface,(self.x,self.y))
 
-
         def display_history(self):
-            history_label = self.big_font.render('HISTORY', True, (0,0,0))
-            history_label_rect = history_label.get_rect(topleft = (self.x + (self.width - history_label.get_width())//2, self.y + 50))
-            window.blit(history_label, history_label_rect)
-            empty = self.normal_font.render("", True, (0,0,0))
+            window.blit(self.history_label, self.history_label_rect)
+            window.blit(self.frame, self.frame_rect)
 
-
-            history1 = self.normal_font.render(f"{self.history_value(self.history_1[2])}:    {self.history_1[1]} - {self.history_1[0]}", True, self.history_color(self.history_1[2]))
-            history1_rect = history1.get_rect(topleft = (self.x + 70,history_label_rect.y + history_label.get_height()+ 40))
-
-            history1_1 = self.history_values(self.history_value(self.history_1[2]), self.history_color(self.history_1[2]), 1, history_label_rect.y + history_label.get_height()+ 40)
-            history1_2 = self.history_values(self.history_1[1],  self.history_color(self.history_1[2]), 2, history_label_rect.y + history_label.get_height()+ 40)
-            history1_3 = self.history_values(self.history_1[0],  self.history_color(self.history_1[2]), 3, history_label_rect.y + history_label.get_height()+ 40)
+            history1_1 = self.history_values(self.history_value(self.history_1[2]), self.history_color(self.history_1[2]), 1, self.history_label_rect.y + self.history_label.get_height()+ 40)
+            history1_2 = self.history_values(self.history_1[1],  self.history_color(self.history_1[2]), 2, self.history_label_rect.y + self.history_label.get_height()+ 40)
+            history1_3 = self.history_values(self.history_1[0],  self.history_color(self.history_1[2]), 3, self.history_label_rect.y + self.history_label.get_height()+ 40)
 
             history2_1 = self.history_values(self.history_value(self.history_2[2]), self.history_color(self.history_2[2]), 1, history1_1.y + 40 + history1_1.text_surface.get_height())
             history2_2 = self.history_values(self.history_2[1],  self.history_color(self.history_2[2]), 2, history1_1.y + 40 + history1_1.text_surface.get_height())
@@ -279,48 +382,109 @@ def mainmenu(loggedinuser):
             history5_3 = self.history_values(self.history_5[0],  self.history_color(self.history_5[2]), 3, history4_1.y + 40 + history1_1.text_surface.get_height())
 
             if self.history_1[2] == 0:
-                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history1_1.y))
+                window.blit(self.empty, (self.x + (self.width - self.empty.get_width())//2, history1_1.y))
             else:
                 history1_1.display()
                 history1_2.display()
                 history1_3.display()
             if self.history_2[2] == 0:
-                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history2_1.y))
+                window.blit(self.empty, (self.x + (self.width - self.empty.get_width())//2, history2_1.y))
             else:
                 history2_1.display()
                 history2_2.display()
                 history2_3.display()
             if self.history_3[2] == 0:
-                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history3_1.y))
+                window.blit(self.empty, (self.x + (self.width - self.empty.get_width())//2, history3_1.y))
             else:
                 history3_1.display()
                 history3_2.display()
                 history3_3.display()
             if self.history_4[2] == 0:
-                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history4_1.y))
+                window.blit(self.empty, (self.x + (self.width - self.empty.get_width())//2, history4_1.y))
             else:
                 history4_1.display()
                 history4_2.display()
                 history4_3.display()
             if self.history_5[2] == 0:
-                window.blit(empty, (self.x + (self.width - empty.get_width())//2, history5_1.y))
+                window.blit(self.empty, (self.x + (self.width - self.empty.get_width())//2, history5_1.y))
             else:
                 history5_1.display()
                 history5_2.display()
                 history5_3.display()
 
+        def disable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+        
+        def enable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
         
         def run(self):
             if self.display:
                 window.blit(self.background, (0,0))
-                pygame.draw.rect(window, (221, 230, 237), self.rect, border_radius=15)
+                pygame.draw.rect(window, (221, 230, 237), self.rect)
 
                 self.update_history()
                 self.display_history()
-                button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+                self.disable_buttons()
             else:
-                button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+                self.enable_buttons()
+    
+    class help_page():
+        def __init__(self):
+            self.display = False
+
+            self.width = 960
+            self.height = int(960*9/16)
+            self.x = (WINDOW_WIDTH - self.width)//2
+            self.y = (WINDOW_HEIGHT - self.height)//2
+            self.frame = pygame.image.load('assets/icons/frame.png').convert_alpha()
+            self.frame = pygame.transform.scale(self.frame, (1035,int(1035*9/16)))
+            self.frame_rect = self.frame.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
+            self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+            self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+            self.background.fill((0,0,0,170))
+            self.instructions = [
+                "Welcome to Bet The Best!",
+                "Start with 300 coins. Bet wisely!",
+                "Coins are everything—win or play mini-games!",
+                "Race effects are unpredictable—brace yourself!",
+                "Finish top 3 for coins; lose otherwise!",
+                "",
+                "Get ready for excitement! Let's race!"
+            ]
+            self.big_font = pygame.font.Font(None, 80)
+            self.normal_font = pygame.font.Font(None, 50)
+
+            self.help_label = self.big_font.render('GAME INSTRUCTIONS', True, (24, 61, 61))
+            self.help_label_rect = self.help_label.get_rect(topleft = (self.x + (self.width - self.help_label.get_width())//2, self.y + 50))
+
+            self.text_x = self.x + 80
+            self.text_y = self.help_label_rect.y + self.help_label.get_height() + 40
+            
+
+        def disable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
         
+        def enable_buttons(self):
+            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+
+        def run(self):
+            if self.display:
+                window.blit(self.background, (0,0))
+                pygame.draw.rect(window, (221, 230, 237), self.rect)
+                window.blit(self.frame, self.frame_rect)
+                window.blit(self.help_label, self.help_label_rect)
+                for line in self.instructions:
+                    text = self.normal_font.render(line, True, (4, 28, 50))
+                    text_rect = text.get_rect(topleft = (self.text_x, self.text_y))
+                    window.blit(text, text_rect)
+                    self.text_y += 43
+                self.text_y = self.help_label_rect.y + self.help_label.get_height() + 40
+                self.disable_buttons()
+            elif not history.display:
+                self.enable_buttons()
+
+
 
     background = background()
     music = music(['./assets/musics/gone-fishing-shandr.mp3','./assets/musics/tech-aylex.mp3', './assets/musics/cyberpunk-alexproduction.mp3'], ['Shandr - Gone fishing','Aylex - Tech','Alexproduction - Cyberpunk'], 0.3, 20, 680)
@@ -333,12 +497,8 @@ def mainmenu(loggedinuser):
     button_help = button(740,500,'./assets/icons/buttons/help.png',1, True)
     button_logout = button(740,610,'./assets/icons/buttons/logout.png',1, True)
     history = history()
-
-    def display_text(x, y, text, color, size):
-        font_model = pygame.font.Font(None, size)
-        text_surface = font_model.render(text, True, color)
-        text_rect = text_surface.get_rect(topleft = (x,y))
-        window.blit(text_surface, text_rect)
+    help = help_page()
+    avatar_selection = avatar_select()
 
     def GUI():
         background.display()
@@ -361,6 +521,8 @@ def mainmenu(loggedinuser):
         button_help.display()
         button_logout.display()
         history.run()
+        help.run()
+        avatar_selection.run()
 
     while isRunning:
         pygame.time.Clock().tick(60)
@@ -368,36 +530,66 @@ def mainmenu(loggedinuser):
         music.play() if isRunning else None
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                save_user_info(username, user_coin)
+                save_coins(username, user_coin)
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
                 if button_logout.image_rect.collidepoint(mousepos) and button_logout.clickable:
                     pygame.mixer.music.stop()
-                    save_user_info(username, user_coin)
+                    save_coins(username, user_coin)
+                    loading.run(4)
                     isRunning = False
                 elif button_minigame.image_rect.collidepoint(mousepos) and button_minigame.visible and button_minigame.clickable:
                     pygame.mixer.music.stop()
+                    loading.run(3)
                     import minigame
                     user_coin += minigame.run()
-                    save_user_info(username, user_coin)
+                    save_coins(username, user_coin)
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible and button_play.clickable:
                     import control_button
                     pygame.mixer.music.stop()
+                    loading.run(2)
                     new_value = control_button.run_test(user_coin)
                     if new_value == ["","",0]:
                         pass
                     else:
                         user_coin += new_value[2]
                         update_history_values(username, new_value)
-                        save_user_info(username, user_coin)
+                        save_coins(username, user_coin)
                 elif button_history.image_rect.collidepoint(mousepos) and history.display == False and button_history.clickable:
                     history.display = True
-                elif not history.rect.collidepoint(mousepos) and history.display == True:
+                elif not history.rect.collidepoint(mousepos) and history.display == True and not button_history.clickable:
                     history.display = False
+                elif button_help.image_rect.collidepoint(mousepos) and help.display == False and button_help.clickable:
+                    help.display = True
+                elif not help.rect.collidepoint(mousepos) and help.display == True and not button_history.clickable:
+                    help.display = False
+                elif user_status.avatar_rect.collidepoint(mousepos) and avatar_selection.display == False:
+                    avatar_selection.display = True
+                elif avatar_selection.display:
+                    if avatar_selection.ava1.rect.collidepoint(mousepos):
+                        save_avatar(username, 0)
+                    elif avatar_selection.ava2.rect.collidepoint(mousepos):
+                        save_avatar(username, 1)
+                    elif avatar_selection.ava3.rect.collidepoint(mousepos):
+                        save_avatar(username, 2)
+                    elif avatar_selection.ava4.rect.collidepoint(mousepos):
+                        save_avatar(username, 3)
+                    elif avatar_selection.ava5.rect.collidepoint(mousepos):
+                        save_avatar(username, 4)
+                    elif avatar_selection.ava6.rect.collidepoint(mousepos):
+                        save_avatar(username, 5)
+                    elif avatar_selection.ava7.rect.collidepoint(mousepos):
+                        save_avatar(username, 6)
+                    elif avatar_selection.ava8.rect.collidepoint(mousepos):
+                        save_avatar(username, 7)
+                    elif avatar_selection.ava9.rect.collidepoint(mousepos):
+                        save_avatar(username, 8)
+                    elif not avatar_selection.rect.collidepoint(mousepos):
+                        avatar_selection.display = False
 
-        user_coin = json.load(open(DATABASE,"r"))[username].get('coin')       
+        user_coin = json.load(open(DATABASE,"r"))[username].get('coin')     
         GUI()
         
         pygame.display.update() #cap nhat man hinh game
@@ -407,4 +599,4 @@ if __name__ == "__main__":
     # Initialize Pygame
     pygame.init()
     pygame.mixer.init()
-    mainmenu("abc")
+    mainmenu("bew")
