@@ -605,6 +605,9 @@ def run_race(usermoney):
             pygame.mixer.Sound.set_volume(race_noise, 0.15)
             race_noise.play()
             
+            winning_music = (pygame.mixer.Sound("assets/sfx/applause.mp3") if self.players[sel.player - 1].order in (1, 2, 3)
+                                                                else pygame.mixer.Sound("assets/sfx/fail.mp3"))
+            
             announce1 = Announcement() 
             announce2 = Announcement()
             
@@ -616,6 +619,7 @@ def run_race(usermoney):
                         running = False
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and showOnce == False:
+                            winning_music.stop()
                             
                             history.append(self.players[sel.player - 1].name)
                             history.append(history_time)
@@ -677,10 +681,9 @@ def run_race(usermoney):
                     showOnce = False
 
                     self.win_or_lose(usermoney)
-                    winning_music = ("assets/sfx/applause.mp3" if self.players[sel.player - 1].order in (1, 2, 3)
-                                                                else "assets/sfx/fail.mp3")
+                    
                     if not check_winning_music:
-                        pygame.mixer.Sound(winning_music).play()
+                        winning_music.play()
                         check_winning_music = True;
                     
                 # Update display
