@@ -33,7 +33,7 @@ def run(speed):
     while progress <= 100:
         pygame.time.delay(20)  # Adjusted loading time delay for faster progress
         progress += speed  # Increased increment for faster progress
-        draw_loading_screen(progress)
+        draw_loading_screen(min(progress,100))
   # When loading is completed, switch to the main menu or the game
 
 # Function to display main menu (placeholder)
