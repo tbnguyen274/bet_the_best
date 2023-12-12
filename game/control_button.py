@@ -150,9 +150,12 @@ class Button:
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 #random ten
-random_name = ["Cody", "Steven", "Dominik", "Mohammed", "Trent", "Anrew", "Virgil", "Ibrahim",
-                       "Alisson", "Joel", "Joe", "Harvey", "Luis", "Darwin", "Diogo", "Mac",
-                       "Curtis", "Ryan", "Thiago", "Caoimhin", "Stefan", "Ben", "Jarell", "Jurgen"]
+random_name = [
+    "Kai", "Zara", "Cleo", "Hiro", "Aiko", "Ezra", "Luna", "Zain", "Nala", "Remy",
+    "Enzo", "Faye", "Idris", "Kato", "Zola", "Azra", "Niam", "Orla", "Ziva", "Zayd",
+    "Kiran", "Rohan", "Ida", "Veda", "Kato", "Cian", "Tari", "Ilya", "Soren", "Ozra"
+]
+
 class TextInput:
     def __init__(self, x, y, width, height, font_size, color_inactive, color_active, font_color):
         self.rect = pygame.Rect(x, y, width, height)
@@ -177,7 +180,6 @@ class TextInput:
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    
                     self.text = ''
                 elif event.key == pygame.K_SPACE:
                     if self.text == "":
@@ -191,14 +193,14 @@ class TextInput:
                 else:
                     temp_text = self.text + event.unicode
                     temp_surface = self.font.render(temp_text, True, self.font_color)
-                    if temp_surface.get_width() < self.rect.w:
+                    if temp_surface.get_width() < self.rect.w and len(temp_text) <= 6:  # Add length check here
                         self.text = temp_text
                 self.txt_surface = self.font.render(self.text, True, self.font_color)
             if event.key == pygame.K_SPACE :
                 if self.text == "":
                     self.text = random.choice(random_name)
                     random_name.remove(self.text)
-                self.txt_surface = self.font.render(self.text, True, self.font_color)  # Change this line
+                self.txt_surface = self.font.render(self.text, True, self.font_color)
 
     def handle_event2(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -363,7 +365,7 @@ class selector:
         self.next = Button(1120, 600, self.next_img, 0.2)
         self.next1 = Button(1120, 600, self.next_img, 0.2)
         self.back = Button(50, 600, pygame.image.load('assets/icons/return.png'), 0.2)
-
+        self.back1 = Button(50, 600, pygame.image.load('assets/icons/return.png'), 0.2)
         self.player = -1
 
         self.bg_default = 'assets/videos/diffselectbg.mp4'
@@ -499,7 +501,7 @@ class selector:
         self.midRace.draw(self.screen)
         self.shortRace.draw(self.screen)
         self.next.draw(self.screen)
-
+        self.back1.draw(self.screen)
         if time.time() - self.popup_time < 1.5:
             popup_surface = pygame.Surface((400, 50), pygame.SRCALPHA)
             popup_surface.fill((255, 255, 255, 160))
@@ -579,6 +581,7 @@ class selector:
 
         self.next1.draw(self.screen)
 
+
         pygame.draw.rect(self.screen, 'white', (320, 425, 640, 170), border_radius=20)
 
         font = pygame.font.Font(None, 60)
@@ -630,7 +633,8 @@ class selector:
 
 sel = selector()
 def run_test(usermoney):
-    global running
+    global running, exitSelect
+    exitSelect = False
     sel.state = 1
     while running:
         if sel.state == 1:
@@ -640,7 +644,9 @@ def run_test(usermoney):
         else:
             import speed
             return speed.run_race(usermoney)
-
+        if exitSelect:
+            return ["","", 0]
+run_test(1000)
 # if __name__ == '__main__':
 #     selector = selector()
 #     selector.select_bgnset()
