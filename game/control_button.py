@@ -649,6 +649,8 @@ def run_test(usermoney):
             sel.select_player_n_bet(usermoney)
         else:
             sel.state = 1
+            import loading
+            loading.run(2)
             import speed
             return speed.run_race(usermoney)
         if exitSelect:
