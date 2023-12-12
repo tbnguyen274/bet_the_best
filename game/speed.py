@@ -22,7 +22,7 @@ def run_race(usermoney):
             self.race_scale = 0.8 if self.length == 'long' else 1 if self.length == 'mid' else 1.1
             self.bg_type = sel.activated_buttons[0] # can be modified to meet up with player's choice
             self.load_images()
-            
+         
         def load_images(self):
             # Set background based on player's choice in control_button.py
             self.background = pygame.image.load('./assets/BG-pic/galaxy.jpg' if self.bg_type == 'galaxy' else
@@ -33,7 +33,7 @@ def run_race(usermoney):
             self.race_start = self.load_and_scale_image('./assets/race/race-start.png')
             self.race_end = self.load_and_scale_image('./assets/race/race-end.png')
             self.end_width = self.race_end.get_width()
-
+            
         def load_and_scale_image(self, path):
             image = pygame.image.load(path)
             image.set_alpha(120)
@@ -69,6 +69,7 @@ def run_race(usermoney):
         def draw_players():
             for player in game.players:
                 window.blit(player.current_image, (player.x, player.y))
+
 
     class PowerUpIcon:
         
@@ -130,7 +131,8 @@ def run_race(usermoney):
                 # check if mystery power-up still active then display it
                 elif power_up_icon.active:
                     window.blit(power_up_icon.image, power_up_icon.rect.topleft)
-                    
+
+                  
     class Announcement:
         def __init__(self):
             self.announce_font = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
@@ -165,6 +167,7 @@ def run_race(usermoney):
             if self.announce_render is not None and self.announce_position is not None:
                 window.blit(self.announce_render, self.announce_position)
 
+
     class Game:
         def __init__(self, num_power_up_icons):
             self.width = 1280
@@ -189,6 +192,7 @@ def run_race(usermoney):
             self.available_y_coordinates = []   #the set of player.y but it instantly changes to create power-ups
             self.text_power_up = None   # text on board 1
             self.text_finish = None # text on board 2
+        
             
         def create_players(self):
             player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
@@ -220,14 +224,17 @@ def run_race(usermoney):
             self.all_y_coordinates = [player.y for player in self.players]
             # create a copy
             self.available_y_coordinates = [player.y for player in self.players]
+        
             
         def create_power_up_icons(self):
             PowerUpIcon.create_power_up_icons()
+
 
         def add_random_power_up_icon(self):
             # Add a randon power-up if a random number created < 0.04 and top 3 is not identified
             if random.random() < 0.04 and len(self.finished_players) < 3: 
                 PowerUpIcon.add_random_power_up_icon()
+    
     
         def apply_power_up(self, player):
             
@@ -282,6 +289,7 @@ def run_race(usermoney):
                 elif player.x > self.width - self.player_size:
                     player.x = self.width - self.player_size
 
+
         def check_power_up_collided(self):
             for player in self.players:
                 player_rect = pygame.Rect(player.x, player.y, self.player_size, self.player_size)
@@ -300,6 +308,7 @@ def run_race(usermoney):
                             self.text_power_up = f"{player.name} (p.{self.players.index(player) + 1}) got a power-up: {power_up_type}"
                             print(f"{player.name} (p.{self.players.index(player) + 1}) got a power-up: {power_up_type}")
 
+
         def check_finish(self):
             for player in self.players:
                 if not player.finished and player.x >= self.width - self.player_size:
@@ -311,11 +320,14 @@ def run_race(usermoney):
                     self.text_finish = f"{player.name} (p.{self.players.index(player) + 1}) finished the race at rank: {player.order}"
                     print(f"{player.name} (p.{self.players.index(player) + 1}) finished the race at rank: {player.order}")
 
+
         def draw_players(self):
             Player.draw_players()
+        
                         
         def draw_powerup_icons(self):
             PowerUpIcon.draw_powerup_icons()
+         
             
         def firework(self):
             clock = pygame.time.Clock()
@@ -412,9 +424,6 @@ def run_race(usermoney):
             sorted_players = sorted(self.players, key=lambda player: player.order)
             print(self.players[sel.player - 1].order)
 
-            
-
-
             # Render and display ranking information
             myfont = pygame.freetype.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             # Sử dụng bản sao để hiển thị thông tin và giữ nguyên thứ tự ban đầu
@@ -454,24 +463,29 @@ def run_race(usermoney):
         def win_or_lose(self, usermoney):
             global reward
             bg.draw_background(window)
+            
+            # Load RankingImg
+            image = Image.open("assets/icons/frame4.png")
 
-           # Set the dimensions of the rectangle
-            rect_width = 620 # 620 = 2480/4
-            rect_height = 545   #545 = 2180/4
+            # Calculate the dimensions of the frame
+            frame_width = image.width // 8
+            frame_height = image.height // 8
+            frame = pygame.Surface((frame_width, frame_height))
 
-            # Calculate the position of the rectangle to place it at the center of the window
-            rect_x = (self.width - rect_width) // 2
-            rect_y = (self.height - rect_height) // 2
+            # Calculate the dimensions of the image display area
+            image_width = image.width // 8
+            image_height = image.height // 8
+
+            # Resize and center the image
+            image = image.resize((image_width, image_height), Image.Resampling.LANCZOS)
+            scaled_image = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
+            image_rect = scaled_image.get_rect(center=(frame_width // 2, frame_height // 2))
+
+            # Fill light gray color
+            frame.fill((245,245,245))
             
-            pygame.draw.rect(window, 'red', (rect_x -5, rect_y -5, rect_width+10, rect_height+10), border_radius=20)
-            pygame.draw.rect(window, 'white', (rect_x, rect_y, rect_width, rect_height), border_radius=15)
-            
-            font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
-            font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
-            
-            def center_text(x, y, width, height, render):
-                text_width, text_height = render.get_size()
-                return (x + (width - text_width) // 2, y + (height - text_height) // 2)
+            # Blit the image onto the frame
+            frame.blit(scaled_image, image_rect.topleft)
 
             reward = 0
             if self.players[sel.player - 1].order == 1:
@@ -494,19 +508,39 @@ def run_race(usermoney):
             
             total = usermoney + reward
             update_coin = f"Your current coins: {total}"
+                       
+            font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
+            font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
             
-            
-            winning_state_render = font_big.render(winning_state, True, (22, 27, 33))
+            winning_state_render = font_big.render(winning_state, True, 'red')
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
             update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
             
-            winning_state_position = center_text(rect_x, rect_y - 100, rect_width, rect_height, winning_state_render)
-            update_bet_position = center_text(rect_x, rect_y, rect_width, rect_height, update_bet_render)
-            update_coin_position = center_text(rect_x, rect_y + 80, rect_width, rect_height, update_coin_render)
+            # Calculate the positions of text elements in the middle of the frame
+            winning_state_position = (
+                (frame_width - winning_state_render.get_width()) // 2,
+                (frame_height - winning_state_render.get_height()) // 2 - 100
+            )
+
+            update_bet_position = (
+                (frame_width - update_bet_render.get_width()) // 2,
+                (frame_height - update_bet_render.get_height()) // 2
+            )
+
+            update_coin_position = (
+                (frame_width - update_coin_render.get_width()) // 2,
+                (frame_height - update_coin_render.get_height()) // 2 + 60
+            )
             
-            window.blit(winning_state_render, winning_state_position)
-            window.blit(update_bet_render, update_bet_position)
-            window.blit(update_coin_render, update_coin_position)
+            frame.blit(winning_state_render, winning_state_position)
+            frame.blit(update_bet_render, update_bet_position)
+            frame.blit(update_coin_render, update_coin_position)
+            
+            # Calculate the position of the frame on the main window
+            frame_rect = frame.get_rect(center=(self.width // 2, self.height // 2))
+
+            # Draw the frame onto the main window
+            window.blit(frame, frame_rect.topleft)
             
             pygame.display.flip()
 
@@ -553,6 +587,7 @@ def run_race(usermoney):
             # Quit Pygame
             pygame.quit()
             sys.exit()
+
 
         def run(self, usermoney):
             global announce1, announce2, history
@@ -643,16 +678,11 @@ def run_race(usermoney):
 
                     self.win_or_lose(usermoney)
                     winning_music = ("assets/sfx/applause.mp3" if self.players[sel.player - 1].order in (1, 2, 3)
-                            else "assets/sfx/fail.mp3")
+                                                                else "assets/sfx/fail.mp3")
                     if not check_winning_music:
                         pygame.mixer.Sound(winning_music).play()
                         check_winning_music = True;
                     
-                    
-                    
-
-
-
                 # Update display
                 pygame.display.flip()
 
