@@ -6,7 +6,7 @@ import datetime
 import time
 pygame.init()
 
-
+exitSelect = False
 running = True
 class VideoPlayer:
     def __init__(self, video_path):
@@ -393,7 +393,7 @@ class selector:
         self.state = 0
 
     def select_bgnset(self):
-        
+        global exitSelect
         self.state = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -451,6 +451,9 @@ class selector:
                 else:
                     self.check_next = True  # Mark as next clicked
                     self.state = 2
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.back1.image_rect.collidepoint(pygame.mouse.get_pos()):
+                    exitSelect = True
                     
         
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
@@ -642,12 +645,11 @@ def run_test(usermoney):
         elif sel.state == 2:
             sel.select_player_n_bet(usermoney)
         else:
+            sel.state = 1
             import speed
             return speed.run_race(usermoney)
         if exitSelect:
             return ["","", 0]
-run_test(1000)
-# if __name__ == '__main__':
-#     selector = selector()
-#     selector.select_bgnset()
-#     selector.select_player_n_bet()
+
+if __name__ == '__main__':
+    run_test(1000)
