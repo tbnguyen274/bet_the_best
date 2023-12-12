@@ -19,7 +19,7 @@ def run_race(usermoney):
             self.length = sel.activated_buttons[2]
             self.width = width
             self.height = height
-            self.race_scale = 0.8 if self.length == 'long' else 1 if self.length == 'mid' else 1.2
+            self.race_scale = 0.8 if self.length == 'long' else 1 if self.length == 'mid' else 1.1
             self.bg_type = sel.activated_buttons[0] # can be modified to meet up with player's choice
             self.load_images()
             
@@ -79,7 +79,7 @@ def run_race(usermoney):
             self.timer = 0  # power-up's real image existing time
             self.active = True  # used to draw mystery power-ups on screen, set to False when the real ones appear
             self.collided = False   # check if players meet the power-ups, set to False if they meet
-            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
             self.power_ups = ["SpeedUp", "SlowDown", "TurnAround", "Restart", "StraightToFinish", "Teleport", "Stun"]   # list of power-ups
             self.power_up_probabilities = [0.04, 0.04, 0.03, 0.02, 0.005, 0.02, 0.04] #The corresponding probabilities of power-ups in the list
             # Update and process power-ups' images
@@ -109,7 +109,7 @@ def run_race(usermoney):
 
             # power-ups will not appear behind the last player
             if x > min(player.x for player in game.players if player.y == y):
-                power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+                power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
                 mystery_icon = pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"unknown.png")), (power_up_size, power_up_size))
                 # create a mystery power-up and add to the power_up_icons list
                 icon = PowerUpIcon(x, y, None, mystery_icon)
@@ -183,15 +183,15 @@ def run_race(usermoney):
             self.players = []
             self.finished_players = []
             self.power_up_icons = []
-            self.player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
-            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+            self.player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
+            self.power_up_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
             self.all_y_coordinates = [] # the set of player.y so that the power-ups can appear on their races
             self.available_y_coordinates = []   #the set of player.y but it instantly changes to create power-ups
             self.text_power_up = None   # text on board 1
             self.text_finish = None # text on board 2
             
         def create_players(self):
-            player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 60
+            player_size = 40 if bg.length == 'long' else 50 if bg.length == 'mid' else 55
             if bg.length == 'mid':
                 self.players = [Player(0, bg.height - bg.image.get_height() +  85*i,
                             pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
@@ -209,7 +209,7 @@ def run_race(usermoney):
                         for i in range(self.num_players)]
             
             else:   
-                self.players = [Player(0, bg.height - bg.image.get_height() +  102*i,
+                self.players = [Player(0, bg.height - bg.image.get_height() +  95*i,
                             pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)),
                             pygame.transform.flip(pygame.transform.scale(pygame.image.load(os.path.join(f"assets/sets/{self.num_player_set}", f"{i+1}.png")), (player_size, player_size)), True, False),
                             sel.char_dict[i+1]
@@ -225,8 +225,8 @@ def run_race(usermoney):
             PowerUpIcon.create_power_up_icons()
 
         def add_random_power_up_icon(self):
-            # Add a randon power-up if a random number created < 0.03 and nobody's finished the line yet
-            if random.random() < 0.04 and len(self.finished_players) == 0: 
+            # Add a randon power-up if a random number created < 0.04 and top 3 is not identified
+            if random.random() < 0.04 and len(self.finished_players) < 3: 
                 PowerUpIcon.add_random_power_up_icon()
     
         def apply_power_up(self, player):
@@ -450,6 +450,7 @@ def run_race(usermoney):
 
             pygame.display.flip()
 
+
         def win_or_lose(self, usermoney):
             global reward
             bg.draw_background(window)
@@ -560,6 +561,7 @@ def run_race(usermoney):
             clock = pygame.time.Clock()
             running = True
             showOnce = True
+            check_winning_music = False
 
             race_music = pygame.mixer.Sound('assets\musics/round.mp3')
             race_music.play()
@@ -627,17 +629,26 @@ def run_race(usermoney):
                         print(self.players[sel.player - 1].order)
                         print("All players reached the finish line!")
                         print(self.players[sel.player - 1].order)
+                        
                         race_noise.stop()
                         self.firework()
                         race_music.stop()
+                        
                         # show leaderboard
                         self.show_rankings()
                         pygame.mixer.Sound('assets\sfx/victory.mp3').play()
                         pygame.time.delay(4000)
+                        
                     showOnce = False
-                    # print(self.players[sel.player - 1].order + 1)
-                    
+
                     self.win_or_lose(usermoney)
+                    winning_music = ("assets/sfx/applause.mp3" if self.players[sel.player - 1].order in (1, 2, 3)
+                            else "assets/sfx/fail.mp3")
+                    if not check_winning_music:
+                        pygame.mixer.Sound(winning_music).play()
+                        check_winning_music = True;
+                    
+                    
                     
 
 
