@@ -137,21 +137,24 @@ class Button:
         self.image_alpha = self.image.copy()
         self.image_alpha.set_alpha(160)
 
-    def draw(self, screen):
+    def handle_event(self, event):
         click_sound = pygame.mixer.Sound('assets/sfx/pop-click-sound.mp3')
         click_sound.set_volume(0.2)
-        cursor_pos = pygame.mouse.get_pos()
-        if self.image_rect.collidepoint(cursor_pos):
-            screen.blit(self.image_alpha, (self.image_rect.x, self.image_rect.y))
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.image_rect.collidepoint(event.pos):
                 self.clicked = True
                 click_sound.play()
                 self.action = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            self.clicked = False
+
+    def draw(self, screen):
+        if self.clicked:
+            screen.blit(self.image_alpha, (self.image_rect.x, self.image_rect.y))
         else:
             screen.blit(self.image, (self.image_rect.x, self.image_rect.y))
 
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
+
 #random ten
 random_name = [
     "Kai", "Zara", "Cleo", "Hiro", "Aiko", "Ezra", "Luna", "Zain", "Nala", "Remy",
@@ -402,8 +405,12 @@ class selector:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if self.next.clicked:
 
+            self.next.handle_event(event)
+            self.back1.handle_event(event)
+
+            if self.next.clicked:
+                
                 ToggleButton.turn_off_all(self.set1_char)
                 ToggleButton.turn_off_all(self.set2_char)
                 ToggleButton.turn_off_all(self.set3_char)
@@ -452,13 +459,15 @@ class selector:
                     self.popup_message = "  Please choose all options"
                     self.popup_time = time.time()
                 else:
+                    time.sleep(0.1)
                     self.check_next = True  # Mark as next clicked
                     self.state = 2
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.back1.image_rect.collidepoint(pygame.mouse.get_pos()):
                     exitSelect = True
                     
-        
+
             ToggleButton.check_click(event, [self.underwater, self.jungle, self.galaxy])
             if self.jungle.clicked:
                 self.check_j = True
@@ -481,6 +490,7 @@ class selector:
             ToggleButton2.check_click(event, [self.midRace, self.longRace, self.shortRace])
 
         # CÁC HÀM VẼ PHẢI ĐƯỢC ĐẶT NGOÀI VÒNG EVENT
+       
         self.bg_default_loop.loop_background()
 
         if self.check_j:
@@ -526,11 +536,13 @@ class selector:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
+            
             for box in self.namebox:
-                box.handle_event(event)
-                
+                 box.handle_event(event)
+            
             self.bet_box.handle_event2(event)
+
+            
 
             if self.activated_buttons[1] == 'set2':
                 ToggleButton.check_click(event, self.set2_char)
@@ -546,6 +558,32 @@ class selector:
                 ToggleButton.check_click(event, self.set4_char)
             if self.activated_buttons[1] == 'set7':
                 ToggleButton.check_click(event, self.set7_char)
+
+            if self.next1.clicked:
+                self.player = -1
+
+                for i in range(7):
+                    for j in range(6):
+                        if self.set_char[i][j].clicked:
+                            self.player = j + 1
+                if not all(self.char_dict.values()):
+                    self.bet_box.set_error_message("Please enter the characters names!")
+                elif self.bet_box.text == "":
+                    self.bet_box.set_error_message("Please enter your bet!")
+                elif self.player == -1:
+                    self.bet_box.set_error_message("Please choose your character!")
+            
+                    
+                elif self.bet_box.text != "" and all(self.char_dict.values()):
+                    self.state = 3
+            
+            self.next1.handle_event(event)
+            self.back.handle_event(event)
+
+            if self.back.clicked:
+                print("back")
+                time.sleep(0.1)
+                self.state = 1
 
         if self.activated_buttons[0] == 'jungle':
             self.bg_j_loop.loop_background()
@@ -577,8 +615,7 @@ class selector:
                 for b in self.set7_char:
                     b.draw(self.screen)
 
-        for box in self.namebox:
-            box.draw(self.screen)
+        
 
         for i in range(1, 7):
             self.char_dict[i] = self.namebox[i - 1].naming_character()
@@ -593,6 +630,8 @@ class selector:
         font = pygame.font.Font(None, 60)
 
         self.bet_box.draw(self.screen)
+        for box in self.namebox:
+            box.draw(self.screen)
         current_money = usermoney
         self.bet_box.validate_input(current_money)
         update_money = font.render(f"You currently have: {current_money}", True, 'black')
@@ -604,35 +643,8 @@ class selector:
         
 
         self.back.draw(self.screen)
-        if self.back.clicked:
-            print("back")
-            self.state = 1
 
-            for box in self.namebox:
-                box.text = ""
-                box.active = False
-                box.color = box.color_inactive
-                box.txt_surface = box.font.render(box.text, True, box.font_color)
-
-        if self.next1.clicked:
-            self.player = -1
-
-            for i in range(7):
-                for j in range(6):
-                    if self.set_char[i][j].clicked:
-                        self.player = j + 1
-            if not all(self.char_dict.values()):
-                self.bet_box.set_error_message("Please enter the characters names!")
-            elif self.bet_box.text == "":
-                self.bet_box.set_error_message("Please enter your bet!")
-            elif self.player == -1:
-                self.bet_box.set_error_message("Please choose your character!")
         
-                
-            elif self.bet_box.text != "" and all(self.char_dict.values()):
-                self.state = 3
-
-
         
         pygame.display.update()
         self.clock.tick(60)
