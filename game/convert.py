@@ -20,8 +20,8 @@ def convert_image_to_text(image_path, output_file='output.txt'):
 if __name__ == "__main__":
     # Thay đổi đường dẫn đến ảnh của bạn và tên file output nếu cần thiết
     image_paths = [
-        "../assets/BG-pic/leaderboard.png",
-        "../assets/screenshots/screenshot_181004_03122023.png"
+        
+        "assets/screenshots/screenshot_005621_16122023.png"
     ]
     output_file = "output.txt"
 
