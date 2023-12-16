@@ -401,6 +401,7 @@ class selector:
     def select_bgnset(self):
         global exitSelect
         self.state = 1
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -465,10 +466,7 @@ class selector:
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.back1.image_rect.collidepoint(pygame.mouse.get_pos()):
-                    ToggleButton.turn_off_all([self.set1, self.set2, self.set3, self.set4,
-                                                self.set5, self.set6, self.set7,
-                                                self.underwater, self.jungle, self.galaxy])
-                    ToggleButton2.turn_off_all([self.midRace, self.longRace, self.shortRace])
+                    
                     exitSelect = True
                     
 
@@ -663,7 +661,12 @@ def run_test(usermoney):
         if sel.state == 1:
             sel.select_bgnset()
         elif sel.state == 2:
+            
             sel.select_player_n_bet(usermoney)
+            ToggleButton.turn_off_all([sel.set1, sel.set2, sel.set3, sel.set4,
+                                sel.set5, sel.set6, sel.set7,
+                                sel.underwater, sel.jungle, sel.galaxy])
+            ToggleButton2.turn_off_all([sel.midRace, sel.longRace, sel.shortRace])
         else:
             sel.state = 1
             import loading

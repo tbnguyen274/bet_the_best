@@ -6,7 +6,6 @@ import time
 from PIL import Image
 from control_button import sel, run_test
 from firework import BulletFlyUp, FireWork, Random
-import mainmenu
 
 def run_race(usermoney):
     # Set up display
@@ -85,10 +84,6 @@ def run_race(usermoney):
             self.power_up_probabilities = [0.04, 0.04, 0.03, 0.02, 0.005, 0.02, 0.04] #The corresponding probabilities of power-ups in the list
             # Update and process power-ups' images
             self.power_up_images = {power_up: pygame.transform.scale(pygame.image.load(os.path.join("assets/icons/buff", f"powerup{i+1}.png")), (self.power_up_size, self.power_up_size)) for i, power_up in enumerate(self.power_ups)}
-
-        @staticmethod    
-        def create_power_up_icons():
-            game.power_up_icons = []
 
         @staticmethod
         # Create randon power-ups on the race
@@ -224,10 +219,6 @@ def run_race(usermoney):
             self.all_y_coordinates = [player.y for player in self.players]
             # create a copy
             self.available_y_coordinates = [player.y for player in self.players]
-        
-            
-        def create_power_up_icons(self):
-            PowerUpIcon.create_power_up_icons()
 
 
         def add_random_power_up_icon(self):
@@ -655,14 +646,11 @@ def run_race(usermoney):
                         
                         if event.key == pygame.K_s and showOnce == False:
                             import convert
-                            image_paths = [
-        
-                                "assets/screenshots/screenshot_" + current_time + ".png"
-                            ]
-                            output_file = "output.txt"
-
-                            for image_path in image_paths:
-                                convert.convert_image_to_text(image_path, output_file)
+                            image_path = "assets/screenshots/screenshot_" + current_time + ".png"
+                            
+                            DATABASE_DIRECTORY = 'db'                   
+                            output_file = os.path.join(DATABASE_DIRECTORY, f"{current_time}.txt")
+                            convert.convert_image_to_text(image_path, output_file)
                                 
                             winning_music.stop()
                             
@@ -746,11 +734,10 @@ def run_race(usermoney):
     bg.draw_background(window)
 
     # Initialize the game
-    game = Game(num_power_up_icons = 20)
+    game = Game(num_power_up_icons = 15)
 
     # Create players and power-up icons
     game.create_players()
-    game.create_power_up_icons()
 
     # Run the game
     return game.countdown(usermoney)
