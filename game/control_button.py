@@ -459,12 +459,16 @@ class selector:
                     self.popup_message = "  Please choose all options"
                     self.popup_time = time.time()
                 else:
-                    time.sleep(0.1)
+                    #time.sleep(0.1)
                     self.check_next = True  # Mark as next clicked
                     self.state = 2
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.back1.image_rect.collidepoint(pygame.mouse.get_pos()):
+                    ToggleButton.turn_off_all([self.set1, self.set2, self.set3, self.set4,
+                                                self.set5, self.set6, self.set7,
+                                                self.underwater, self.jungle, self.galaxy])
+                    ToggleButton2.turn_off_all([self.midRace, self.longRace, self.shortRace])
                     exitSelect = True
                     
 
@@ -582,7 +586,7 @@ class selector:
 
             if self.back.clicked:
                 print("back")
-                time.sleep(0.1)
+                #time.sleep(0.1)
                 self.state = 1
 
         if self.activated_buttons[0] == 'jungle':
@@ -654,6 +658,7 @@ def run_test(usermoney):
     global running, exitSelect
     exitSelect = False
     sel.state = 1
+    
     while running:
         if sel.state == 1:
             sel.select_bgnset()
