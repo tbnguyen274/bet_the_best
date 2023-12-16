@@ -87,21 +87,6 @@ def run(isFullscreen):
                 self.kill()
 
     class displayEvent():
-        def displayScore():
-            #Lose announcement:
-            game_over = test_font.render('Game Over!', False, (111, 196, 169))
-            game_over_rect = game_over.get_rect(center=(640, 80))
-            screen.blit(game_over,game_over_rect)
-            #Losing score
-            score_message = test_font.render(f'Your score: {score}/100', False, (111, 196, 169))
-            score_message_rect = score_message.get_rect(midtop=(640, 520))
-            screen.blit(score_message, score_message_rect)
-            #Lose
-            lose_instruction = test_font.render(f'Press Space to try again', False, (188, 122, 249))
-            lose_instruction_rect = lose_instruction.get_rect(midtop=(640, score_message_rect.y + score_message.get_height() + 20))
-            screen.blit(lose_instruction,lose_instruction_rect)
-            
-            
 
         def displayRule():
             #Rule
@@ -118,7 +103,19 @@ def run(isFullscreen):
             screen.blit(game_instruction2,game_instruction2_rect)
 
             
-            
+        def displayScore():
+            #Lose announcement:
+            game_over = test_font.render('Game Over!', False, (111, 196, 169))
+            game_over_rect = game_over.get_rect(center=(640, 80))
+            screen.blit(game_over,game_over_rect)
+            #Losing score
+            score_message = test_font.render(f'Your score: {score}/100', False, (111, 196, 169))
+            score_message_rect = score_message.get_rect(midtop=(640, 520))
+            screen.blit(score_message, score_message_rect)
+            #Lose
+            lose_instruction = test_font.render(f'Press Space to try again', False, (188, 122, 249))
+            lose_instruction_rect = lose_instruction.get_rect(midtop=(640, score_message_rect.y + score_message.get_height() + 20))
+            screen.blit(lose_instruction,lose_instruction_rect)  
             
 
         def displayGameBeat():
@@ -178,15 +175,20 @@ def run(isFullscreen):
         screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
     else:
         screen = pygame.display.set_mode((width, height))
-    clock = pygame.time.Clock()
+    
     test_font = pygame.font.Font('assets/font/Pixeltype.ttf', 80)
+    clock = pygame.time.Clock()
+    
     game_active = False
+    isRunning = True
+
+    # Score
     start_time = 0
     score = 0
-    consecutive_esc_presses = 0
-    isRunning = True
+    
+    # Exit
     last_esc_time = 0
-
+    consecutive_esc_presses = 0
 
     # Groups
     player = pygame.sprite.GroupSingle()
