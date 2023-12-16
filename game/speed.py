@@ -453,7 +453,7 @@ def run_race(usermoney, isFullscreen):
             history_time = time.strftime("%d/%m/%Y")
             
             # Save the entire window to a file with the current time in the filename
-            pygame.image.save(window, os.path.join("assets/screenshots", "screenshot_" + current_time + ".png"))  
+            pygame.image.save(window, os.path.join("assets\screenshots", "screenshot_" + current_time + ".png"))  
 
             pygame.display.flip()
 
@@ -461,6 +461,7 @@ def run_race(usermoney, isFullscreen):
         def win_or_lose(self, usermoney):
             global reward, blink_timer
             bg.draw_background(window)
+            
             
             # Load RankingImg
             image = Image.open("assets/icons/frame4.png")
@@ -512,12 +513,13 @@ def run_race(usermoney, isFullscreen):
                        
             font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
             font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
+            font_small = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 25)
             
             winning_state_render = font_big.render(winning_state, True, 'red')
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
             update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
             guidance_render = font_normal.render(guidance, True, 'gray')
-            extract_render = font_normal.render(extract, True, 'gray')
+            extract_render = font_small.render(extract, True, 'gray')
             
             # Calculate the positions of text elements in the middle of the frame
             winning_state_position = (
@@ -581,7 +583,7 @@ def run_race(usermoney, isFullscreen):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
-                    elif event.type == pygame.MOUSEBUTTONDOWN and event.key == 1:
+                    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if close_button_rect.collidepoint(pygame.mouse.get_pos()) and isFullscreen:
                             running = False
 
@@ -618,6 +620,7 @@ def run_race(usermoney, isFullscreen):
             global announce1, announce2, history, blink_timer
             
             # Main game loop
+            pygame.mixer.init()
             clock = pygame.time.Clock()
             running = True
             showOnce = True
@@ -630,8 +633,7 @@ def run_race(usermoney, isFullscreen):
             pygame.mixer.Sound.set_volume(race_noise, 0.15)
             race_noise.play()
             
-            winning_music = (pygame.mixer.Sound("assets/sfx/applause.mp3") if self.players[sel.player - 1].order in (1, 2, 3)
-                                                                else pygame.mixer.Sound("assets/sfx/fail.mp3"))
+            
             
             announce1 = Announcement() 
             announce2 = Announcement()
@@ -645,7 +647,7 @@ def run_race(usermoney, isFullscreen):
                     if event.type == pygame.QUIT:
                         running = False
                         
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.key == 1:
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if close_button_rect.collidepoint(pygame.mouse.get_pos()) and isFullscreen:
                             running = False
                             
@@ -660,7 +662,7 @@ def run_race(usermoney, isFullscreen):
                             
                             return history
                         
-                    if event.key == pygame.K_s and showOnce == False:
+                        if event.key == pygame.K_s and showOnce == False:
                             import convert
                             image_path = "assets/screenshots/screenshot_" + current_time + ".png"
 
@@ -713,13 +715,13 @@ def run_race(usermoney, isFullscreen):
                 if isFullscreen:
                     window.blit(close_button, close_button_rect)
 
+                winning_music = (pygame.mixer.Sound("assets/sfx/applause.mp3") if self.players[sel.player - 1].order in (1, 2, 3)
+                                                                else pygame.mixer.Sound("assets/sfx/fail.mp3"))
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
                     
                     if showOnce:
-                        print(self.players[sel.player - 1].order)
                         print("All players reached the finish line!")
-                        print(self.players[sel.player - 1].order)
                         
                         race_noise.stop()
                         self.firework()
