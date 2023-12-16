@@ -257,7 +257,7 @@ def start_login():
             self.button_faceid = button(self.button_login.x, self.button_login.y + 70, form.width - form.indent*2, 50, DARKBLUE, "Login with Face ID", WHITE, 32, False)
 
             self.pop_fail = login_pop_up("Login failed!", RED, form.x + form.indent, self.button_faceid.y + self.button_faceid.height + 30)
-            self.pop_empty = login_pop_up("Please fill all the space!", NEONPURPLE, form.x + form.indent, self.button_faceid.y + self.button_faceid.height + 30)
+            self.pop_empty = login_pop_up("Please complete all fields", NEONPURPLE, form.x + form.indent, self.button_faceid.y + self.button_faceid.height + 30)
             self.start_time = 0
 
         def validate_login(self, username, password):
@@ -370,9 +370,9 @@ def start_login():
             self.pop_empty = login_pop_up("Enter username!", ORANGE, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_registersuccess = login_pop_up("Account created!", GREEN, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_noface = login_pop_up("No face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
-            self.pop_exist = login_pop_up("User already exist!", PURPLE, form.x + form.width - 330, self.button_register.y - 40)
+            self.pop_exist = login_pop_up("User already existed!", PURPLE, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_loginfail = login_pop_up("User doesn't exist!", NEONGREEN, form.x + form.width - 330, self.button_register.y - 40)
-            self.pop_manyfaces = login_pop_up("So many face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
+            self.pop_manyfaces = login_pop_up("Multiple face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
 
             self.register_clicked = self.login_clicked = False
             self.start_time = 0

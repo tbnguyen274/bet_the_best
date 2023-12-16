@@ -660,22 +660,22 @@ def run_race(usermoney, isFullscreen):
                             
                             return history
                         
-                    if event.key == pygame.K_s and showOnce == False:
-                            import convert
-                            image_path = "assets/screenshots/screenshot_" + current_time + ".png"
+                        if event.key == pygame.K_s and showOnce == False:
+                                import convert
+                                image_path = "assets/screenshots/screenshot_" + current_time + ".png"
 
-                            DATABASE_DIRECTORY = 'db'                   
-                            output_file = os.path.join(DATABASE_DIRECTORY, f"{current_time}.txt")
-                            convert.convert_image_to_text(image_path, output_file)
+                                DATABASE_DIRECTORY = 'db'                   
+                                output_file = os.path.join(DATABASE_DIRECTORY, f"{current_time}.txt")
+                                convert.convert_image_to_text(image_path, output_file)
 
-                            winning_music.stop()
+                                winning_music.stop()
 
-                            history.append(self.players[sel.player - 1].name)
-                            history.append(history_time)
-                            history.append(reward)
-                            print(history)
+                                history.append(self.players[sel.player - 1].name)
+                                history.append(history_time)
+                                history.append(reward)
+                                print(history)
 
-                            return history
+                                return history
 
                 self.finished_players = [player for player in self.players if player.finished]
                 
