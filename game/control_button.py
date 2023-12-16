@@ -640,7 +640,7 @@ class selector:
 
         self.bet_box.draw(screen)
         for box in self.namebox:
-            box.draw(self.screen)
+            box.draw(screen)
         current_money = usermoney
         self.bet_box.validate_input(current_money)
         update_money = font.render(f"You currently have: {current_money}", True, 'black')

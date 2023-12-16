@@ -137,8 +137,8 @@ def run(isFullscreen):
             screen.blit(ground_surface, (0, 500))
 
     def generate_points():
-        random_number_1 = random.randint(100, 500)
-        random_number_2 = random.randint(100, 500)
+        random_number_1 = random.randint(100, 300)
+        random_number_2 = random.randint(100, 300)
 
         # Choose the minimum of the two numbers
         random_number = min(random_number_1, random_number_2)
