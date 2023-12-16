@@ -467,7 +467,7 @@ def run_race(usermoney, isFullscreen):
 
 
         def win_or_lose(self, usermoney):
-            global reward
+            global reward, blink_timer
             bg.draw_background(window)
             
             # Load RankingImg
@@ -514,6 +514,8 @@ def run_race(usermoney, isFullscreen):
             
             total = usermoney + reward
             update_coin = f"Your current coins: {total}"
+            
+            guidance = "Press Space to return to lobby ..."
                        
             font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
             font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
@@ -521,6 +523,7 @@ def run_race(usermoney, isFullscreen):
             winning_state_render = font_big.render(winning_state, True, 'red')
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
             update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
+            guidance_render = font_normal.render(guidance, True, 'gray')
             
             # Calculate the positions of text elements in the middle of the frame
             winning_state_position = (
@@ -538,9 +541,19 @@ def run_race(usermoney, isFullscreen):
                 (frame_height - update_coin_render.get_height()) // 2 + 60
             )
             
+            guidance_position = (
+                (frame_width - guidance_render.get_width()) // 2,
+                (frame_height - guidance_render.get_height()) - 100 
+            )
+            
             frame.blit(winning_state_render, winning_state_position)
             frame.blit(update_bet_render, update_bet_position)
             frame.blit(update_coin_render, update_coin_position)
+            
+            if blink_timer < 2:
+                frame.blit(guidance_render, guidance_position)
+            else:
+                blink_timer = -1
             
             # Calculate the position of the frame on the main window
             frame_rect = frame.get_rect(center=(self.width // 2, self.height // 2))
@@ -602,7 +615,7 @@ def run_race(usermoney, isFullscreen):
 
 
         def run(self, usermoney):
-            global announce1, announce2, history
+            global announce1, announce2, history, blink_timer
             
             # Main game loop
             clock = pygame.time.Clock()
@@ -624,6 +637,8 @@ def run_race(usermoney, isFullscreen):
             announce2 = Announcement()
             
             history = []
+            
+            blink_timer = 0
         
             while running:
                 for event in pygame.event.get():
@@ -697,7 +712,7 @@ def run_race(usermoney, isFullscreen):
                         pygame.time.delay(4000)
                         
                     showOnce = False
-
+                    blink_timer += 1
                     self.win_or_lose(usermoney)
                     
                     if not check_winning_music:
