@@ -400,20 +400,20 @@ def run_race(usermoney, isFullscreen):
         
         
         def show_rankings(self):
-            global history_time
+            global history_time, current_time
             bg.draw_background(window)
 
             # Load RankingImg
             RankingImg = Image.open("assets/BG-pic/leaderboard.png")
 
             # Calculate the dimensions of the frame
-            frame_width = RankingImg.width // 4 + 10
-            frame_height = RankingImg.height // 4 + 10
+            frame_width = RankingImg.width + 10
+            frame_height = RankingImg.height + 10
             frame = pygame.Surface((frame_width, frame_height))
 
             # Calculate the dimensions of the image display area
-            image_width = RankingImg.width // 4
-            image_height = RankingImg.height // 4
+            image_width = RankingImg.width
+            image_height = RankingImg.height
 
             # Resize and center the image
             RankingImg = RankingImg.resize((image_width, image_height), Image.Resampling.LANCZOS)
@@ -438,11 +438,11 @@ def run_race(usermoney, isFullscreen):
                     rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), 'red')
                 else:
                     # Render the text onto a new Surface
-                    rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), (255, 255, 255))
+                    rank_text_surface, rank_text_rect = myfont.render('{0}'.format(player.name), 'black')
 
                 # Calculate the position of the text to center it in the frame
-                rank_text_position = ((frame_width - rank_text_rect.width) // 2, image_rect.top + 197 + i * 55)
-                player_postion = (535, image_rect.top + 185 + i * 55)
+                rank_text_position = ((frame_width - rank_text_rect.width) // 2 + 100, image_rect.top + 252 + i * 55)
+                player_postion = (520, image_rect.top + 244 + i * 55)
 
                 # Draw the text onto the frame
                 frame.blit(rank_text_surface, rank_text_position)
@@ -516,6 +516,7 @@ def run_race(usermoney, isFullscreen):
             update_coin = f"Your current coins: {total}"
             
             guidance = "Press Space to return to lobby ..."
+            extract = "Press s to extract the leaderboard to output.txt"
                        
             font_big = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 50)
             font_normal = pygame.font.Font('assets/font/#9Slide03 Roboto Condensed Bold.ttf', 30)
@@ -524,6 +525,7 @@ def run_race(usermoney, isFullscreen):
             update_bet_render = font_normal.render(update_bet, True, (22, 27, 33))
             update_coin_render = font_normal.render(update_coin, True, (22, 27, 33))
             guidance_render = font_normal.render(guidance, True, 'gray')
+            extract_render = font_normal.render(extract, True, 'gray')
             
             # Calculate the positions of text elements in the middle of the frame
             winning_state_position = (
@@ -546,9 +548,15 @@ def run_race(usermoney, isFullscreen):
                 (frame_height - guidance_render.get_height()) - 100 
             )
             
+            extract_position = (
+                (frame_width - extract_render.get_width()) // 2,
+                (frame_height - extract_render.get_height()) // 2 - 240 
+            )
+            
             frame.blit(winning_state_render, winning_state_position)
             frame.blit(update_bet_render, update_bet_position)
             frame.blit(update_coin_render, update_coin_position)
+            frame.blit(extract_render, extract_position)
             
             if blink_timer < 2:
                 frame.blit(guidance_render, guidance_position)
@@ -644,9 +652,11 @@ def run_race(usermoney, isFullscreen):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                        
                     if event.type == pygame.MOUSEBUTTONDOWN and event.key == 1:
                         if close_button_rect.collidepoint(pygame.mouse.get_pos()) and isFullscreen:
                             running = False
+                            
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and showOnce == False:
                             winning_music.stop()
@@ -656,6 +666,22 @@ def run_race(usermoney, isFullscreen):
                             history.append(reward)
                             print(history)
                             
+                            return history
+                        
+                    if event.key == pygame.K_s and showOnce == False:
+                            import convert
+                            image_path = "assets/screenshots/screenshot_" + current_time + ".png"
+
+                            output_file = "output.txt"
+                            convert.convert_image_to_text(image_path, output_file)
+
+                            winning_music.stop()
+
+                            history.append(self.players[sel.player - 1].name)
+                            history.append(history_time)
+                            history.append(reward)
+                            print(history)
+
                             return history
 
                 self.finished_players = [player for player in self.players if player.finished]
