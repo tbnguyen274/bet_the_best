@@ -3,7 +3,7 @@ import sys
 import random
 from random import choice
 
-def run():
+def run(isFullscreen):
     class Player(pygame.sprite.Sprite):
         def __init__(self):
             super().__init__()
@@ -172,7 +172,12 @@ def run():
     icon = pygame.image.load('./assets/icons/game-icon.png')
     pygame.display.set_icon(icon)
     pygame.display.set_caption('Bet the best')
-    screen = pygame.display.set_mode((1280, 720))
+    width = 1280
+    height = 720
+    if isFullscreen:
+        screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
+    else:
+        screen = pygame.display.set_mode((width, height))
     clock = pygame.time.Clock()
     test_font = pygame.font.Font('assets/font/Pixeltype.ttf', 80)
     game_active = False
@@ -189,7 +194,9 @@ def run():
 
     obstacle_group = pygame.sprite.Group()
 
-
+    close_button = pygame.image.load('assets/icons/close.png')
+    close_button = pygame.transform.scale(close_button, (50, 50))
+    close_button_rect = close_button.get_rect(topleft = (1220, 10))
 
     # Starting and ending screen
     player_stand = pygame.image.load('assets/graphics/Player/player_stand.png').convert_alpha()
@@ -218,7 +225,10 @@ def run():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if close_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    pygame.quit()
+                    exit()
             if game_active:
                 if event.type == obstacle_timer:
                     obstacle_group.add(Obstacle(choice(['fly', 'snail', 'snail', 'snail'])))
@@ -296,6 +306,9 @@ def run():
                 if not fail_sound_play:
                     fail_sound.play()
                     fail_sound_play = True
+        
+        if isFullscreen:
+            screen.blit(close_button, close_button_rect)
 
         pygame.display.update()
         clock.tick(60)

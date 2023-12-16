@@ -8,8 +8,11 @@ WIDTH, HEIGHT = 1280, 720
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Loading Screen")
+from mainmenu import isFullscreen
+if isFullscreen:
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
+else:
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Function to draw loading screen
 def draw_loading_screen(progress):

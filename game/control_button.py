@@ -8,11 +8,19 @@ pygame.init()
 
 exitSelect = False
 running = True
+from mainmenu import isFullscreen
+if isFullscreen:
+    screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)
+else:
+    screen = pygame.display.set_mode((1280, 720))
+close_button = pygame.image.load('assets/icons/close.png')
+close_button = pygame.transform.scale(close_button, (50, 50))
+close_button_rect = close_button.get_rect(topleft = (1220, 10))
+Fullscreen = False
 class VideoPlayer:
     def __init__(self, video_path):
         self.video_capture = cv2.VideoCapture(video_path)
         pygame.init()
-        self.screen = pygame.display.set_mode((1280, 720))
 
     def loop_background(self):
         ret, frame = self.video_capture.read()
@@ -22,7 +30,7 @@ class VideoPlayer:
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb, (1280, 720))
         pygame_frame = pygame.image.frombuffer(frame_resized.tobytes(), frame_resized.shape[1::-1], "RGB")
-        self.screen.blit(pygame_frame, (0, 0))
+        screen.blit(pygame_frame, (0, 0))
 
 
 class ToggleButton:
@@ -258,10 +266,6 @@ class TextInput:
     def naming_character(self):
         return self.text
 
-
-
-WIDTH, HEIGHT = 1280, 720
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 
@@ -269,7 +273,6 @@ class selector:
     def __init__(self):
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((1280, 720))
 
         self.shortRace = ToggleButton2(280, 600, 'assets/icons/buttons/button_short.png')
         self.midRace = ToggleButton2(530, 600, 'assets/icons/buttons/button_medium.png')
@@ -402,6 +405,10 @@ class selector:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and Fullscreen:
+                if close_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    pygame.quit()
+                    sys.exit()
             if self.next.clicked:
 
                 ToggleButton.turn_off_all(self.set1_char)
@@ -486,47 +493,52 @@ class selector:
         if self.check_j:
             ToggleButton.turn_off_all([self.set1, self.set2, self.set5, self.set6, self.set7])
             self.bg_j_loop.loop_background()
-            self.set3.draw(self.screen)
-            self.set4.draw(self.screen)
+            self.set3.draw(screen)
+            self.set4.draw(screen)
         if self.check_g:
             ToggleButton.turn_off_all([self.set1, self.set2, self.set3, self.set4])
             self.bg_g_loop.loop_background()
-            self.set5.draw(self.screen)
-            self.set6.draw(self.screen)
-            self.set7.draw(self.screen)
+            self.set5.draw(screen)
+            self.set6.draw(screen)
+            self.set7.draw(screen)
         if self.check_uw:
             ToggleButton.turn_off_all([self.set3, self.set4, self.set5, self.set6, self.set7])
             self.bg_uw_loop.loop_background()
-            self.set1.draw(self.screen)
-            self.set2.draw(self.screen)
+            self.set1.draw(screen)
+            self.set2.draw(screen)
 
-        self.underwater.draw(self.screen)
-        self.galaxy.draw(self.screen)
-        self.jungle.draw(self.screen)
-        self.longRace.draw(self.screen)
-        self.midRace.draw(self.screen)
-        self.shortRace.draw(self.screen)
-        self.next.draw(self.screen)
-        self.back1.draw(self.screen)
+        self.underwater.draw(screen)
+        self.galaxy.draw(screen)
+        self.jungle.draw(screen)
+        self.longRace.draw(screen)
+        self.midRace.draw(screen)
+        self.shortRace.draw(screen)
+        self.next.draw(screen)
+        self.back1.draw(screen)
         if time.time() - self.popup_time < 1.5:
             popup_surface = pygame.Surface((400, 50), pygame.SRCALPHA)
             popup_surface.fill((255, 255, 255, 160))
             popup_text = pygame.font.Font(None, 40).render(self.popup_message, True, pygame.Color('firebrick2'))
             popup_surface.blit(popup_text, (10, 10))
-            self.screen.blit(popup_surface, (440, 510)) 
+            screen.blit(popup_surface, (440, 510)) 
+        if Fullscreen:
+            screen.blit(close_button, close_button_rect)
 
         pygame.display.update()
         self.clock.tick(60)
 
 
     def select_player_n_bet(self, usermoney):
-        pygame.surface.Surface.fill(self.screen, 'white')
+        pygame.surface.Surface.fill(screen, 'white')
         self.state = 2
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if close_button_rect.collidepoint(pygame.mouse.get_pos()) and Fullscreen:
+                    pygame.quit()
+                    sys.exit()
             for box in self.namebox:
                 box.handle_event(event)
                 
@@ -551,59 +563,59 @@ class selector:
             self.bg_j_loop.loop_background()
             if self.activated_buttons[1] == 'set3':
                 for b in self.set3_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
             elif self.activated_buttons[1] == 'set4':
                 for b in self.set4_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
 
         elif self.activated_buttons[0] == 'underwater':
             self.bg_uw_loop.loop_background()
             if self.activated_buttons[1] == 'set2':
                 for b in self.set2_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
             elif self.activated_buttons[1] == 'set1':
                 for b in self.set1_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
 
         elif self.activated_buttons[0] == 'galaxy':
             self.bg_g_loop.loop_background()
             if self.activated_buttons[1] == 'set5':
                 for b in self.set5_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
             if self.activated_buttons[1] == 'set6':
                 for b in self.set6_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
             if self.activated_buttons[1] == 'set7':
                 for b in self.set7_char:
-                    b.draw(self.screen)
+                    b.draw(screen)
 
         for box in self.namebox:
-            box.draw(self.screen)
+            box.draw(screen)
 
         for i in range(1, 7):
             self.char_dict[i] = self.namebox[i - 1].naming_character()
 
         
 
-        self.next1.draw(self.screen)
+        self.next1.draw(screen)
 
 
-        pygame.draw.rect(self.screen, 'white', (320, 425, 640, 170), border_radius=20)
+        pygame.draw.rect(screen, 'white', (320, 425, 640, 170), border_radius=20)
 
         font = pygame.font.Font(None, 60)
 
-        self.bet_box.draw(self.screen)
+        self.bet_box.draw(screen)
         current_money = usermoney
         self.bet_box.validate_input(current_money)
         update_money = font.render(f"You currently have: {current_money}", True, 'black')
-        self.screen.blit(update_money, (350, 440))
+        screen.blit(update_money, (350, 440))
         instruction_text = font.render("Bet: ", True, 'black')
         screen.blit(instruction_text, (350, 495))  # Điều chỉnh vị trí hiển thị hướng dẫn
 
         
         
 
-        self.back.draw(self.screen)
+        self.back.draw(screen)
         if self.back.clicked:
             print("back")
             self.state = 1
@@ -631,15 +643,23 @@ class selector:
                 
             elif self.bet_box.text != "" and all(self.char_dict.values()):
                 self.state = 3
-
+        if Fullscreen:
+            screen.blit(close_button, close_button_rect)
 
         
         pygame.display.update()
         self.clock.tick(60)
 
 sel = selector()
-def run_test(usermoney):
-    global running, exitSelect
+def run_test(usermoney, isFullscreen):
+    global screen, Fullscreen
+    global running, exitSelect, close_button, close_button_rect
+    if isFullscreen:
+        screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)
+        Fullscreen = True
+    else:
+        screen = pygame.display.set_mode((1280, 720))
+        Fullscreen = False
     exitSelect = False
     sel.state = 1
     while running:
@@ -652,9 +672,9 @@ def run_test(usermoney):
             import loading
             loading.run(2)
             import speed
-            return speed.run_race(usermoney)
+            return speed.run_race(usermoney, isFullscreen)
         if exitSelect:
-            return ["","", 0]
+            return ["","", 0]      
 
 if __name__ == '__main__':
     run_test(1000)

@@ -6,13 +6,19 @@ import time
 from PIL import Image
 from control_button import sel, run_test
 from firework import BulletFlyUp, FireWork, Random
-import mainmenu
 
-def run_race(usermoney):
+def run_race(usermoney, isFullscreen):
     # Set up display
     width, height = 1280, 720
-    window = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Bet the Best - Racing Game")
+    if isFullscreen:
+        window = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
+    else:
+        window = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Bet the Best - Racing Game")
+    
+    close_button = pygame.image.load('assets/icons/close.png')
+    close_button = pygame.transform.scale(close_button, (50, 50))
+    close_button_rect = close_button.get_rect(topleft = (1220, 10))
 
     class Background:
         def __init__(self, width, height):
@@ -562,6 +568,9 @@ def run_race(usermoney):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                    elif event.type == pygame.MOUSEBUTTONDOWN and event.key == 1:
+                        if close_button_rect.collidepoint(pygame.mouse.get_pos()) and isFullscreen:
+                            running = False
 
                 bg.draw_background(window)
                 self.draw_players()                
@@ -581,6 +590,9 @@ def run_race(usermoney):
                 else:
                     pygame.time.delay(800) # delay 0.5s
                     return self.run(usermoney)  # start run() - main game
+
+                if isFullscreen:
+                    window.blit(close_button, close_button_rect)
 
                 pygame.display.update()
             
@@ -617,6 +629,9 @@ def run_race(usermoney):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.key == 1:
+                        if close_button_rect.collidepoint(pygame.mouse.get_pos()) and isFullscreen:
+                            running = False
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and showOnce == False:
                             winning_music.stop()
@@ -661,6 +676,9 @@ def run_race(usermoney):
                 announce1.draw_power_up()
                 announce2.draw_finish()
                 
+                if isFullscreen:
+                    window.blit(close_button, close_button_rect)
+
                 # Check for winners
                 if len(self.finished_players) == self.num_players:
                     

@@ -38,7 +38,12 @@ def update_history_values(username, new_history_value):
             # Save the updated data to the database
             save_to_database(user_data)
 
+isFullscreen = False
+close_button = pygame.image.load('assets/icons/close.png')
+close_button = pygame.transform.scale(close_button, (50, 50))
+close_button_rect = close_button.get_rect(topleft = (1220, 10))
 def mainmenu(loggedinuser):
+    global isFullscreen, close_button, close_button_rect
     pygame.init()
     username = loggedinuser
     user_coin = json.load(open(DATABASE,"r"))[username].get('coin')
@@ -100,6 +105,8 @@ def mainmenu(loggedinuser):
             self.x = x
             self.y = y
             self.image = pygame.transform.scale(self.image,(int(self.width*scale), int(self.height*scale)))
+            self.width = self.image.get_width()
+            self.height = self.image.get_height()
             self.image_rect = self.image.get_rect(topleft = (x, y))
             self.clicked = False
             self.hover_image = self.hover_effect(self.image)  # Tạo hình ảnh sậm đi khi nút được nhấn
@@ -258,10 +265,10 @@ def mainmenu(loggedinuser):
                 if pygame.mouse.get_pressed()[0] == 0:
                     self.clicked = False
         def disable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
         
         def enable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
 
         def run(self):
             if self.display:
@@ -413,10 +420,10 @@ def mainmenu(loggedinuser):
                 history5_3.display()
 
         def disable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
         
         def enable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
         
         def run(self):
             if self.display:
@@ -463,10 +470,10 @@ def mainmenu(loggedinuser):
             
 
         def disable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
         
         def enable_buttons(self):
-            button_credit.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
 
         def run(self):
             if self.display:
@@ -484,6 +491,55 @@ def mainmenu(loggedinuser):
             elif not history.display:
                 self.enable_buttons()
 
+    class setting():
+        def __init__(self):
+            self.display = False
+            self.Fullscreen = False
+
+            self.width = 570
+            self.height = int(self.width*545/620)
+            self.x = (WINDOW_WIDTH - self.width)//2
+            self.y = (WINDOW_HEIGHT - self.height)//2
+            self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
+            self.frame = pygame.image.load('assets/icons/frame3.png')
+            self.frame = pygame.transform.scale(self.frame, (600,int(600*545/620)))
+            self.frame_rect = self.frame.get_rect(center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
+            self.background = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+            self.background.fill((0,0,0,170))
+
+            self.big_font = pygame.font.Font(None, 80)
+            self.normal_font = pygame.font.Font(None, 50)
+
+            self.label = self.big_font.render('SETTING', True, (0,0,0))
+            self.label_rect = self.label.get_rect(topleft = (self.x + (self.width - self.label.get_width())//2, self.y + 50))
+
+            self.fullscreen_label = self.normal_font.render('Window size:', True, (68, 80, 105))
+            self.fullscreen_label_rect = self.fullscreen_label.get_rect(topleft = (self.x + (self.width - self.fullscreen_label.get_width())//2, self.y + self.width//2 - 100))
+
+            self.button_fullscreen = button(self.x + 40, self.y + self.width//2 - 30, 'assets/icons/buttons/fullscreen.png', 0.7, True)
+            self.button_windowed = button(self.button_fullscreen.x + self.button_fullscreen.width + 30, self.y + self.width//2 - 30, 'assets/icons/buttons/windowed.png', 0.7, True)
+        
+        def disable_buttons(self):
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = False
+        
+        def enable_buttons(self):
+            button_setting.clickable = button_help.clickable = button_history.clickable = button_logout.clickable = button_minigame.clickable = button_play.clickable = True
+
+        def run(self):
+            if self.display:
+                window.blit(self.background, (0,0))
+                pygame.draw.rect(window, (221, 230, 237), self.rect)
+                window.blit(self.frame, self.frame_rect)
+
+                window.blit(self.label, self.label_rect)
+                window.blit(self.fullscreen_label, self.fullscreen_label_rect)
+                self.button_fullscreen.display()
+                self.button_windowed.display()
+                self.disable_buttons()
+            elif not help.display and not avatar_selection.display and not history.display:
+                self.enable_buttons()
+            
+
 
 
     background = background()
@@ -492,13 +548,14 @@ def mainmenu(loggedinuser):
 
     button_play = button(740,170,'./assets/icons/buttons/play.png',1, True)
     button_minigame = button(740,170,'./assets/icons/buttons/minigame.png',1, False)
-    button_credit = button(740,390,'./assets/icons/buttons/credit.png',1, True)
+    button_setting = button(740,390,'./assets/icons/buttons/setting.png',1, True)
     button_history = button(740,280,'./assets/icons/buttons/history.png',1, True)
     button_help = button(740,500,'./assets/icons/buttons/help.png',1, True)
     button_logout = button(740,610,'./assets/icons/buttons/logout.png',1, True)
     history = history()
     help = help_page()
     avatar_selection = avatar_select()
+    setting = setting()
 
     def GUI():
         background.display()
@@ -506,23 +563,25 @@ def mainmenu(loggedinuser):
         user_status.display()
 
         if user_status.coin < 100:
-            user_status.tips_index = 1
             button_minigame.visible = True
             button_play.visible = False
         else:
             button_minigame.visible = False
             button_play.visible = True
-            user_status.tips_index = 2
 
         button_minigame.display()          
         button_play.display()
-        button_credit.display()
+        button_setting.display()
         button_history.display()
         button_help.display()
         button_logout.display()
         history.run()
         help.run()
         avatar_selection.run()
+        setting.run()
+
+        if isFullscreen:
+            window.blit(close_button, close_button_rect)
 
     while isRunning:
         pygame.time.Clock().tick(60)
@@ -535,7 +594,11 @@ def mainmenu(loggedinuser):
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mousepos = pygame.mouse.get_pos()
-                if button_logout.image_rect.collidepoint(mousepos) and button_logout.clickable:
+                if close_button_rect.collidepoint(mousepos) and isFullscreen:
+                    save_coins(username, user_coin)
+                    pygame.quit()
+                    sys.exit()
+                elif button_logout.image_rect.collidepoint(mousepos) and button_logout.clickable:
                     pygame.mixer.music.stop()
                     save_coins(username, user_coin)
                     loading.run(4)
@@ -544,12 +607,23 @@ def mainmenu(loggedinuser):
                     pygame.mixer.music.stop()
                     loading.run(3)
                     import minigame
-                    user_coin += minigame.run()
+                    user_coin += minigame.run(isFullscreen)
                     save_coins(username, user_coin)
+                elif button_setting.image_rect.collidepoint(mousepos) and button_setting.visible and button_setting.clickable:
+                    setting.display = True
+                elif not setting.rect.collidepoint(mousepos) and setting.display == True and not button_setting.clickable:
+                    setting.display = False
+                elif setting.display:
+                    if setting.button_fullscreen.image_rect.collidepoint(mousepos):
+                        window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.FULLSCREEN)
+                        isFullscreen = True
+                    elif setting.button_windowed.image_rect.collidepoint(mousepos):
+                        window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+                        isFullscreen = False
                 elif button_play.image_rect.collidepoint(mousepos) and button_play.visible and button_play.clickable:
                     import control_button
                     pygame.mixer.music.stop()
-                    new_value = control_button.run_test(user_coin)
+                    new_value = control_button.run_test(user_coin, isFullscreen= isFullscreen)
                     if new_value == ["","",0]:
                         pass
                     else:
