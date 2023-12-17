@@ -156,7 +156,7 @@ def run_race(usermoney, isFullscreen):
         def draw_power_up(self):
             board_1 = pygame.Rect(310, 15, 660, 50)     
             pygame.Surface.fill(window, (248,248,255), board_1)
-            pygame.draw.rect(window, (30,144,255),board_1 , 3)
+            pygame.draw.rect(window, 'red',board_1 , 5)
 
             if self.announce_render is not None and self.announce_position is not None:
                 window.blit(self.announce_render, self.announce_position)
@@ -164,7 +164,7 @@ def run_race(usermoney, isFullscreen):
         def draw_finish(self):
             board_2 = pygame.Rect(310, 66, 660, 50)
             pygame.Surface.fill(window, (22, 27, 33), board_2)
-            pygame.draw.rect(window, (30,144,255),board_2 , 3)
+            pygame.draw.rect(window, 'red',board_2 , 5)
             
             if self.announce_render is not None and self.announce_position is not None:
                 window.blit(self.announce_render, self.announce_position)
