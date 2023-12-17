@@ -404,6 +404,7 @@ class selector:
     def select_bgnset(self):
         global exitSelect
         self.state = 1
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -465,7 +466,7 @@ class selector:
                     self.popup_message = "  Please choose all options"
                     self.popup_time = time.time()
                 else:
-                    time.sleep(0.1)
+                    #time.sleep(0.1)
                     self.check_next = True  # Mark as next clicked
                     self.state = 2
                     
@@ -593,7 +594,7 @@ class selector:
 
             if self.back.clicked:
                 print("back")
-                time.sleep(0.1)
+                #time.sleep(0.1)
                 self.state = 1
         
         if self.activated_buttons[0] == 'jungle':
@@ -669,11 +670,16 @@ def run_test(usermoney, isFullscreen):
         Fullscreen = False
     exitSelect = False
     sel.state = 1
+    
     while running:
         if sel.state == 1:
             sel.select_bgnset()
         elif sel.state == 2:
             sel.select_player_n_bet(usermoney)
+            ToggleButton.turn_off_all([sel.set1, sel.set2, sel.set3, sel.set4,
+                                sel.set5, sel.set6, sel.set7,
+                                sel.underwater, sel.jungle, sel.galaxy])
+            ToggleButton2.turn_off_all([sel.midRace, sel.longRace, sel.shortRace])
         else:
             sel.state = 1
             import loading
