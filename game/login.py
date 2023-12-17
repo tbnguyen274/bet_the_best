@@ -566,8 +566,8 @@ def start_login():
             return re.match(pattern, email)
 
         def send_email_notification(self, receiver_email, username):
-            sender_email = 'betthebestn0reply@hotmail.com'
-            password = 'Bestthebestmailsender'
+            sender_email = 'Betthebest4@outlook.com'
+            password = 'Kheuocacquy'
             smtp_server = 'smtp.office365.com'
             smtp_port = 587
 
