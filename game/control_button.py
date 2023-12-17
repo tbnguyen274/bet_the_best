@@ -293,46 +293,46 @@ class selector:
         self.bet_box = TextInput(450, 495, 200, 35, 35, 'grey70', 'grey80', 'black')
         self.bet = 0
         #uw la underwater, j la jungle, g la galaxy
-        self.set1 = ToggleButton(450, 330, 'assets/sets/Set 1/1.png', 0.3)
-        self.set2 = ToggleButton(640, 330, 'assets/sets/Set 2/1.png', 0.3)
-        self.set3 = ToggleButton(470, 330, 'assets/sets/Set 3/1.png', 0.3)
-        self.set4 = ToggleButton(660, 360, 'assets/sets/Set 4/1.png', 0.3)
+        self.set1 = ToggleButton(450, 330, 'assets/sets/Set 1/1.png', 0.2)
+        self.set2 = ToggleButton(700, 330, 'assets/sets/Set 2/1.png', 0.2)
+        self.set3 = ToggleButton(410, 365, 'assets/sets/Set 3/1.png', 0.43)
+        self.set4 = ToggleButton(660, 360, 'assets/sets/Set 4/1.png', 0.4)
         self.set5 = ToggleButton(370, 330, 'assets/sets/Set 5/1.png', 0.3)
         self.set6 = ToggleButton(560, 330, 'assets/sets/Set 6/1.png', 0.3)
         self.set7 = ToggleButton(770, 330, 'assets/sets/Set 7/2.png', 0.3)
 
         self.set1_char = [
-            ToggleButton(20, 130, 'assets/sets/Set 1/1.png', 0.22),
-            ToggleButton(210, 130, 'assets/sets/Set 1/2.png', 0.22),
-            ToggleButton(460, 130, 'assets/sets/Set 1/3.png', 0.22),
-            ToggleButton(650, 130, 'assets/sets/Set 1/4.png', 0.22),
-            ToggleButton(850, 130, 'assets/sets/Set 1/5.png', 0.22),
-            ToggleButton(1050, 130, 'assets/sets/Set 1/6.png', 0.22),
+            ToggleButton(20, 130, 'assets/sets/Set 1/1.png', 0.17),
+            ToggleButton(220, 130, 'assets/sets/Set 1/2.png', 0.17),
+            ToggleButton(440, 130, 'assets/sets/Set 1/3.png', 0.17),
+            ToggleButton(650, 130, 'assets/sets/Set 1/4.png', 0.17),
+            ToggleButton(850, 130, 'assets/sets/Set 1/5.png', 0.17),
+            ToggleButton(1050, 130, 'assets/sets/Set 1/6.png', 0.17),
         ]
         self.set2_char = [
-            ToggleButton(20, 130, 'assets/sets/Set 2/1.png', 0.2),
-            ToggleButton(210, 130, 'assets/sets/Set 2/2.png', 0.2),
-            ToggleButton(440, 130, 'assets/sets/Set 2/3.png', 0.2),
-            ToggleButton(660, 130, 'assets/sets/Set 2/4.png', 0.2),
-            ToggleButton(800, 130, 'assets/sets/Set 2/5.png', 0.2),
-            ToggleButton(1030, 130, 'assets/sets/Set 2/6.png', 0.2),
+            ToggleButton(40, 130, 'assets/sets/Set 2/1.png', 0.27),
+            ToggleButton(230, 130, 'assets/sets/Set 2/2.png', 0.27),
+            ToggleButton(460, 130, 'assets/sets/Set 2/3.png', 0.27),
+            ToggleButton(650, 130, 'assets/sets/Set 2/4.png', 0.27),
+            ToggleButton(830, 130, 'assets/sets/Set 2/5.png', 0.27),
+            ToggleButton(1030, 130, 'assets/sets/Set 2/6.png', 0.27),
         ]
 
         self.set3_char = [
-            ToggleButton(50, 130, 'assets/sets/Set 3/1.png', 0.3),
-            ToggleButton(250, 130, 'assets/sets/Set 3/2.png', 0.3),
-            ToggleButton(450, 130, 'assets/sets/Set 3/3.png', 0.3),
-            ToggleButton(680, 130, 'assets/sets/Set 3/4.png', 0.3),
-            ToggleButton(850, 130, 'assets/sets/Set 3/5.png', 0.3),
-            ToggleButton(1050, 130, 'assets/sets/Set 3/6.png', 0.3),
+            ToggleButton(50, 190, 'assets/sets/Set 3/1.png', 0.3),
+            ToggleButton(250, 190, 'assets/sets/Set 3/2.png', 0.3),
+            ToggleButton(450, 190, 'assets/sets/Set 3/3.png', 0.3),
+            ToggleButton(660, 190, 'assets/sets/Set 3/4.png', 0.3),
+            ToggleButton(850, 190, 'assets/sets/Set 3/5.png', 0.3),
+            ToggleButton(1050, 190, 'assets/sets/Set 3/6.png', 0.3),
         ]
         self.set4_char = [
-            ToggleButton(50, 130, 'assets/sets/Set 4/1.png', 0.3),
-            ToggleButton(250, 130, 'assets/sets/Set 4/2.png', 0.3),
-            ToggleButton(450, 130, 'assets/sets/Set 4/3.png', 0.3),
-            ToggleButton(650, 130, 'assets/sets/Set 4/4.png', 0.3),
-            ToggleButton(850, 130, 'assets/sets/Set 4/5.png', 0.3),
-            ToggleButton(1050, 130, 'assets/sets/Set 4/6.png', 0.2),
+            ToggleButton(50, 160, 'assets/sets/Set 4/1.png', 0.3),
+            ToggleButton(250, 160, 'assets/sets/Set 4/2.png', 0.3),
+            ToggleButton(450, 160, 'assets/sets/Set 4/3.png', 0.3),
+            ToggleButton(630, 160, 'assets/sets/Set 4/4.png', 0.3),
+            ToggleButton(850, 160, 'assets/sets/Set 4/5.png', 0.3),
+            ToggleButton(1050, 160, 'assets/sets/Set 4/6.png', 0.3),
 
         ]
         self.set5_char = [
