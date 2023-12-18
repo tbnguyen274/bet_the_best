@@ -672,4 +672,4 @@ if __name__ == "__main__":
     # Initialize Pygame
     pygame.init()
     pygame.mixer.init()
-    mainmenu("bew")
+    mainmenu("test")

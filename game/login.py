@@ -372,7 +372,7 @@ def start_login():
             self.pop_noface = login_pop_up("No face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_exist = login_pop_up("User already existed!", PURPLE, form.x + form.width - 330, self.button_register.y - 40)
             self.pop_loginfail = login_pop_up("User doesn't exist!", NEONGREEN, form.x + form.width - 330, self.button_register.y - 40)
-            self.pop_manyfaces = login_pop_up("Multiple face detected!", RED, form.x + form.width - 330, self.button_register.y - 40)
+            self.pop_manyfaces = login_pop_up("Multiple faces detected!" , RED, form.x + form.width - 330, self.button_register.y - 40)
 
             self.register_clicked = self.login_clicked = False
             self.start_time = 0
